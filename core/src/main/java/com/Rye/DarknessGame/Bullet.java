@@ -78,8 +78,8 @@ public class Bullet {
 
         shapeRenderer.setProjectionMatrix(player.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(226 / 255f, 88 / 255f, 34 / 255f, .1f);
-        shapeRenderer.circle((float) posX, (float) posY, 15);
+        shapeRenderer.setColor(255/ 255f, 255/ 255f, 0 / 255f, 1f);
+        shapeRenderer.circle((float) posX, (float) posY, 10);
         shapeRenderer.end();
 
         checkForWall();

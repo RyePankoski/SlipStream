@@ -22,12 +22,12 @@ TODO: Fix the point out front problem for the bullet.
 TODO: Add laser gun; Battery drained less is laser shorter (based on mouse pos);
 TODO: Add blur around lights & RayTrace other light sources.
 
+
 11/17/2024
 TIER 1:
-
 TODO: Add way to switch between scenes.
 TODO: Settings, Options, Doors, Player Health, LOS, PathFinding, Drop Weapons/Tools
-
+TODO: Make bullets ray cast.
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
 TODO: Tasks, Key-rebinds
@@ -39,6 +39,7 @@ TODO: ship hazards (exposed wiring, fires, leaking conduits, no o2, etc,)
 TODO: Power-Routing (power cables,) Alien Sabotage, Shield Generator, Different States of Ship disrepair, , Different Ship Contexts
 TODO: Co-op, Tweak variables of monster AI
 TODO:Make it so the camera cant see through walls... gulp...
+
 
 
 

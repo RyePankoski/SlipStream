@@ -43,7 +43,7 @@ public class DarknessLayer implements Screen {
         lightBufferRegion.flip(false, true);
     }
 
-    public void bulletStrike(boolean tf, double bullX, double bullY,double strikeSize){
+    public void bulletStrike(boolean tf, double bullX, double bullY, double strikeSize) {
         bulletStrike = tf;
         this.bullX = bullX;
         this.bullY = bullY;
@@ -65,51 +65,65 @@ public class DarknessLayer implements Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         lightCone = player.lightCone();
 
-        if (bulletStrike){
+        if (bulletStrike) {
             bulletStrike = false;
-            shapeRenderer.setColor(255/255f, 255/255f, 0/255f, (float)strikeSize/300);
-            shapeRenderer.circle((float)bullX, (float)bullY, (float)strikeSize);
+            shapeRenderer.setColor(255 / 255f, 255 / 255f, 0 / 255f, (float) strikeSize / 300);
+            shapeRenderer.circle((float) bullX, (float) bullY, (float) strikeSize);
         }
 
         float battery = (float) player.getBattery();
+
+        lightVertices = player.rayCast(1000, 160, (int) (player.getFacingAngle()));
+
 
         int totalFlashFrames = 13;
         if (justFired && !justFlashed) {
             justFlashed = true;
             justFired = false;
             flashFramesRemaining = totalFlashFrames;
+
         }
 
         if (flashFramesRemaining > 0) {
             float alpha = flashFramesRemaining / (float) totalFlashFrames; // Fading effect
             shapeRenderer.setColor(1f, 1f, 0f, alpha); // Yellow flash with fading alpha
-            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 1000);
+
+
+            for (int i = 0; i < lightVertices.length - 2; i += 2) {
+                shapeRenderer.triangle(
+                    (float)player.pointInFrontVector[0], (float)player.pointInFrontVector[1],     // First point (center)
+                    lightVertices[i], lightVertices[i + 1],   // Second point
+                    lightVertices[i + 2], lightVertices[i + 3] // Third point
+                );
+            }
 
             flashFramesRemaining--;
-
             if (flashFramesRemaining == 0) {
                 justFlashed = false;
             }
         }
 
         if (player.getFlashLight()) {
-            if (battery > 20){
+            if (battery > 20) {
                 ambientLight = 20;
                 brightness = 100;
             } else if (battery < 20 && player.getFlashLight()) {
-                if (brightness > battery){
+                if (brightness > battery) {
                     brightness -= .5;
                 }
             }
-            if(brightness < 20){
+            if (brightness < 20) {
                 ambientLight = brightness;
             }
 
 
-            shapeRenderer.setColor(1, 1, 1, (float)ambientLight/100 + .1f);
+            shapeRenderer.setColor(1, 1, 1, (float) ambientLight / 100 + .1f);
+
+
             shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 200);
-            lightVertices = player.shapeVerticies;
-            shapeRenderer.setColor(1, 1, 1, (float)brightness/100 + .1f);
+
+            lightVertices = player.rayCast(1800, 20, (int) player.getFacingAngle());
+            shapeRenderer.setColor(1, 1, 1, (float) brightness / 100 + .1f);
 
             for (int i = 0; i < lightVertices.length - 2; i += 2) {
                 shapeRenderer.triangle(
@@ -125,8 +139,8 @@ public class DarknessLayer implements Screen {
         }
 
         shapeRenderer.end();
-
         lightBuffer.end();
+
         batch.begin();
         batch.setProjectionMatrix(camera.combined);
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

@@ -68,13 +68,13 @@ public class Hud {
         bitmapFont.draw(spriteBatch, staminaValue, camera.position.x + 500, (float) (camera.position.y + cameraZoom / 2 - 70));
 
         flashlightBattery = Math.ceil(flashlightBattery);
-        flashlightBatteryString = String.valueOf(flashlightBattery);
+        flashlightBatteryString = String.valueOf((int)flashlightBattery);
 
         redTotal = Math.min(255, 2 * (1 - (flashlightBattery/100)) * 255);
         greenTotal = 255 - Math.max(0,(1 - (2 * (flashlightBattery/100))) * 255);
 
         bitmapFont.setColor((float)redTotal/255,(float)greenTotal/255,0,1f);
-        bitmapFont.draw(spriteBatch, flashlightBatteryString, camera.position.x - 600, (float) (camera.position.y + cameraZoom / 2 - 180));
+        bitmapFont.draw(spriteBatch, flashlightBatteryString + "%", camera.position.x - 600, (float) (camera.position.y + cameraZoom / 2 - 180));
 
         spriteBatch.end();
     }

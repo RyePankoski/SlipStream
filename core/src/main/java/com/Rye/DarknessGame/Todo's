@@ -1,0 +1,53 @@
+TODOd: Add Menu Scene
+TODOd: Maybe add shooting? Totally smoke and mirrors at this point.
+TODOd: Fix camera so it doesn't go off the boundaries of the map.
+
+11/16/2024
+TODOd: Finally implement walls?
+TODOd: Fix Collision
+TODOd: Ask Xacor about the stamina counter in child weapon class. Note: I got it myself
+TODOd:Ask Xacor about the reload time. Note: Also got this myself.
+TODOd: Add walls around levels that are rendered.
+TODOd: Flashlight
+TODOd: Look into shaders more.
+
+-----------------
+
+TODO: More cleanup across the board. This is super important. Get help for code review.
+TODO: Look into TILE level editor.
+TODO: Aiming?
+TODO:Layer Manager
+TODO: Rework point in front so it can take a length argument.
+TODO: Fix the point out front problem for the bullet.
+TODO: Add laser gun; Battery drained less is laser shorter (based on mouse pos);
+TODO: Add blur around lights & RayTrace other light sources.
+
+11/17/2024
+TIER 1:
+
+TODO: Add way to switch between scenes.
+TODO: Settings, Options, Doors, Player Health, LOS, PathFinding, Drop Weapons/Tools
+
+TIER 2:
+TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
+TODO: Tasks, Key-rebinds
+TIER 3:
+TODO: Tools(Traps, Deployable Lights,) Parts,  More Guns (LaserGun,)
+TODO: Monster AI,
+TIER 4:
+TODO: ship hazards (exposed wiring, fires, leaking conduits, no o2, etc,)
+TODO: Power-Routing (power cables,) Alien Sabotage, Shield Generator, Different States of Ship disrepair, , Different Ship Contexts
+TODO: Co-op, Tweak variables of monster AI
+TODO:Make it so the camera cant see through walls... gulp...
+
+
+
+
+Power Routing:
+    Power is typically routed through walls etc. So sometimes to make a repair you may need to use deployable cables to link parts of the ship to power.
+Alien Sabotage:
+    Alien can only sabotage "unprotected" repair tasks.
+Ship Contexts:
+    Ship might exist in different physical spaces.
+    The ship may need point defense to protect against asteroids, emc if going through interstellar space at relativistic speeds, orbiting a star (radiation shielding.)
+

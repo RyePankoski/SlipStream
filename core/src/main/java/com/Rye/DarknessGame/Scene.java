@@ -39,15 +39,22 @@ public class Scene {
         this.room = roomManager.getRooms().get(0);
         this.image = room.getImage();
 
-        batch.begin();
-//        for (float x = 0; x < room.getWidth(); x += image.getWidth()) {
-//            for (float y = 0; y < room.getHeight(); y += image.getHeight()) {
-//                batch.draw(image, x, y);
-//            }
-//        }
 
-        batch.draw(image,0,0);
+        batch.begin();
+        batch.setProjectionMatrix(projection);
+
+        batch.draw(image,
+            (int)(player.getCoorX() - player.cameraZoom/2),  // Screen X (centered on player)
+            (int)(player.getCoorY() - player.cameraZoom/2),  // Screen Y (centered on player)
+            (int)player.cameraZoom,                          // Width to draw on screen
+            (int)player.cameraZoom,                          // Height to draw on screen
+            (int)(player.getCoorX() - player.cameraZoom/2),  // Start X in texture
+            (int)(image.getHeight() - (player.getCoorY() + player.cameraZoom/2)),  // Start Y in texture, flipped
+            (int)player.cameraZoom,                          // Width of texture region
+            (int)player.cameraZoom,                          // Height of texture region
+            false, false);                                   // No flipping needed anymore
         batch.end();
+
         soundPlayer.playSound(stageName, ambience);
     }
 }

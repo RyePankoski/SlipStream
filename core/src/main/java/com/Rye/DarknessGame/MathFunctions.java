@@ -66,7 +66,6 @@ public class MathFunctions {
             shapeVertices[2 * (verticesIndex) + 1] = (float) y1;
             verticesIndex++;
         }
-
         return  shapeVertices;
     }
 }

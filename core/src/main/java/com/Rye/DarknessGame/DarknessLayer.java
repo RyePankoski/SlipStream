@@ -11,16 +11,18 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+
 public class DarknessLayer implements Screen {
     // Constants
-    private static final int FLASH_TOTAL_FRAMES = 12;
-    private static final float AMBIENT_ALPHA = 0.07f;
-    private static final float DARKNESS_ALPHA = 0.97f;
+    private static final int FLASH_TOTAL_FRAMES = 8;
+    private static final float AMBIENT_ALPHA = 0.021f;
+    private static final float DARKNESS_ALPHA = 1f;
     private static final float MIN_BATTERY_THRESHOLD = 20f;
     private static final float BRIGHTNESS_DECAY_RATE = 0.5f;
     private static final float BASE_LIGHT_RADIUS = 200f;
-    private static final int RAYCAST_DISTANCE = 1800;
-    private static final int RAYCAST_RAYS = 20;
+    private static final int RAYCAST_DISTANCE = 1300;
+    private static final int RAYCAST_RAYS = 15;
 
     // Rendering components
     private final SpriteBatch batch;
@@ -34,9 +36,10 @@ public class DarknessLayer implements Screen {
     private final LightState lightState;
     private final FlashState flashState;
     private final BulletStrikeState bulletStrikeState;
+    ArrayList<StaticLightSource> staticLights;
 
 
-    public DarknessLayer(Player player) {
+    public DarknessLayer(Player player, ArrayList<StaticLightSource> lights) {
         this.player = player;
         this.camera = player.getCamera();
         this.batch = new SpriteBatch();
@@ -44,6 +47,7 @@ public class DarknessLayer implements Screen {
         this.lightState = new LightState();
         this.flashState = new FlashState();
         this.bulletStrikeState = new BulletStrikeState();
+        this.staticLights = lights;
 
         initializeLightBuffer();
     }
@@ -60,6 +64,7 @@ public class DarknessLayer implements Screen {
     @Override
     public void render(float delta) {
         beginLightBufferRendering();
+        renderStaticLights();
         renderLightEffects();
         endLightBufferRendering();
     }
@@ -67,7 +72,7 @@ public class DarknessLayer implements Screen {
     private void beginLightBufferRendering() {
         lightBuffer.begin();
 
-        if(player.playerHurt){
+        if (player.playerHurt) {
             player.playerHurt = false;
             Gdx.gl.glClearColor(.2f, 0, 0, DARKNESS_ALPHA);
         } else {
@@ -80,6 +85,31 @@ public class DarknessLayer implements Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
     }
 
+    public void renderStaticLights() {
+        shapeRenderer.setColor(1, 1, 1, (float) lightState.getBrightness() / 100 + 0.1f);
+
+        System.out.println("Number of static lights: " + staticLights.size());
+        for (int i = 0; i < staticLights.size(); i++) {
+            StaticLightSource light = staticLights.get(i);
+
+            // Debug print for each light
+            System.out.println("Light " + i + ":");
+            System.out.println("  X: " + light.getX());
+            System.out.println("  Y: " + light.getY());
+
+            float[] vertices = light.getVertices();
+            System.out.println("  Vertices length: " + vertices.length);
+
+            // Print first few vertices
+            for (int j = 0; j < Math.min(vertices.length, 6); j += 2) {
+                System.out.println("  Vertex " + (j / 2) + ": (" + vertices[j] + ", " + vertices[j + 1] + ")");
+            }
+
+            shapeRenderer.setColor(1, 1, 1, light.brightness);
+            renderLightTriangles(light.getVertices(), light.getX(), light.getY());
+        }
+    }
+
     private void renderLightEffects() {
         if (bulletStrikeState.isActive()) {
             renderBulletStrike();
@@ -88,6 +118,16 @@ public class DarknessLayer implements Screen {
             renderFlashEffect();
         }
         renderPlayerLight();
+    }
+
+    private void renderLightTriangles(float[] vertices, double centerX, double centerY) {
+        for (int i = 0; i < vertices.length - 2; i += 2) {
+            shapeRenderer.triangle(
+                (float) centerX, (float) centerY,
+                vertices[i], vertices[i + 1],
+                vertices[i + 2], vertices[i + 3]
+            );
+        }
     }
 
     private void renderBulletStrike() {
@@ -102,35 +142,30 @@ public class DarknessLayer implements Screen {
 
     private void renderFlashEffect() {
 
-        float alpha = flashState.getCurrentFrame() / (float) FLASH_TOTAL_FRAMES;
+        float alpha = flashState.getCurrentFrame() / (float) FLASH_TOTAL_FRAMES - .5f;
         shapeRenderer.setColor(1f, 1f, 0f, alpha);
 
         float[] lightVertices = MathFunctions.rayCast(
-            1000, 181,
+            1400, 181,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(),
             player.pixmap
         );
 
-        renderLightTriangles(lightVertices, player.pointInFrontVector[0], player.pointInFrontVector[1]);
+        renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
         flashState.update();
     }
 
     private void renderPlayerLight() {
         if (player.getFlashLight()) {
             renderFlashlight();
-        } else {
-            renderAmbientLight();
         }
+        renderAmbientLight();
     }
 
     private void renderFlashlight() {
         updateLightState();
-
-        // Render ambient circle
-        shapeRenderer.setColor(1, 1, 1, (float) lightState.getAmbientLight() / 100 + 0.05f);
-        shapeRenderer.circle(player.getCoorX(), player.getCoorY(), BASE_LIGHT_RADIUS);
 
         // Render directional light
         float[] lightVertices = MathFunctions.rayCast(
@@ -146,19 +181,23 @@ public class DarknessLayer implements Screen {
     }
 
     private void renderAmbientLight() {
+        float[] lightVertices = MathFunctions.rayCast(
+            RAYCAST_DISTANCE, 180,
+            (int) player.getFacingAngle(),
+            (int) player.getCoorX(),
+            (int) player.getCoorY(),
+            player.pixmap
+        );
         shapeRenderer.setColor(1, 1, 1, AMBIENT_ALPHA);
-        shapeRenderer.circle(player.getCoorX(), player.getCoorY(), BASE_LIGHT_RADIUS);
+        renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
+
+        if(player.flashLightIsOn) {
+            shapeRenderer.setColor(1f, 1f, 1f, .5f);
+            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 100);
+        }
+
     }
 
-    private void renderLightTriangles(float[] vertices, double centerX, double centerY) {
-        for (int i = 0; i < vertices.length - 2; i += 2) {
-            shapeRenderer.triangle(
-                (float) centerX, (float) centerY,
-                vertices[i], vertices[i + 1],
-                vertices[i + 2], vertices[i + 3]
-            );
-        }
-    }
 
     private void endLightBufferRendering() {
         shapeRenderer.end();

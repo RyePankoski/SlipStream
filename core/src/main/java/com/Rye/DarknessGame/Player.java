@@ -96,6 +96,8 @@ public class Player {
 
     public boolean playerHurt;
     public Music playerDamagedGrunt;
+    float camX;
+    float camY;
 
     //endregion
 
@@ -323,7 +325,6 @@ public class Player {
         moveSpeed = sprint ? speed * factor : speed;
         moveSpeed *= (float) ((0.4 + (0.6 * (stamina / 100))));
 
-        System.out.println(moveSpeed);
 
         //region key input management
         if (keyStrokes.contains(Input.Keys.W)) {
@@ -440,8 +441,6 @@ public class Player {
 
     public void updateCamera() {
 
-        //Clamp camera position if it goes out of bounds.
-        float camX;
         if (coorX + (cameraZoom / 2) > roomWidth) {
             camX = roomWidth - cameraZoom / 2;
         } else if (coorX - (cameraZoom / 2) < 0) {
@@ -449,9 +448,9 @@ public class Player {
         } else {
             camX = coorX;
         }
-        float camY;
-        if (coorY + (cameraZoom / 2) > roomWidth) {
-            camY = roomWidth - cameraZoom / 2;
+
+        if (coorY + (cameraZoom / 2) > roomHeight) {
+            camY = roomHeight - cameraZoom / 2;
         } else if (coorY - (cameraZoom / 2) < 0) {
             camY = cameraZoom / 2;
         } else {
@@ -502,8 +501,8 @@ public class Player {
         pointInFrontVector = new double[2];
         equippedWeaponName = "SMG";
         cameraZoom = 3000;
-        roomWidth = 5000;
-        roomHeight = 5000;
+        roomWidth = 15000;
+        roomHeight = 10000;
         flashlightBattery = 100;
     }
 
@@ -592,4 +591,11 @@ public class Player {
         return pointInFrontVector;
     }
 
+    public float getCamX() {
+        return camX;
+    }
+
+    public float getCamY() {
+        return camY;
+    }
 }

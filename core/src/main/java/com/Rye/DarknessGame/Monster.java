@@ -60,11 +60,6 @@ public class Monster {
                 health += 0.02;
             }
         }
-
-
-        if (coorX > 5000 || coorY > 5000 || coorX < 0 || coorY < 0) {
-            System.out.println("Im off the map");
-        }
     }
 
     public void distanceToPlayer() {
@@ -247,8 +242,8 @@ public class Monster {
     public void initVariables() {
         dx = 5;
 
-        coorX = 2500;
-        coorY = 2500;
+        coorX = 1000;
+        coorY = 5000;
         health = 100;
         ran = new Random();
 

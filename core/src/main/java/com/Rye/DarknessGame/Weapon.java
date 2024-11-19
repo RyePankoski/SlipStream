@@ -83,7 +83,7 @@ public class Weapon {
 
         if (canFire && ammo > 0) {
 
-            player.main.darknessLayer.justFired = true;
+            player.main.darknessLayer.setJustFired(true);
 
             bullet = new Bullet(player.getCollisionMask(), player, bulletSpeed, monster, this);
             player.updateBullets(bullet);

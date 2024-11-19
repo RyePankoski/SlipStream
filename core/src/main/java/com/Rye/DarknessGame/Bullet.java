@@ -41,28 +41,13 @@ public class Bullet {
         this.monster = monster;
         this.weapon = weapon;
 
-        pixmap = collisionMask.getPixmap();
-        alive = true;
-
-        startX = player.getCoorX();
-        startY = player.getCoorY();
-        facingX = player.getFaceX();
-        facingY = player.getFaceY();
-
-        posX = startX;
-        posY = startY;
-
-        white = new Color(255, 255, 255);
-        shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
-        pixmap = collisionMask.getPixmap();
-
-        bulletStrike = Gdx.audio.newSound(Gdx.files.internal("bulletStrike.mp3"));
-        bulletStrikeTexture = new Texture(Gdx.files.internal("bulletImpactSprite.png"));
-        monsterStrike = Gdx.audio.newSound((Gdx.files.internal(("monsterStrikeSound.mp3"))));
-
+        initVariables();
+        initDrawParams();
+        initSprites();
+        initSounds();
         findXYIncrements();
     }
+
 
     public void findXYIncrements() {
         dx = facingX - startX;
@@ -78,7 +63,7 @@ public class Bullet {
 
         shapeRenderer.setProjectionMatrix(player.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(255/ 255f, 255/ 255f, 0 / 255f, 1f);
+        shapeRenderer.setColor(255 / 255f, 255 / 255f, 0 / 255f, 1f);
         shapeRenderer.circle((float) posX, (float) posY, 10);
         shapeRenderer.end();
 
@@ -116,7 +101,7 @@ public class Bullet {
             spriteBatch.draw(bulletStrikeTexture, ((float) (posX - bulletStrikeTexture.getWidth() / 2f)), ((float) (posY - bulletStrikeTexture.getHeight() / 2f)));
             spriteBatch.end();
 
-            player.main.darknessLayer.bulletStrike(true, posX,posY,weapon.getWeaponType().hitSize);
+            player.main.darknessLayer.setBulletStrike(true, posX, posY, weapon.getWeaponType().hitSize);
             die();
         }
     }
@@ -161,6 +146,33 @@ public class Bullet {
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public void initVariables() {
+        alive = true;
+        startX = player.getCoorX();
+        startY = player.getCoorY();
+        facingX = player.getFaceX();
+        facingY = player.getFaceY();
+        posX = startX;
+        posY = startY;
+    }
+
+    public void initDrawParams() {
+        pixmap = collisionMask.getPixmap();
+        white = new Color(255, 255, 255);
+        shapeRenderer = new ShapeRenderer();
+        spriteBatch = new SpriteBatch();
+        pixmap = collisionMask.getPixmap();
+    }
+
+    public void initSounds() {
+        bulletStrike = Gdx.audio.newSound(Gdx.files.internal("bulletStrike.mp3"));
+        monsterStrike = Gdx.audio.newSound((Gdx.files.internal(("monsterStrikeSound.mp3"))));
+    }
+
+    public void initSprites() {
+        bulletStrikeTexture = new Texture(Gdx.files.internal("bulletImpactSprite.png"));
     }
 
 }

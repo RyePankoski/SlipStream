@@ -49,8 +49,17 @@ public class Hud {
         GirraffeY = Gdx.graphics.getHeight();
     }
 
+    public void renderHud(){
+        drawPlayerStats();
+        drawWeaponInfo();
+    }
+
     public void drawPlayerStats() {
         spriteBatch.begin();
+
+        double redTotal = Math.min(255, 2 * (1 - (stamina/100)) * 255);
+        double greenTotal = 255 - Math.max(0,(1 - (2 * (stamina/100))) * 255);
+
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.draw(plaque, camera.position.x - 1000, (float) (camera.position.y + cameraZoom / 2 - 300));
         bitmapFont.setColor(Color.GREEN);
@@ -60,13 +69,8 @@ public class Hud {
         hardStaminaValue = Math.floor(hardStaminaValue);
         staminaValue = String.valueOf(hardStaminaValue);
         bitmapFont.draw(spriteBatch, "STAMINA:", camera.position.x + 0, (float) (camera.position.y + cameraZoom / 2 - 70));
-
-        double redTotal = Math.min(255, 2 * (1 - (stamina/100)) * 255);
-        double greenTotal = 255 - Math.max(0,(1 - (2 * (stamina/100))) * 255);
-
         bitmapFont.setColor((float)redTotal/255,(float)greenTotal/255,0,1f);
         bitmapFont.draw(spriteBatch, staminaValue, camera.position.x + 500, (float) (camera.position.y + cameraZoom / 2 - 70));
-
         flashlightBattery = Math.ceil(flashlightBattery);
         flashlightBatteryString = String.valueOf((int)flashlightBattery);
 

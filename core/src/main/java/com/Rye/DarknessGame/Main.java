@@ -17,8 +17,6 @@ public class Main extends ApplicationAdapter {
     CollisionMask collisionMask;
     DarknessLayer darknessLayer;
     Monster monster;
-    boolean canRender;
-    private double timeUntilRender;
 
     boolean monsterAlive = true;
     //endregion
@@ -81,7 +79,6 @@ public class Main extends ApplicationAdapter {
         }
 
         darknessLayer.render(0f);
-        hud.drawPlayerStats();
-        hud.drawWeaponInfo();
+        hud.renderHud();
     }
 }

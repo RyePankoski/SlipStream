@@ -9,7 +9,7 @@ TODOd: Ask Xacor about the stamina counter in child weapon class. Note: I got it
 TODOd:Ask Xacor about the reload time. Note: Also got this myself.
 TODOd: Add walls around levels that are rendered.
 TODOd: Flashlight
-TODOd: Look into shaders more.
+TODOd: Look into shaders more,Player Health
 
 -----------------
 
@@ -26,7 +26,7 @@ TODO: Add blur around lights & RayTrace other light sources.
 11/17/2024
 TIER 1:
 TODO: Add way to switch between scenes, clamp renderer like camera, cats color function no working on health;
-TODO: Settings, Options, Doors, Player Health, LOS, PathFinding, Drop Weapons/Tools
+TODO: Settings, Options, Doors, LOS, PathFinding, Drop Weapons/Tools
 TODO: Make bullets ray cast, Undo Reference Spaghetti
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level

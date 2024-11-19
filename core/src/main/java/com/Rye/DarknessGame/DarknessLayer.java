@@ -88,21 +88,14 @@ public class DarknessLayer implements Screen {
     public void renderStaticLights() {
         shapeRenderer.setColor(1, 1, 1, (float) lightState.getBrightness() / 100 + 0.1f);
 
-        System.out.println("Number of static lights: " + staticLights.size());
         for (int i = 0; i < staticLights.size(); i++) {
             StaticLightSource light = staticLights.get(i);
 
-            // Debug print for each light
-            System.out.println("Light " + i + ":");
-            System.out.println("  X: " + light.getX());
-            System.out.println("  Y: " + light.getY());
 
             float[] vertices = light.getVertices();
-            System.out.println("  Vertices length: " + vertices.length);
 
             // Print first few vertices
             for (int j = 0; j < Math.min(vertices.length, 6); j += 2) {
-                System.out.println("  Vertex " + (j / 2) + ": (" + vertices[j] + ", " + vertices[j + 1] + ")");
             }
 
             shapeRenderer.setColor(1, 1, 1, light.brightness);

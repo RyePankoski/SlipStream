@@ -11,7 +11,6 @@ public class Scene {
     Sound ambience;
     SoundPlayer soundPlayer;
     String stageName;
-    RoomManager roomManager;
     Player player;
     Texture image;
     Room room;
@@ -19,14 +18,14 @@ public class Scene {
     private final SpriteBatch batch;
     Matrix4 projection;
 
-    public Scene(String stageName, Sound ambience, RoomManager roomManager, SoundPlayer soundPlayerRef, Player player) {
+    public Scene(String stageName, Sound ambience, SoundPlayer soundPlayerRef, Player player, Texture image) {
         this.stageName = stageName;
         this.ambience = ambience;
-        this.roomManager = roomManager;
-        soundPlayer = soundPlayerRef;
+        this.image = image;
         this.player = player;
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
+        soundPlayer = soundPlayerRef;
     }
 
     public void renderScene() {
@@ -34,11 +33,6 @@ public class Scene {
         projection = player.getCamera().combined;
         batch.setProjectionMatrix(projection);
         shapeRenderer.setProjectionMatrix(projection);
-        batch.setProjectionMatrix(projection);
-
-        this.room = roomManager.getRooms().get(0);
-        this.image = room.getImage();
-
 
         batch.begin();
         batch.setProjectionMatrix(projection);
@@ -56,5 +50,9 @@ public class Scene {
         batch.end();
 
         soundPlayer.playSound(stageName, ambience);
+    }
+
+    public void dispose(){
+        shapeRenderer.dispose();
     }
 }

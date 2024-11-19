@@ -57,7 +57,7 @@ public class Player {
 
     // **Sound Effects**
     private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound;
-    private Music flashLightWarning;
+    private Music flashLightWarning, playerDamagedSound;
     SoundPlayer soundManager;
 
     // **Input Handling**
@@ -92,6 +92,11 @@ public class Player {
     // **Game Main Reference**
     public Main main;
 
+    double health;
+
+    public boolean playerHurt;
+    public Music playerDamagedGrunt;
+
     //endregion
 
     public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
@@ -113,13 +118,10 @@ public class Player {
         initCamera();
         initWeapons();
 
-        hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery);
+        hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
     }
 
-
-
-    //region Update Methods
     public void updatePlayer() {
         keyStrokes = handler.getPressedKeysHash();
         pressedMouseHash = handler.getPressedMouseHash();
@@ -130,12 +132,13 @@ public class Player {
         updateCamera();
         drawMyself();
         weapon();
+        distanceToMonster();
+        manageHealth();
         melee();
         flashLight();
-        distanceToMonster();
         pointInFront();
 
-        hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery);
+        hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
     }
 
@@ -150,11 +153,29 @@ public class Player {
         monsterDistance = Math.sqrt((newX * newX) + (newY * newY));
     }
 
-    public void manageHealth(){
+    public void manageHealth() {
 
+        if (health < 100) {
+            health += 0.01;
+        }
 
+        if (monsterDistance < 200) {
+            playerHurt = true;
+            if (!playerDamagedSound.isPlaying()) {
+                playerDamagedSound.play();
+            }
+            if (!playerDamagedGrunt.isPlaying()) {
+                playerDamagedGrunt.play();
+            }
+            health -= .5;
+        } else {
+            playerDamagedGrunt.stop();
+        }
 
-        
+        if (health <= 0) {
+            health = 0;
+        }
+
     }
 
     public void pointInFront() {
@@ -300,7 +321,9 @@ public class Player {
         }
 
         moveSpeed = sprint ? speed * factor : speed;
-        moveSpeed *= (float) ((0.6 + 0.4 * (stamina / 100)));
+        moveSpeed *= (float) ((0.4 + (0.6 * (stamina / 100))));
+
+        System.out.println(moveSpeed);
 
         //region key input management
         if (keyStrokes.contains(Input.Keys.W)) {
@@ -474,13 +497,14 @@ public class Player {
     }
 
     public void initVariables() {
+        health = 100;
         bullets = new ArrayList<>();
         pointInFrontVector = new double[2];
         equippedWeaponName = "SMG";
         cameraZoom = 3000;
         roomWidth = 5000;
         roomHeight = 5000;
-        flashlightBattery = 10;
+        flashlightBattery = 100;
     }
 
     public void initDrawParams() {
@@ -503,6 +527,8 @@ public class Player {
         meleeMiss = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/meleeMiss.mp3"));
         flashLightSound = Gdx.audio.newSound((Gdx.files.internal("PlayerSFX/flashLightSound.mp3")));
         flashLightWarning = Gdx.audio.newMusic((Gdx.files.internal("PlayerSFX/flashlightWarning.mp3")));
+        playerDamagedSound = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamaged.mp3"));
+        playerDamagedGrunt = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamagedGrunt.mp3"));
     }
 
     private ArrayList<Sound> initWeaponSounds(String weaponType) {

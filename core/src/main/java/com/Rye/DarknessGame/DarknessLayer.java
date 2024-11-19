@@ -35,6 +35,7 @@ public class DarknessLayer implements Screen {
     private final FlashState flashState;
     private final BulletStrikeState bulletStrikeState;
 
+
     public DarknessLayer(Player player) {
         this.player = player;
         this.camera = player.getCamera();
@@ -65,7 +66,13 @@ public class DarknessLayer implements Screen {
 
     private void beginLightBufferRendering() {
         lightBuffer.begin();
-        Gdx.gl.glClearColor(0, 0, 0, DARKNESS_ALPHA);
+
+        if(player.playerHurt){
+            player.playerHurt = false;
+            Gdx.gl.glClearColor(.2f, 0, 0, DARKNESS_ALPHA);
+        } else {
+            Gdx.gl.glClearColor(0, 0, 0, DARKNESS_ALPHA);
+        }
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);

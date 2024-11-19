@@ -30,7 +30,7 @@ TODO: Settings, Options, Doors, Player Health, LOS, PathFinding, Drop Weapons/To
 TODO: Make bullets ray cast, Undo Reference Spaghetti
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
-TODO: Tasks, Key-rebinds
+TODO: Tasks, Key-rebinds, Master Static Class with all hardcoded Variables.
 TIER 3:
 TODO: Tools(Traps, Deployable Lights,) Parts,  More Guns (LaserGun,)
 TODO: Monster AI,

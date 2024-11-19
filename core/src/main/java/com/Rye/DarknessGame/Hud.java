@@ -37,13 +37,13 @@ public class Hud {
         spriteBatch = new SpriteBatch();
         bitmapFont = new BitmapFont();
 
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("computaFont.ttf"));
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("Fonts/computaFont.ttf"));
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 160;
         bitmapFont = generator.generateFont(parameter);
         generator.dispose();
 
-        plaque = new Texture(Gdx.files.internal("dataPlaque.png"));
+        plaque = new Texture(Gdx.files.internal("TexSprites/dataPlaque.png"));
 
         GiraffeX = Gdx.graphics.getWidth();
         GiraffeY = Gdx.graphics.getHeight();

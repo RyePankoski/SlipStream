@@ -43,15 +43,14 @@ public class Main extends ApplicationAdapter {
 
     public void initScenes() {
         RoomManager menu = new RoomManager();
-        menu.addRoom(new Room("Menu", 1920, 1080, image = new Texture("MenuScreen.jpg")));
+        menu.addRoom(new Room("Menu", 1920, 1080, image = new Texture("FloorTex/MenuScreen.jpg")));
 
         RoomManager firstLevel = new RoomManager();
-        firstLevel.addRoom(new Room("Start", 5000, 5000, image = new Texture("mainLevel.png")));
-        firstLevel.addRoom(new Room("Second Room", 5000, 5000, image = new Texture("basicFloor3.jpg")));
+        firstLevel.addRoom(new Room("Start", 5000, 5000, image = new Texture("FloorTex/mainLevel.png")));
 
 
-        Scene menuScene = new Scene("Menu", Gdx.audio.newSound(Gdx.files.internal("MenuTheme.mp3")), menu, DJ, playcor);
-        Scene scene1 = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience.mp3")), firstLevel, DJ, playcor);
+        Scene menuScene = new Scene("Menu", Gdx.audio.newSound(Gdx.files.internal("Music/MenuTheme.mp3")), menu, DJ, playcor);
+        Scene scene1 = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")), firstLevel, DJ, playcor);
         sceneManager = new SceneManager();
         sceneManager.addScene(menuScene);
         sceneManager.addScene(scene1);

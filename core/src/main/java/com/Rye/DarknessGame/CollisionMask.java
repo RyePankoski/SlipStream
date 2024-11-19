@@ -17,7 +17,7 @@ public class CollisionMask {
 
     public CollisionMask(){
         spriteBatch = new SpriteBatch();
-        pixmap = new Pixmap(Gdx.files.internal("collisionMap.png"));
+        pixmap = new Pixmap(Gdx.files.internal("CollisionMap/collisionMap.png"));
         pixmap.setBlending(Pixmap.Blending.None);
         collisionMap = new Texture(pixmap);
     }

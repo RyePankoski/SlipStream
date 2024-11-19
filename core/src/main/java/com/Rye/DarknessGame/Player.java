@@ -25,7 +25,7 @@ public class Player {
     //region Variables
 
     // **Booleans**
-    boolean sprint, staminaPause, staminaRegen, canChangeGun = true, flashLightIsOn = true, justFired, canMelee = true, canFlashLight;
+    boolean sprint, staminaPause, staminaRegen, canChangeGun = true, flashLightIsOn = true, canMelee = true, canFlashLight;
 
     // **Coordinates and Positioning**
     private float coorX;
@@ -94,7 +94,6 @@ public class Player {
 
     //endregion
 
-    //region Constructor
     public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
                   CollisionMask collisionMask, Monster monster, Main main) {
 
@@ -117,7 +116,7 @@ public class Player {
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
     }
-    //endregion
+
 
 
     //region Update Methods
@@ -151,6 +150,13 @@ public class Player {
         monsterDistance = Math.sqrt((newX * newX) + (newY * newY));
     }
 
+    public void manageHealth(){
+
+
+
+        
+    }
+
     public void pointInFront() {
         tempVector.set(faceX - coorX, faceY - coorY);
         float distance = tempVector.len();
@@ -171,6 +177,7 @@ public class Player {
         }
 
         if (flashlightBattery <= 0) {
+            flashLightSound.play();
             flashlightBattery = 0;
             flashLightIsOn = false;
         }
@@ -473,12 +480,12 @@ public class Player {
         cameraZoom = 3000;
         roomWidth = 5000;
         roomHeight = 5000;
-        flashlightBattery = 50;
+        flashlightBattery = 10;
     }
 
     public void initDrawParams() {
 
-        Texture playerTexture = new Texture(Gdx.files.internal("PlayerChar.png"));
+        Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
         pixmap = collisionMask.getPixmap();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
@@ -489,20 +496,20 @@ public class Player {
     }
 
     public void initPlayerSounds() {
-        running = Gdx.audio.newSound(Gdx.files.internal("Running.mp3"));
-        walking = Gdx.audio.newSound(Gdx.files.internal("Walking.mp3"));
-        changeGun = Gdx.audio.newSound(Gdx.files.internal("changeGuns.mp3"));
-        meleeHit = Gdx.audio.newSound(Gdx.files.internal("meleeSound.mp3"));
-        meleeMiss = Gdx.audio.newSound(Gdx.files.internal("meleeMiss.mp3"));
-        flashLightSound = Gdx.audio.newSound((Gdx.files.internal("flashLightSound.mp3")));
-        flashLightWarning = Gdx.audio.newMusic((Gdx.files.internal("flashlightWarning.mp3")));
+        running = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/Running.mp3"));
+        walking = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/Walking.mp3"));
+        changeGun = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/changeGuns.mp3"));
+        meleeHit = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/meleeSound.mp3"));
+        meleeMiss = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/meleeMiss.mp3"));
+        flashLightSound = Gdx.audio.newSound((Gdx.files.internal("PlayerSFX/flashLightSound.mp3")));
+        flashLightWarning = Gdx.audio.newMusic((Gdx.files.internal("PlayerSFX/flashlightWarning.mp3")));
     }
 
     private ArrayList<Sound> initWeaponSounds(String weaponType) {
         ArrayList<Sound> sounds = new ArrayList<>();
-        sounds.add(Gdx.audio.newSound(Gdx.files.internal(weaponType + "Shot.mp3")));
-        sounds.add(Gdx.audio.newSound(Gdx.files.internal(weaponType + "Reload.mp3")));
-        sounds.add(Gdx.audio.newSound(Gdx.files.internal("emptyGun.mp3")));
+        sounds.add(Gdx.audio.newSound(Gdx.files.internal("SoundEffects/" + weaponType + "Shot.mp3")));
+        sounds.add(Gdx.audio.newSound(Gdx.files.internal("SoundEffects/" + weaponType + "Reload.mp3")));
+        sounds.add(Gdx.audio.newSound(Gdx.files.internal("SoundEffects/emptyGun.mp3")));
         return sounds;
     }
 
@@ -549,10 +556,6 @@ public class Player {
 
     public double getBattery() {
         return flashlightBattery;
-    }
-
-    public double getZoom() {
-        return cameraZoom;
     }
 
     public CollisionMask getCollisionMask() {

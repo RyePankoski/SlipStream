@@ -42,9 +42,9 @@ public class Bullet {
         this.weapon = weapon;
 
         initVariables();
+        initSounds();
         initDrawParams();
         initSprites();
-        initSounds();
         findXYIncrements();
     }
 
@@ -167,12 +167,12 @@ public class Bullet {
     }
 
     public void initSounds() {
-        bulletStrike = Gdx.audio.newSound(Gdx.files.internal("bulletStrike.mp3"));
-        monsterStrike = Gdx.audio.newSound((Gdx.files.internal(("monsterStrikeSound.mp3"))));
+        bulletStrike = Gdx.audio.newSound(Gdx.files.internal("BulletSFX/bulletStrike.mp3"));
+        monsterStrike = Gdx.audio.newSound((Gdx.files.internal(("BulletSFX/monsterStrikeSound.mp3"))));
     }
 
     public void initSprites() {
-        bulletStrikeTexture = new Texture(Gdx.files.internal("bulletImpactSprite.png"));
+        bulletStrikeTexture = new Texture(Gdx.files.internal("TexSprites/bulletImpactSprite.png"));
     }
 
 }

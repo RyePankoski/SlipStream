@@ -122,7 +122,7 @@ public class DarknessLayer implements Screen {
         updateLightState();
 
         // Render ambient circle
-        shapeRenderer.setColor(1, 1, 1, (float) lightState.getAmbientLight() / 100 + 0.1f);
+        shapeRenderer.setColor(1, 1, 1, (float) lightState.getAmbientLight() / 100 + 0.05f);
         shapeRenderer.circle(player.getCoorX(), player.getCoorY(), BASE_LIGHT_RADIUS);
 
         // Render directional light

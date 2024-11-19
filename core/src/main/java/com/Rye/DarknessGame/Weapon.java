@@ -131,10 +131,6 @@ public class Weapon {
         updateInfo();
     }
 
-    public float getFireRate() {
-        return fireRate;
-    }
-
     public int getMagazines() {
         return magazines;
     }
@@ -165,16 +161,14 @@ public class Weapon {
     }
 
     public void initTextures() {
-        gunFlashTexture = new Texture(Gdx.files.internal("shotFlash.png"));
-        outOfAmmoSound = Gdx.audio.newSound(Gdx.files.internal("outOfAmmoSound.mp3"));
+        gunFlashTexture = new Texture(Gdx.files.internal("TexSprites/shotFlash.png"));
         gunFlashSprite = new Sprite(gunFlashTexture);
     }
 
     public void initSounds() {
+        outOfAmmoSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/outOfAmmoSound.mp3"));
         gunShotOne = sounds.get(0);
         reloadSound = sounds.get(1);
         emptyGunSound = sounds.get(2);
     }
-
-
 }

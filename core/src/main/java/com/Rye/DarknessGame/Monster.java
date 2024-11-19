@@ -234,14 +234,14 @@ public class Monster {
     public void initDrawParams(Pixmap pixmap){
 
         this.pixmap = pixmap;
-        monsterTexture = new Texture(Gdx.files.internal("monster.png"));
+        monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
     }
 
     public void initSounds(){
-        eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("eerieMusic.mp3"));
+        eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/eerieMusic.mp3"));
     }
 
     public void initVariables() {

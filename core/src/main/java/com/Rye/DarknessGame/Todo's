@@ -27,7 +27,7 @@ TODO: Add blur around lights & RayTrace other light sources.
 TIER 1:
 TODO: Add way to switch between scenes.
 TODO: Settings, Options, Doors, Player Health, LOS, PathFinding, Drop Weapons/Tools
-TODO: Make bullets ray cast.
+TODO: Make bullets ray cast, Undo Reference Spaghetti
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
 TODO: Tasks, Key-rebinds

@@ -27,7 +27,7 @@ public class Hud {
     double cameraZoom;
 
     double GiraffeX;
-    double GirraffeY;
+    double GiraffeY;
 
     double flashlightBattery;
     String flashlightBatteryString;
@@ -46,10 +46,10 @@ public class Hud {
         plaque = new Texture(Gdx.files.internal("dataPlaque.png"));
 
         GiraffeX = Gdx.graphics.getWidth();
-        GirraffeY = Gdx.graphics.getHeight();
+        GiraffeY = Gdx.graphics.getHeight();
     }
 
-    public void renderHud(){
+    public void renderHud() {
         drawPlayerStats();
         drawWeaponInfo();
     }
@@ -57,8 +57,8 @@ public class Hud {
     public void drawPlayerStats() {
         spriteBatch.begin();
 
-        double redTotal = Math.min(255, 2 * (1 - (stamina/100)) * 255);
-        double greenTotal = 255 - Math.max(0,(1 - (2 * (stamina/100))) * 255);
+        double redTotal = Math.min(255, 2 * (1 - (stamina / 100)) * 255);
+        double greenTotal = 255 - Math.max(0, (1 - (2 * (stamina / 100))) * 255);
 
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.draw(plaque, camera.position.x - 1000, (float) (camera.position.y + cameraZoom / 2 - 300));
@@ -69,15 +69,15 @@ public class Hud {
         hardStaminaValue = Math.floor(hardStaminaValue);
         staminaValue = String.valueOf(hardStaminaValue);
         bitmapFont.draw(spriteBatch, "STAMINA:", camera.position.x + 0, (float) (camera.position.y + cameraZoom / 2 - 70));
-        bitmapFont.setColor((float)redTotal/255,(float)greenTotal/255,0,1f);
+        bitmapFont.setColor((float) redTotal / 255, (float) greenTotal / 255, 0, 1f);
         bitmapFont.draw(spriteBatch, staminaValue, camera.position.x + 500, (float) (camera.position.y + cameraZoom / 2 - 70));
         flashlightBattery = Math.ceil(flashlightBattery);
-        flashlightBatteryString = String.valueOf((int)flashlightBattery);
+        flashlightBatteryString = String.valueOf((int) flashlightBattery);
 
-        redTotal = Math.min(255, 2 * (1 - (flashlightBattery/100)) * 255);
-        greenTotal = 255 - Math.max(0,(1 - (2 * (flashlightBattery/100))) * 255);
+        redTotal = Math.min(255, 2 * (1 - (flashlightBattery / 100)) * 255);
+        greenTotal = 255 - Math.max(0, (1 - (2 * (flashlightBattery / 100))) * 255);
 
-        bitmapFont.setColor((float)redTotal/255,(float)greenTotal/255,0,1f);
+        bitmapFont.setColor((float) redTotal / 255, (float) greenTotal / 255, 0, 1f);
         bitmapFont.draw(spriteBatch, flashlightBatteryString + "%", camera.position.x - 600, (float) (camera.position.y + cameraZoom / 2 - 180));
 
         spriteBatch.end();
@@ -88,30 +88,22 @@ public class Hud {
         spriteBatch.begin();
         spriteBatch.setProjectionMatrix(camera.combined);
 
-        if (ammo > maxAmmo * .8) {
-            bitmapFont.setColor(Color.GREEN);
-        } else if (ammo < maxAmmo * .8 && ammo > maxAmmo * .4) {
-            bitmapFont.setColor(Color.YELLOW);
-        } else if (ammo <= maxAmmo * .4) {
-            bitmapFont.setColor(Color.RED);
-        }
+        double redTotal = Math.min(255, 2 * (1 - (ammo / maxAmmo)) * 255);
+        double greenTotal = 255 - Math.max(0, (1 - (2 * (ammo / maxAmmo))) * 255);
 
         if (ammo == 0) {
-            bitmapFont.draw(spriteBatch, "Reload!", camera.position.x + 4001, camera.position.y + 870);
+            bitmapFont.setColor(Color.RED);
+            bitmapFont.draw(spriteBatch, "Reload!", (camera.position.x + 300), (float) (camera.position.y + cameraZoom / 2 - 180));
         }
 
-        double redTotal = Math.min(255, 2 * (1 - (ammo/maxAmmo)) * 255);
-        double greenTotal = 255 - Math.max(0,(1 - (2 * (ammo/maxAmmo))) * 255);
-
         ammoNumberString = String.valueOf((int) ammo);
-        bitmapFont.setColor((float)redTotal/255,(float)greenTotal/255,0,1f);
-        bitmapFont.draw(spriteBatch, ammoNumberString, (float) (camera.position.x + 160), (float) (camera.position.y + cameraZoom / 2 - 180));
+        bitmapFont.setColor((float) redTotal / 255, (float) greenTotal / 255, 0, 1f);
+        bitmapFont.draw(spriteBatch, ammoNumberString, (camera.position.x + 160), (float) (camera.position.y + cameraZoom / 2 - 180));
 
-        redTotal = Math.min(255, 2 * (1 - (magazines/maxMagazines)) * 255);
-        greenTotal = 255 - Math.max(0,(1 - (2 * (magazines/maxMagazines))) * 255);
+        redTotal = Math.min(255, 2 * (1 - (magazines / maxMagazines)) * 255);
+        greenTotal = 255 - Math.max(0, (1 - (2 * (magazines / maxMagazines))) * 255);
 
         bitmapFont.setColor((float) redTotal / 255f, (float) greenTotal / 255f, 0, 1f);
-
         String magazineNumber = String.valueOf((int) magazines);
         bitmapFont.draw(spriteBatch, magazineNumber + ":", camera.position.x, (float) (camera.position.y + cameraZoom / 2 - 180));
         spriteBatch.end();

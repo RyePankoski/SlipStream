@@ -19,24 +19,29 @@ public class Main extends ApplicationAdapter {
     Monster monster;
 
     boolean monsterAlive = true;
+    SoundPlayer DJ;
     //endregion
 
     public void create() {
-        SoundPlayer DJ = new SoundPlayer();
-
+        DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
-
         hud = new Hud();
         handler = new InputHandler();
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(1000, 1000, 8, DJ, handler, hud, collisionMask, monster, this);
+        darknessLayer = new DarknessLayer(playcor);
 
         monster.setPlayer(playcor);
-
         collisionMask.setCamera(playcor.getCamera());
-        hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
 
+        hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
+
+        initScenes();
+        stage();
+    }
+
+    public void initScenes() {
         RoomManager menu = new RoomManager();
         menu.addRoom(new Room("Menu", 1920, 1080, image = new Texture("MenuScreen.jpg")));
 
@@ -44,25 +49,23 @@ public class Main extends ApplicationAdapter {
         firstLevel.addRoom(new Room("Start", 5000, 5000, image = new Texture("mainLevel.png")));
         firstLevel.addRoom(new Room("Second Room", 5000, 5000, image = new Texture("basicFloor3.jpg")));
 
+
         Scene menuScene = new Scene("Menu", Gdx.audio.newSound(Gdx.files.internal("MenuTheme.mp3")), menu, DJ, playcor);
         Scene scene1 = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience.mp3")), firstLevel, DJ, playcor);
         sceneManager = new SceneManager();
         sceneManager.addScene(menuScene);
         sceneManager.addScene(scene1);
-
-        darknessLayer = new DarknessLayer(playcor);
-        stage();
     }
 
     public void stage() {
         sceneToRender = sceneManager.getScenes().get(sceneNumber);
     }
 
-    public float secondsToNano(float seconds){
+    public float secondsToNano(float seconds) {
         return (seconds * 1000000000);
     }
 
-    public void killMonster(Monster monster){
+    public void killMonster(Monster monster) {
         monster = null;
         monsterAlive = false;
         System.gc();
@@ -74,7 +77,7 @@ public class Main extends ApplicationAdapter {
         playcor.updatePlayer();
         playcor.checkBullets();
 
-        if(monsterAlive) {
+        if (monsterAlive) {
             monster.updateMonster();
         }
 

@@ -18,7 +18,7 @@ public class Monster {
     Texture monsterTexture;
     SpriteBatch spriteBatch;
     Player player;
-    Pixmap pixmap;
+    public Pixmap pixmap;
     double coorX;
     double coorY;
     double dx;
@@ -33,28 +33,16 @@ public class Monster {
 
     double angerTime = 1;
 
-
     ShapeRenderer shapeRenderer;
 
 //endregion
 
     public Monster(Pixmap pixmap) {
-        //My name is Ronald
-        this.pixmap = pixmap;
-
-        monsterTexture = new Texture(Gdx.files.internal("monster.png"));
-        shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
-        white = new Color(255, 255, 255);
-
-        dx = 5;
-
-        coorX = 2500;
-        coorY = 2500;
-        health = 100;
-        ran = new Random();
-        eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("eerieMusic.mp3"));
+        initVariables();
+        initSounds();
+        initDrawParams(pixmap);
     }
+
 
     public void setPlayer(Player player) {
         this.player = player;
@@ -72,7 +60,6 @@ public class Monster {
                 health += 0.02;
             }
         }
-
 
 
         if (coorX > 5000 || coorY > 5000 || coorX < 0 || coorY < 0) {
@@ -236,12 +223,35 @@ public class Monster {
 
     }
 
-    public void die(){
+    public void die() {
         eerieMusic.dispose();
         spriteBatch.dispose();
         shapeRenderer.dispose();
         monsterTexture.dispose();
         player.main.killMonster(this);
+    }
+
+    public void initDrawParams(Pixmap pixmap){
+
+        this.pixmap = pixmap;
+        monsterTexture = new Texture(Gdx.files.internal("monster.png"));
+        shapeRenderer = new ShapeRenderer();
+        spriteBatch = new SpriteBatch();
+        white = new Color(255, 255, 255);
+    }
+
+    public void initSounds(){
+        eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("eerieMusic.mp3"));
+    }
+
+    public void initVariables() {
+        dx = 5;
+
+        coorX = 2500;
+        coorY = 2500;
+        health = 100;
+        ran = new Random();
+
     }
 
 

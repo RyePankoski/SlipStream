@@ -46,7 +46,6 @@ public class Weapon {
     int maxMagazines;
 
 
-
     public Weapon(float fireRate, int magazines, int magazineSize, int damage, ArrayList<Sound> sounds,
                   OrthographicCamera camera, Player player, Hud hud, double bulletSpeed, Monster monster, int hitSize, int maxMagazines) {
         this.maxMagazines = maxMagazines;
@@ -62,21 +61,16 @@ public class Weapon {
         this.monster = monster;
         this.hitSize = hitSize;
 
-        shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
-        ammo = magazineSize;
-
-        gunShotOne = sounds.get(0);
-        reloadSound = sounds.get(1);
-        emptyGunSound = sounds.get(2);
-
-        gunFlashTexture = new Texture(Gdx.files.internal("shotFlash.png"));
-        outOfAmmoSound = Gdx.audio.newSound(Gdx.files.internal("outOfAmmoSound.mp3"));
-        gunFlashSprite = new Sprite(gunFlashTexture);
+        initVariables();
+        initTextures();
+        initSounds();
+        initDrawParams();
     }
 
+
+
     public void updateInfo() {
-        hud.updateWeaponStats(ammo, magazines, magazineSize,maxMagazines);
+        hud.updateWeaponStats(ammo, magazines, magazineSize, maxMagazines);
     }
 
     public void fireWeapon() {
@@ -159,6 +153,27 @@ public class Weapon {
 
     public int getAmmo() {
         return ammo;
+    }
+
+    public void initVariables() {
+        ammo = magazineSize;
+    }
+
+    public void initDrawParams() {
+        shapeRenderer = new ShapeRenderer();
+        spriteBatch = new SpriteBatch();
+    }
+
+    public void initTextures() {
+        gunFlashTexture = new Texture(Gdx.files.internal("shotFlash.png"));
+        outOfAmmoSound = Gdx.audio.newSound(Gdx.files.internal("outOfAmmoSound.mp3"));
+        gunFlashSprite = new Sprite(gunFlashTexture);
+    }
+
+    public void initSounds() {
+        gunShotOne = sounds.get(0);
+        reloadSound = sounds.get(1);
+        emptyGunSound = sounds.get(2);
     }
 
 

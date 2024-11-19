@@ -3,9 +3,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import java.awt.*;
 public class MathFunctions {
 
-    public MathFunctions() {
-
-    }
+    public MathFunctions() {}
     public static java.awt.Color getPixelColor(int x, int y, Pixmap pixmap) {
 
         int pixel = pixmap.getPixel(x, pixmap.getHeight() - y);

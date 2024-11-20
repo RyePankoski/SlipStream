@@ -1,0 +1,38 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "MainMapDarknessGame.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "MainMapDarknessGame.tmx": {
+            "scale": 0.0625,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 9744,
+                "y": 2064
+            }
+        },
+        "SpaceStationOne.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/frank/OneDrive/Documents/Tiled Maps/DarknessGameMaps/Map1",
+    "map.height": 312,
+    "map.lastUsedFormat": "tmx",
+    "map.width": 468,
+    "openFiles": [
+        "MainMapDarknessGame.tmx",
+        "SpaceStationOne.tsx"
+    ],
+    "project": "InTheDarkGame.tiled-project",
+    "recentFiles": [
+        "SpaceStationOne.tsx",
+        "MainMapDarknessGame.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

@@ -457,14 +457,14 @@ public class Player {
         //endregion
 
         //region edge of level collision
-        if (coorX + dx < 80) {
-            coorX = 80;
-        } else if (coorY + dy < 80) {
-            coorY = 80;
-        } else if (coorX + dx > pixmap.getWidth() - 80) {
-            coorX = pixmap.getWidth() - 80;
-        } else if (coorY + dy > pixmap.getHeight() - 80) {
-            coorY = pixmap.getHeight() - 80;
+        if (coorX + dx < 10) {
+            coorX = 10;
+        } else if (coorY + dy < 10) {
+            coorY = 10;
+        } else if (coorX + dx > pixmap.getWidth() - 10) {
+            coorX = pixmap.getWidth() - 10;
+        } else if (coorY + dy > pixmap.getHeight() - 10) {
+            coorY = pixmap.getHeight() - 10;
         }
         //endregion
 

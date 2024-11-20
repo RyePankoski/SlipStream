@@ -33,7 +33,7 @@ public class Main extends ApplicationAdapter {
         hud = new Hud();
         handler = new InputHandler();
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(7500, 100, 2, DJ, handler, hud, collisionMask, monster, this);
+        playcor = new Player(7700, 100, 2, DJ, handler, hud, collisionMask, monster, this);
 
 
         initLightSources();
@@ -64,8 +64,8 @@ public class Main extends ApplicationAdapter {
 
     public void initLightSources() {
 
-        StaticLightSource testLight = new StaticLightSource(5000, 100, .2f, MathFunctions.rayCast(100, 181
-            , 90, 100, 5000, collisionMask.getPixmap()));
+        StaticLightSource testLight = new StaticLightSource(200, 7800, .2f, MathFunctions.rayCast(500, 181
+            , 90, 7800, 200, collisionMask.getPixmap()));
         StaticLightSource nextLight = new StaticLightSource(5000, 200, .2f, MathFunctions.rayCast(100, 181
             , 90, 200, 5000, collisionMask.getPixmap()));
         staticLightSources = new ArrayList<>();

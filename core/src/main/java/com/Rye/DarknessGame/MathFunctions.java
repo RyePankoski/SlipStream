@@ -41,11 +41,11 @@ public class MathFunctions {
                 //check for collision, we are multiplying by 30, so it can see into the wall a little bit.
                 if (white.equals(getPixelColor((int) x1, (int) y1, pixmap))) {
                     if (i < 0) {
-                        x1 += 30 * cosines[i + 360];
-                        y1 += 30 * sins[i + 360];
+                        x1 += 5 * cosines[i + 360];
+                        y1 += 5* sins[i + 360];
                     } else {
-                        x1 += 30 * cosines[i];
-                        y1 += 30 * sins[i];
+                        x1 += 5 * cosines[i];
+                        y1 += 5 * sins[i];
                     }
                     break;
                 }

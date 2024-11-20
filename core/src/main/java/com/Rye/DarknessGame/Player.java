@@ -40,7 +40,7 @@ public class Player {
     // **Speed, Angles, and Movement Factors**
     public float speed;
     float facingAngle;
-    float factor = 2.5f;
+    float factor = 1.8f;
 
     // **Room Dimensions and Overlaps**
     int roomWidth, roomHeight;
@@ -56,8 +56,8 @@ public class Player {
     ArrayList<Bullet> bullets;
 
     // **Sound Effects**
-    private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound;
-    private Music flashLightWarning, playerDamagedSound;
+    private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound, searchBeep;
+    private Music flashLightWarning, playerDamagedSound, searchPatternSound,turnOnSearch;
     SoundPlayer soundManager;
 
     // **Input Handling**
@@ -99,6 +99,14 @@ public class Player {
     float camX;
     float camY;
 
+    public boolean searchPattern;
+
+    boolean canToggleSearch = true;
+
+    private double timeTillCanToggleSearch;
+
+    double beepTimer;
+
     //endregion
 
     public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
@@ -125,6 +133,7 @@ public class Player {
     }
 
     public void updatePlayer() {
+
         keyStrokes = handler.getPressedKeysHash();
         pressedMouseHash = handler.getPressedMouseHash();
         if (System.nanoTime() >= haltUntil) staminaRegen = true;
@@ -139,6 +148,7 @@ public class Player {
         melee();
         flashLight();
         pointInFront();
+        ronaldProximity();
 
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
@@ -161,7 +171,7 @@ public class Player {
             health += 0.01;
         }
 
-        if (monsterDistance < 200) {
+        if (monsterDistance < 50) {
             playerHurt = true;
             if (!playerDamagedSound.isPlaying()) {
                 playerDamagedSound.play();
@@ -181,11 +191,11 @@ public class Player {
     }
 
     public void pointInFront() {
-        tempVector.set(faceX - coorX, faceY - coorY);
+        tempVector.set(faceX - coorX + 5, faceY - coorY + 5);
         float distance = tempVector.len();
 
         if (distance != 0) {
-            tempVector.scl(200f / distance);
+            tempVector.scl(18f / distance);
             pointInFrontVector[0] = coorX + tempVector.x;
             pointInFrontVector[1] = coorY + tempVector.y;
         }
@@ -208,7 +218,7 @@ public class Player {
 
         if (flashLightIsOn && flashlightBattery > 0) {
             flashlightBattery -= 0.005;
-        } else if (flashlightBattery <= 100) {
+        } else if (flashlightBattery <= 100 && !searchPattern) {
             flashlightBattery += 0.02;
             if (flashlightBattery > 100) {
                 flashlightBattery = 100;
@@ -286,6 +296,54 @@ public class Player {
                 }
                 canMelee = false;
                 timeTillMelee = main.secondsToNano(2);
+            }
+        }
+    }
+
+    public void ronaldProximity() {
+
+
+
+        if (System.nanoTime() >= timeTillCanToggleSearch) {
+            canToggleSearch = true;
+        }
+        if (keyStrokes.contains(Input.Keys.T) && canToggleSearch) {
+            turnOnSearch.play();
+            searchPattern = !searchPattern;
+            canToggleSearch = false;
+            timeTillCanToggleSearch = System.nanoTime() + main.secondsToNano(1);
+        }
+        if (searchPattern) {
+            if (!searchPatternSound.isPlaying()) {
+                searchPatternSound.play();
+            }
+        } else if (searchPatternSound.isPlaying() && !searchPattern) {
+            searchPatternSound.stop();
+        }
+
+
+
+        if(searchPattern && monsterDistance < 7000){
+
+            flashlightBattery-= 0.02;
+            if(beepTimer <= 0){
+                if (monsterDistance < 500){
+                  beepTimer = 10;
+                } else if(monsterDistance < 2000) {
+                    beepTimer = 20;
+                } else if (monsterDistance < 3500){
+                    beepTimer = 40;
+                } else if(monsterDistance < 5000) {
+                    beepTimer = 80;
+                } else if(monsterDistance < 6500) {
+                    beepTimer = 160;
+                } else {
+                    beepTimer = 320;
+                }
+                searchBeep.play();
+            }
+            if(beepTimer > 0){
+                beepTimer--;
             }
         }
     }
@@ -412,20 +470,20 @@ public class Player {
 
         //region collision
         if (movingRight) {
-            if (MathFunctions.getPixelColor((int) coorX + 80, (int) coorY, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX + 10, (int) coorY, pixmap).equals(white)) {
                 dx = 0;
             }
         } else if (movingLeft) {
-            if (MathFunctions.getPixelColor((int) coorX - 80, (int) coorY, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX - 10, (int) coorY, pixmap).equals(white)) {
                 dx = 0;
             }
         }
         if (movingUp) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 80, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 10, pixmap).equals(white)) {
                 dy = 0;
             }
         } else if (movingDown) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 80, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 10, pixmap).equals(white)) {
                 dy = 0;
             }
         }
@@ -484,8 +542,8 @@ public class Player {
     }
 
     public void initWeapons() {
-        smg = new SubMachineGun(0.11f, 3, 35, 6, initWeaponSounds("smg"), camera, this, hud, 60, this.monster, 150, 3);
-        rifle = new Rifle(2, 15, 1, 25, initWeaponSounds("rifle"), camera, this, hud, 120, this.monster, 300, 15);
+        smg = new SubMachineGun(0.11f, 3, 35, 6, initWeaponSounds("smg"), camera, this, hud, 15, this.monster, 50, 3);
+        rifle = new Rifle(2, 15, 1, 25, initWeaponSounds("rifle"), camera, this, hud, 30, this.monster, 80, 15);
 
         equippedWeapon = smg;
     }
@@ -500,7 +558,7 @@ public class Player {
         bullets = new ArrayList<>();
         pointInFrontVector = new double[2];
         equippedWeaponName = "SMG";
-        cameraZoom = 3000;
+        cameraZoom = 500;
         roomWidth = 15000;
         roomHeight = 10000;
         flashlightBattery = 100;
@@ -528,6 +586,9 @@ public class Player {
         flashLightWarning = Gdx.audio.newMusic((Gdx.files.internal("PlayerSFX/flashlightWarning.mp3")));
         playerDamagedSound = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamaged.mp3"));
         playerDamagedGrunt = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamagedGrunt.mp3"));
+        searchPatternSound = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/searchStatic.mp3"));
+        turnOnSearch = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/turnOnSearch.mp3"));
+        searchBeep = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/proxBeep.mp3"));
     }
 
     private ArrayList<Sound> initWeaponSounds(String weaponType) {

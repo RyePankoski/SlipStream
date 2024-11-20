@@ -48,7 +48,6 @@ public class Bullet {
         findXYIncrements();
     }
 
-
     public void findXYIncrements() {
         dx = facingX - startX;
         dy = facingY - startY;
@@ -64,7 +63,7 @@ public class Bullet {
         shapeRenderer.setProjectionMatrix(player.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(255 / 255f, 255 / 255f, 0 / 255f, 1f);
-        shapeRenderer.circle((float) posX, (float) posY, 10);
+        shapeRenderer.circle((float) posX, (float) posY, 2);
         shapeRenderer.end();
 
         checkForWall();
@@ -75,6 +74,7 @@ public class Bullet {
     }
 
     public void die() {
+        System.out.println("Im dead!");
         alive = false;
     }
 
@@ -117,7 +117,7 @@ public class Bullet {
         double newY = y2 - y1;
         double distance = Math.sqrt((newX * newX) + (newY * newY));
 
-        if (distance < 100) {
+        if (distance < 20) {
             monster.hitByBullet(weapon.getWeaponType());
             monsterStrike.play();
             die();

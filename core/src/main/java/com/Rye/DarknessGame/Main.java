@@ -29,14 +29,17 @@ public class Main extends ApplicationAdapter {
 
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
+
         hud = new Hud();
         handler = new InputHandler();
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(100, 5000, 8, DJ, handler, hud, collisionMask, monster, this);
+        playcor = new Player(7500, 100, 2, DJ, handler, hud, collisionMask, monster, this);
+
 
         initLightSources();
         darknessLayer = new DarknessLayer(playcor, staticLightSources);
 
+        hud.setPlayer(playcor);
         monster.setPlayer(playcor);
         collisionMask.setCamera(playcor.getCamera());
 
@@ -50,9 +53,9 @@ public class Main extends ApplicationAdapter {
     public void initScenes() {
 
         Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")),
-            DJ, playcor, image = new Texture("CollisionMap/collisionMap.png"));
-        Scene levelTwo = new Scene("Second Stage",Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))),
-            DJ,playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
+            DJ, playcor, image = new Texture("FloorTex/MainMapDarknessGame.png"));
+        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))),
+            DJ, playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
 
         sceneManager = new SceneManager();
         sceneManager.addScene(levelOne);
@@ -61,10 +64,10 @@ public class Main extends ApplicationAdapter {
 
     public void initLightSources() {
 
-        StaticLightSource testLight = new StaticLightSource(5000, 1000, .2f, MathFunctions.rayCast(1000, 181
-            , 90, 1000, 5000, collisionMask.getPixmap()));
-        StaticLightSource nextLight = new StaticLightSource(5000, 2000, .2f, MathFunctions.rayCast(1000, 181
-            , 90, 2000, 5000, collisionMask.getPixmap()));
+        StaticLightSource testLight = new StaticLightSource(5000, 100, .2f, MathFunctions.rayCast(100, 181
+            , 90, 100, 5000, collisionMask.getPixmap()));
+        StaticLightSource nextLight = new StaticLightSource(5000, 200, .2f, MathFunctions.rayCast(100, 181
+            , 90, 200, 5000, collisionMask.getPixmap()));
         staticLightSources = new ArrayList<>();
         staticLightSources.add(testLight);
         staticLightSources.add(nextLight);
@@ -85,13 +88,12 @@ public class Main extends ApplicationAdapter {
     }
 
     public void render() {
-        System.out.println("(main) FPS:" + Gdx.graphics.getFramesPerSecond());
 
         sceneToRender.renderScene();
         playcor.updatePlayer();
         playcor.checkBullets();
 
-        if(Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)){
+        if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
             sceneNumber += 1;
             stage();
         }

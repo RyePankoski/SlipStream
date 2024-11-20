@@ -11,23 +11,25 @@ TODOd: Add walls around levels that are rendered.
 TODOd: Flashlight
 TODOd: Look into shaders more,Player Health
 
+11/19/2024
+TODOd: Look into TILE level editor.
+
 -----------------
 
-TODO: More cleanup across the board. This is super important. Get help for code review.
-TODO: Look into TILE level editor.
+
 TODO: Aiming?
-TODO:Layer Manager
 TODO: Rework point in front so it can take a length argument.
 TODO: Fix the point out front problem for the bullet.
 TODO: Add laser gun; Battery drained less is laser shorter (based on mouse pos);
 TODO: Add blur around lights & RayTrace other light sources.
 
-
-11/17/2024
 TIER 1:
+TODO: More cleanup across the board. This is super important. Get help for code review.
+TODO: Map leyers, vent system
+
 TODO: Add way to switch between scenes, clamp renderer like camera, cats color function no working on health;
 TODO: Settings, Options, Doors, LOS, PathFinding, Drop Weapons/Tools
-TODO: Make bullets ray cast, Undo Reference Spaghetti
+TODO: Undo Reference Spaghetti
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
 TODO: Tasks, Key-rebinds, Master Static Class with all hardcoded Variables.

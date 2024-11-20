@@ -16,12 +16,11 @@ import java.util.ArrayList;
 public class DarknessLayer implements Screen {
     // Constants
     private static final int FLASH_TOTAL_FRAMES = 8;
-    private static final float AMBIENT_ALPHA = 0.021f;
+    private static final float AMBIENT_ALPHA = 0.05f;
     private static final float DARKNESS_ALPHA = 1f;
     private static final float MIN_BATTERY_THRESHOLD = 20f;
     private static final float BRIGHTNESS_DECAY_RATE = 0.5f;
-    private static final float BASE_LIGHT_RADIUS = 200f;
-    private static final int RAYCAST_DISTANCE = 1300;
+    private static final int RAYCAST_DISTANCE = 250;
     private static final int RAYCAST_RAYS = 15;
 
     // Rendering components
@@ -78,6 +77,7 @@ public class DarknessLayer implements Screen {
         } else {
             Gdx.gl.glClearColor(0, 0, 0, DARKNESS_ALPHA);
         }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -139,7 +139,7 @@ public class DarknessLayer implements Screen {
         shapeRenderer.setColor(1f, 1f, 0f, alpha);
 
         float[] lightVertices = MathFunctions.rayCast(
-            1400, 181,
+            200, 181,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(),
@@ -186,9 +186,8 @@ public class DarknessLayer implements Screen {
 
         if(player.flashLightIsOn) {
             shapeRenderer.setColor(1f, 1f, 1f, .5f);
-            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 100);
+            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 20);
         }
-
     }
 
 

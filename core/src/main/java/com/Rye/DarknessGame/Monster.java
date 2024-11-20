@@ -2,6 +2,7 @@ package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,10 +31,11 @@ public class Monster {
     double health;
     boolean angry = false;
     public double moveSpeed = 5;
-
     double angerTime = 1;
+    int tpAwayTimer = 0;
 
     ShapeRenderer shapeRenderer;
+    private Sound escapeSound;
 
 //endregion
 
@@ -42,7 +44,6 @@ public class Monster {
         initSounds();
         initDrawParams(pixmap);
     }
-
 
     public void setPlayer(Player player) {
         this.player = player;
@@ -60,21 +61,17 @@ public class Monster {
                 health += 0.02;
             }
         }
+
+        if(tpAwayTimer > 0) {
+            shouldITeleport();
+        }
     }
 
     public void distanceToPlayer() {
-        double x1 = coorX;
-        double y1 = coorY;
-        double x2 = player.getCoorX();
-        double y2 = player.getCoorY();
 
-        double max = 3000;
-
-        double newX = x2 - x1;
-        double newY = y2 - y1;
-        double distance = Math.sqrt((newX * newX) + (newY * newY));
+        double max = 2000;
+        double distance = player.monsterDistance;
         double percent = (max - distance) / max;
-
 
         if (distance < max) {
             if (eerieMusic.isPlaying()) {
@@ -115,10 +112,32 @@ public class Monster {
         angry = true;
         angerTime = System.nanoTime() + player.main.secondsToNano(7);
         health -= weapon.getDamage();
+        tpAwayTimer = 1000;
     }
 
     public double getCoorX() {
         return coorX;
+    }
+
+    public void teleportAway(){
+        health = 100;
+        if(eerieMusic.isPlaying()){
+            eerieMusic.stop();
+        }
+        escapeSound.play();
+        coorX = ran.nextInt(100,pixmap.getWidth()-100);
+        coorY = ran.nextInt(100,pixmap.getHeight()-100);
+    }
+
+    public void shouldITeleport(){
+
+        if(tpAwayTimer > 0){
+            tpAwayTimer--;
+        }
+        if(tpAwayTimer == 0){
+            teleportAway();
+        }
+
     }
 
     public double getCoorY() {
@@ -134,39 +153,40 @@ public class Monster {
 
     public void move() {
 
-        int textureSize = monsterTexture.getWidth() / 2 - 50;
+        int textureSize = monsterTexture.getWidth() / 2;
 
-        moveSpeed = 5;
+        moveSpeed = 1;
         moveSpeed = angry ? moveSpeed * 3 : moveSpeed;
 
+        //out of bounds
         if (coorX + dx > pixmap.getWidth()) {
             dx *= -1;
-            dy += ran.nextDouble(-5, 5);
+            dy += ran.nextDouble(-2,2);
         } else if (coorX + dx < 0) {
             dx *= -1;
-            dy += ran.nextDouble(-5, 5);
+            dy += ran.nextDouble(-2,2);
         }
-
         if (coorY + dy > pixmap.getHeight()) {
             dy *= -1;
-            dx += ran.nextDouble(-5, 5);
+            dx += ran.nextDouble(-2,2);
 
         } else if (coorY + dy < 0) {
             dy *= -1;
-            dx += ran.nextDouble(-5, 5);
+            dx += ran.nextDouble(-2,2);
         }
 
+        //wall collision
         if (dx > 0) {
             dx = moveSpeed;
             if (getPixelColor((int) coorX + textureSize, (int) coorY).equals(white)) {
                 dx *= -1;
-                dy += ran.nextDouble(-5, 5);
+                dy += ran.nextDouble(-2, 2);
             }
         } else if (dx < 0) {
             dx = -moveSpeed;
             if (getPixelColor((int) coorX - textureSize, (int) coorY).equals(white)) {
                 dx *= -1;
-                dy += ran.nextDouble(-5, 5);
+                dy += ran.nextDouble(-2, 2);
             }
         }
 
@@ -213,7 +233,7 @@ public class Monster {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(255, 0, 0, (float) (1 - (health / 100)));
-        shapeRenderer.circle((float) coorX, (float) coorY, 50);
+        shapeRenderer.circle((float) coorX, (float) coorY, 10);
         shapeRenderer.end();
 
     }
@@ -237,16 +257,15 @@ public class Monster {
 
     public void initSounds(){
         eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/eerieMusic.mp3"));
+        escapeSound = Gdx.audio.newSound(Gdx.files.internal("MonsterSFX/monsterEscape.mp3"));
     }
 
     public void initVariables() {
-        dx = 5;
-
-        coorX = 2000;
+        dx = 1;
+        coorX = 20;
         coorY = 5000;
         health = 100;
         ran = new Random();
-
     }
 
 

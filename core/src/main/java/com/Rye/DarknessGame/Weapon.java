@@ -90,7 +90,7 @@ public class Weapon {
             spriteBatch.begin();
             gunFlashSprite.setPosition((float) pointInFrontVector[0] - gunFlashSprite.getWidth() / 2,
                 (float) pointInFrontVector[1] - gunFlashSprite.getHeight() / 2);
-            gunFlashSprite.setRotation(player.getFacingAngle());
+            gunFlashSprite.setRotation(player.getFacingAngle() + 90);
             gunFlashSprite.draw(spriteBatch);
             spriteBatch.end();
 

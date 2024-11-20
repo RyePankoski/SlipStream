@@ -659,4 +659,17 @@ public class Player {
     public float getCamY() {
         return camY;
     }
+
+    public void addToCoors(int x, int y){
+        coorX += x;
+        coorY += y;
+    }
+
+    public void setCoorX(float coorX) {
+        this.coorX = coorX;
+    }
+
+    public void setCoorY(float coorY) {
+        this.coorY = coorY;
+    }
 }

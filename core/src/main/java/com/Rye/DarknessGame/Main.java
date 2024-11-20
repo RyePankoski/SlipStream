@@ -23,6 +23,8 @@ public class Main extends ApplicationAdapter {
     boolean monsterAlive = true;
     SoundPlayer DJ;
     ArrayList<StaticLightSource> staticLightSources;
+
+    Tram tram;
     //endregion
 
     public void create() {
@@ -33,8 +35,9 @@ public class Main extends ApplicationAdapter {
         hud = new Hud();
         handler = new InputHandler();
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(7700, 100, 2, DJ, handler, hud, collisionMask, monster, this);
+        playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask, monster, this);
 
+        tram = new Tram(playcor);
 
         initLightSources();
         darknessLayer = new DarknessLayer(playcor, staticLightSources);
@@ -90,19 +93,13 @@ public class Main extends ApplicationAdapter {
     public void render() {
 
         sceneToRender.renderScene();
+        tram.updateTram();
         playcor.updatePlayer();
         playcor.checkBullets();
-
-        if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
-            sceneNumber += 1;
-            stage();
-        }
-
 
         if (monsterAlive) {
             monster.updateMonster();
         }
-
         darknessLayer.render(0f);
         hud.renderHud();
     }

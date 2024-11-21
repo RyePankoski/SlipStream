@@ -79,4 +79,10 @@ public class MathFunctions {
     public static float fastSqrt(float x) {
         return 1.0f / fastInvSqrt(x);  // Invert the result to get sqrt(x)
     }
+
+    public static double distanceFromMe(double x1, double y1, double x2, double y2){
+        float dx = (float)(x2 - x1);
+        float dy = (float)(y2 - y1);
+        return (MathFunctions.fastSqrt((dx*dx)+(dy*dy)));
+    }
 }

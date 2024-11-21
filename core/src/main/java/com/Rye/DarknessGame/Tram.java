@@ -44,7 +44,6 @@ public class Tram {
         move();
         drawMyself();
     }
-
     public void handleInputs() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
             if (!(whichStop + 1 > tramStops.length-1)) {
@@ -59,17 +58,12 @@ public class Tram {
     }
 
     public void move() {
-
         Rectangle interactionZone = new Rectangle(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
-
         int tramSpeed = 3;
-
 //        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
 //        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 //        shapeRenderer.rect(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
 //        shapeRenderer.end();
-
-
         if (moving && !tramMovingSound.isPlaying()) {
             tramMovingSound.play();
         }

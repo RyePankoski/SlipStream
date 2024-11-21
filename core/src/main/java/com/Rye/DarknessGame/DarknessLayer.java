@@ -69,15 +69,14 @@ public class DarknessLayer implements Screen {
     }
 
     private void beginLightBufferRendering() {
-        lightBuffer.begin();
 
+        lightBuffer.begin();
         if (player.playerHurt) {
             player.playerHurt = false;
             Gdx.gl.glClearColor(.2f, 0, 0, DARKNESS_ALPHA);
         } else {
             Gdx.gl.glClearColor(0, 0, 0, DARKNESS_ALPHA);
         }
-
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -86,18 +85,9 @@ public class DarknessLayer implements Screen {
     }
 
     public void renderStaticLights() {
+
         shapeRenderer.setColor(1, 1, 1, (float) lightState.getBrightness() / 100 + 0.1f);
-
-        for (int i = 0; i < staticLights.size(); i++) {
-            StaticLightSource light = staticLights.get(i);
-
-
-            float[] vertices = light.getVertices();
-
-            // Print first few vertices
-            for (int j = 0; j < Math.min(vertices.length, 6); j += 2) {
-            }
-
+        for (StaticLightSource light : staticLights) {
             shapeRenderer.setColor(1, 1, 1, light.brightness);
             renderLightTriangles(light.getVertices(), light.getX(), light.getY());
         }
@@ -202,7 +192,6 @@ public class DarknessLayer implements Screen {
         float x = camera.position.x - camera.viewportWidth / 2;
         float y = camera.position.y - camera.viewportHeight / 2;
         batch.draw(lightBufferRegion, x, y, camera.viewportWidth, camera.viewportHeight);
-
         batch.end();
     }
 

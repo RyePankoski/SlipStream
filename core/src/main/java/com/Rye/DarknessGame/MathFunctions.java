@@ -68,4 +68,15 @@ public class MathFunctions {
         }
         return  shapeVertices;
     }
+    public static float fastInvSqrt(float x) {
+        float half = 0.5f * x;
+        int i = Float.floatToIntBits(x); // Bitwise representation of the float
+        i = 0x5f3759df - (i >> 1);       // Magic constant and bit shift
+        x = Float.intBitsToFloat(i);      // Convert back to float
+        x = x * (1.5f - half * x * x);    // Newton-Raphson method
+        return x;
+    }
+    public static float fastSqrt(float x) {
+        return 1.0f / fastInvSqrt(x);  // Invert the result to get sqrt(x)
+    }
 }

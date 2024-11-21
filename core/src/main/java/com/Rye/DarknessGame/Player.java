@@ -127,18 +127,19 @@ public class Player {
         initPlayerSounds();
         initCamera();
         initWeapons();
-
-        hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
-        hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
     }
 
     public void updatePlayer() {
-
         keyStrokes = handler.getPressedKeysHash();
         pressedMouseHash = handler.getPressedMouseHash();
         if (System.nanoTime() >= haltUntil) staminaRegen = true;
+        if (System.nanoTime() >= timeTillCanFlash) canFlashLight = true;
+        if (System.nanoTime() >= timeTillChange) canChangeGun = true;
+        if (System.nanoTime() >= timeTillMelee) canMelee = true;
+        if (System.nanoTime() >= timeTillCanToggleSearch) canToggleSearch = true;
 
         move();
+        handleMouse();
         facingAngle();
         updateCamera();
         drawMyself();
@@ -162,7 +163,7 @@ public class Player {
 
         double newX = x2 - x1;
         double newY = y2 - y1;
-        monsterDistance = Math.sqrt((newX * newX) + (newY * newY));
+        monsterDistance = MathFunctions.fastSqrt((float)((newX * newX) + (newY * newY)));
     }
 
     public void manageHealth() {
@@ -223,12 +224,8 @@ public class Player {
             if (flashlightBattery > 100) {
                 flashlightBattery = 100;
             }
-
-
         }
-        if (System.nanoTime() >= timeTillCanFlash) {
-            canFlashLight = true;
-        }
+
         if (keyStrokes.contains(Input.Keys.F) && canFlashLight) {
             flashLightSound.play();
             flashLightIsOn = !flashLightIsOn;
@@ -261,15 +258,8 @@ public class Player {
             }
         }
 
-        if (System.nanoTime() >= timeTillChange) {
-            canChangeGun = true;
-        }
-
         if (pressedMouseHash.contains(Input.Buttons.LEFT) && canChangeGun) {
-
-
             equippedWeapon.fireWeapon();
-
             if (equippedWeapon.getAmmo() > 0) {
                 staminaRegen = false;
             }
@@ -283,9 +273,7 @@ public class Player {
     }
 
     public void melee() {
-        if (System.nanoTime() == timeTillMelee) {
-            canMelee = true;
-        }
+
         if (keyStrokes.contains(Input.Keys.V)) {
             if (canMelee) {
                 if (monsterDistance < 200) {
@@ -302,11 +290,6 @@ public class Player {
 
     public void ronaldProximity() {
 
-
-
-        if (System.nanoTime() >= timeTillCanToggleSearch) {
-            canToggleSearch = true;
-        }
         if (keyStrokes.contains(Input.Keys.T) && canToggleSearch) {
             turnOnSearch.play();
             searchPattern = !searchPattern;
@@ -321,10 +304,7 @@ public class Player {
             searchPatternSound.stop();
         }
 
-
-
         if(searchPattern && monsterDistance < 7000){
-
             flashlightBattery-= 0.02;
             if(beepTimer <= 0){
                 if (monsterDistance < 500){
@@ -363,6 +343,12 @@ public class Player {
 
     public void updateBullets(Bullet bulletz) {
         bullets.add(bulletz);
+    }
+
+    public void handleMouse(){
+        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mousePos);
+        setFacing(mousePos.x, mousePos.y);
     }
 
     public void move() {
@@ -447,7 +433,6 @@ public class Player {
         float inputX = Math.abs(dx);
         float inputY = Math.abs(dy);
         double magnitude = sqrt((dx * dx) + (dy * dy));
-
         if (magnitude != 0) {
             dx /= (float) magnitude;
             dy /= (float) magnitude;
@@ -491,14 +476,9 @@ public class Player {
 
         coorX += dx;
         coorY += dy;
-
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-        setFacing(mousePos.x, mousePos.y);
     }
 
     public void updateCamera() {
-
         if (coorX + (cameraZoom / 2) > roomWidth) {
             camX = roomWidth - cameraZoom / 2;
         } else if (coorX - (cameraZoom / 2) < 0) {
@@ -522,15 +502,11 @@ public class Player {
     public void drawMyself() {
         spriteBatch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
-
         spriteBatch.begin();
         playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
         playerSprite.setRotation(getFacingAngle() + 90);
         playerSprite.draw(spriteBatch);
         spriteBatch.end();
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.PINK);
         shapeRenderer.end();
     }
 
@@ -652,24 +628,8 @@ public class Player {
         return pointInFrontVector;
     }
 
-    public float getCamX() {
-        return camX;
-    }
-
-    public float getCamY() {
-        return camY;
-    }
-
     public void addToCoors(int x, int y){
         coorX += x;
         coorY += y;
-    }
-
-    public void setCoorX(float coorX) {
-        this.coorX = coorX;
-    }
-
-    public void setCoorY(float coorY) {
-        this.coorY = coorY;
     }
 }

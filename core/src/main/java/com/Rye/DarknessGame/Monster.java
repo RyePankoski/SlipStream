@@ -50,9 +50,9 @@ public class Monster {
     }
 
     public void updateMonster() {
-
-        amIAngry();
+        if (System.nanoTime() >= angerTime) angry = false;
         monitorHealth();
+
         if (alive) {
             move();
             drawMyself();
@@ -144,13 +144,6 @@ public class Monster {
         return coorY;
     }
 
-    public void amIAngry() {
-
-        if (System.nanoTime() >= angerTime) {
-            angry = false;
-        }
-    }
-
     public void move() {
 
         int textureSize = monsterTexture.getWidth() / 2;
@@ -224,6 +217,7 @@ public class Monster {
     public void drawMyself() {
         spriteBatch.setProjectionMatrix(player.getCamera().combined);
         shapeRenderer.setProjectionMatrix(player.getCamera().combined);
+
         spriteBatch.begin();
         spriteBatch.draw(monsterTexture, (float) coorX - monsterTexture.getWidth() / 2f, (float) coorY - monsterTexture.getHeight() / 2f);
         spriteBatch.end();
@@ -247,7 +241,6 @@ public class Monster {
     }
 
     public void initDrawParams(Pixmap pixmap){
-
         this.pixmap = pixmap;
         monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
         shapeRenderer = new ShapeRenderer();
@@ -267,6 +260,4 @@ public class Monster {
         health = 100;
         ran = new Random();
     }
-
-
 }

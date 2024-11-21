@@ -26,14 +26,12 @@ public class Scene {
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         soundPlayer = soundPlayerRef;
+
+        projection = player.getCamera().combined;
+        shapeRenderer.setProjectionMatrix(projection);
     }
 
     public void renderScene() {
-
-        projection = player.getCamera().combined;
-        batch.setProjectionMatrix(projection);
-        shapeRenderer.setProjectionMatrix(projection);
-
         batch.begin();
         batch.setProjectionMatrix(projection);
 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class SoundPlayer {
 
-    private Map<String, Long> activeSounds = new HashMap<>();
+    private final Map<String, Long> activeSounds = new HashMap<>();
 
     public SoundPlayer() {
     }

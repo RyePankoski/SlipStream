@@ -13,15 +13,17 @@ public class StaticLightSource {
 
     float brightness;
 
-    public StaticLightSource(int posY, int posX,float brightness, float[] vertices) {
-        initVariables(posX, posY,brightness,vertices);
+    public StaticLightSource(int posY, int posX, float brightness, float[] vertices) {
+        initVariables(posX, posY, brightness, vertices);
     }
+
     public void initVariables(int x, int y, float brightness, float[] vertices) {
         this.x = x;
         this.y = y;
         this.vertices = vertices;
         this.brightness = brightness;
     }
+
     public int getX() {
         return x;
     }

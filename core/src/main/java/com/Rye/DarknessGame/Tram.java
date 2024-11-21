@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 
 
 public class Tram {
@@ -41,7 +43,6 @@ public class Tram {
         handleInputs();
         move();
         drawMyself();
-
     }
 
     public void handleInputs() {
@@ -59,6 +60,16 @@ public class Tram {
 
     public void move() {
 
+        Rectangle interactionZone = new Rectangle(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
+
+        int tramSpeed = 3;
+
+//        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//        shapeRenderer.rect(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
+//        shapeRenderer.end();
+
+
         if (moving && !tramMovingSound.isPlaying()) {
             tramMovingSound.play();
         }
@@ -68,23 +79,26 @@ public class Tram {
 
         if (coorX > tramStops[whichStop]) {
             moving = true;
-            coorX -= 4;
-            player.addToCoors(-4, 0);
+            coorX -= tramSpeed;
+            if (interactionZone.contains(player.getCoorX(), player.getCoorY())) {
+                player.addToCoors(-tramSpeed, 0);
+            }
 
         } else if (coorX < tramStops[whichStop]) {
             moving = true;
-            coorX += 4;
-            player.addToCoors(4, 0);
+            coorX += tramSpeed;
+            if (interactionZone.contains(player.getCoorX(), player.getCoorY())) {
+                player.addToCoors(tramSpeed, 0);
+            }
         } else {
             moving = false;
         }
     }
 
-
     public void initVariables() {
         whichStop = 2;
         tramStops = new int[4];
-        tramStops[0] = 3200;
+        tramStops[0] = 3210;
         tramStops[1] = 4800;
         tramStops[2] = 9000;
         tramStops[3] = 12900;

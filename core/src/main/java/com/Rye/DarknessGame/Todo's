@@ -25,22 +25,26 @@ TODO: Add blur around lights & RayTrace other light sources.
 
 TIER 1:
 TODO: More cleanup across the board. This is super important. Get help for code review.
-TODO: Map leyers, vent system
-
+TODO: Map layers, vent system
 TODO: Add way to switch between scenes, clamp renderer like camera, cats color function no working on health;
 TODO: Settings, Options, Doors, LOS, PathFinding, Drop Weapons/Tools
 TODO: Undo Reference Spaghetti
+
 TIER 2:
 TODO: Pre-Mission screen/Store, Equipments Load (modify stamina/action Speed,) Noise Levels, Danger Level
 TODO: Tasks, Key-rebinds, Master Static Class with all hardcoded Variables.
+TODO: look up at ceiling mechanic (thanks cat)
+
 TIER 3:
 TODO: Tools(Traps, Deployable Lights) Parts,  More Guns (LaserGun,)
 TODO: Monster AI,
+
 TIER 4:
 TODO: ship hazards (exposed wiring, fires, leaking conduits, no o2, etc,)
-TODO: Power-Routing (power cables,) Alien Sabotage, Shield Generator, Different States of Ship disrepair, , Different Ship Contexts
+TODO: Power-Routing (power cables,) Alien Sabotage, Shield Generator, Different States of Ship disrepair, Different Ship Contexts
 TODO: Co-op, Tweak variables of monster AI
-TODO:Make it so the camera cant see through walls... gulp...
+TODO: Make it so the camera cant see through walls... gulp...
+TODO: Walkie-Talkie and pager. Objectives that mandate splitting up.
 
 
 

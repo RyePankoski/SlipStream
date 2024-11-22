@@ -4,6 +4,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -31,16 +36,13 @@ public class Main extends ApplicationAdapter {
 
     Color sectorColor;
     int playerSector;
-    private boolean canCheckSector = true;
+    private boolean canRenderFast = true;
+    double RenderTimerFast;
+    Door door;
 
-    double checkSectorTimer;
-    Door firstDoor;
-    //endregion
+    ArrayList<Door> doors;
 
     public void create() {
-
-
-
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         hud = new Hud();
@@ -48,8 +50,6 @@ public class Main extends ApplicationAdapter {
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask, monster, this);
 
-
-        firstDoor = new Door(9090,4750, playcor, collisionMask.getPixmap());
         tram = new Tram(playcor);
         initLightSources();
         darknessLayer = new DarknessLayer(playcor, staticLightSources);
@@ -61,6 +61,52 @@ public class Main extends ApplicationAdapter {
         initScenes();
         stage();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
+
+        doors = new ArrayList<>();
+        loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
+
+    }
+
+    public void updateDoors(int playerSector) {
+        for (Door door : doors) {
+            // Check if the door's sector matches the player's current sector
+            if (door.getSector() == playerSector) {
+                // Only update the door if it belongs to the same sector as the player
+                door.updateDoor();
+            }
+        }
+    }
+
+    public void loadMapAndInstantiateDoors(String mapPath) {
+
+        int doorNum = 0;
+        TmxMapLoader mapLoader = new TmxMapLoader();
+        TiledMap map = mapLoader.load(mapPath);
+        MapLayer objectLayer = map.getLayers().get("doorLayer");
+
+        if (objectLayer == null) {
+            System.out.println("No 'Objects' layer found in the map.");
+            return;
+        }
+
+        MapObjects objects = objectLayer.getObjects();
+        for (MapObject object : objects) {
+
+            String objectClass = object.getProperties().get("type", String.class);
+            if ("Door".equals(objectClass)) {
+                doorNum++;
+                // Retrieve position and size properties
+                float x = object.getProperties().get("x", Float.class);
+                float y = object.getProperties().get("y", Float.class);
+                float width = object.getProperties().get("width", Float.class);
+                float height = object.getProperties().get("height", Float.class);
+
+                door = new Door((int) x, (int) y, (int)width, (int)height, findSector((int) x, (int) y),doorNum, playcor, collisionMask.getPixmap());
+
+
+                doors.add(door);
+            }
+        }
     }
 
     public void initScenes() {
@@ -77,12 +123,6 @@ public class Main extends ApplicationAdapter {
 
     public void initLightSources() {
         staticLightSources = new ArrayList<>();
-
-        StaticLightSource testLight = new StaticLightSource(200, 7800, .2f, MathFunctions.rayCast(500, 181
-            , 90, 7800, 200, collisionMask.getPixmap()));
-        StaticLightSource nextLight = new StaticLightSource(5000, 200, .2f, MathFunctions.rayCast(100, 181
-            , 90, 200, 5000, collisionMask.getPixmap()));
-
         StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(500, 181
             , 90, 3200, 4930, collisionMask.getPixmap()));
         StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(500, 181
@@ -96,9 +136,6 @@ public class Main extends ApplicationAdapter {
         staticLightSources.add(stationLight2);
         staticLightSources.add(stationLight3);
         staticLightSources.add(stationLight4);
-
-        staticLightSources.add(testLight);
-        staticLightSources.add(nextLight);
     }
 
     public void stage() {
@@ -115,83 +152,71 @@ public class Main extends ApplicationAdapter {
         System.gc();
     }
 
-    public void findSectorOfPlayer() {
+    public int findSector(int x, int y) {
 
-        if (System.currentTimeMillis() >= checkSectorTimer) {
-            canCheckSector = true;
-        }
+        int sector = 0;
+        System.out.println(playerSector);
 
-        if (canCheckSector) {
-            System.out.println(playerSector);
-            canCheckSector = false;
-            checkSectorTimer = System.currentTimeMillis() + 250;
+        int[] colorValues = {255, 200, 180, 160, 140, 120, 100, 80, 60, 40};
+        sectorColor = (MathFunctions.getPixelColor(x, y, sectorMap));
+        int red = sectorColor.getRed();
+        int green = sectorColor.getGreen();
+        int blue = sectorColor.getBlue();
 
-            int[] colorValues = {255, 200, 180, 160, 140, 120, 100, 80, 60, 40};
-            sectorColor = (MathFunctions.getPixelColor((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap));
-            int red = sectorColor.getRed();
-            int green = sectorColor.getGreen();
-            int blue = sectorColor.getBlue();
 
-            if (red == 255 && green == 255) {
-                playerSector = 100;
-                return;
-            }
 
-            if (red > 0) {
-                for (int i = 0; i < colorValues.length; i++) {
-                    if (red == colorValues[i]) {
-                        this.playerSector = i;
-                        return;
-                    }
-                }
-            }
-            if (green > 0) {
-                for (int i = 0; i < colorValues.length; i++) {
-                    if (green == colorValues[i]) {
-                        this.playerSector = i + 10;
-                        return;
-                    }
-                }
-            }
-            if (blue > 0) {
-                for (int i = 0; i < colorValues.length; i++) {
-                    if (blue == colorValues[i]) {
-                        this.playerSector = i + 20;
-                        return;
-                    }
+        if (red > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (red == colorValues[i]) {
+                    sector = i;
                 }
             }
         }
+        if (green > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (green == colorValues[i]) {
+                    sector = i + 10;
+                }
+            }
+        }
+        if (blue > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (blue == colorValues[i]) {
+                    sector = i + 20;
+                }
+            }
+        }
+
+        if (red == 255 && green == 255) {
+            sector = 100;
+        }
+        return sector;
     }
-
-    public void chooseAndRender() {
-
-    }
-
 
     public void render() {
 
+        if (System.currentTimeMillis() >= RenderTimerFast) canRenderFast = true;
+        if (canRenderFast) {
+            canRenderFast = false;
+            RenderTimerFast = System.currentTimeMillis() + 250;
+            playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
+            updateDoors(playerSector);
+        }
 
-
-        findSectorOfPlayer();
-        chooseAndRender();
         sceneToRender.renderScene();
-
 
         if (playerSector == 100 || tram.moving) {
             tram.updateTram();
         }
+
         playcor.updatePlayer();
         playcor.checkBullets();
 
         if (monsterAlive) {
             monster.updateMonster();
         }
-        firstDoor.updateDoor();
 
         darknessLayer.render(0f);
         hud.renderHud();
     }
-
-
 }

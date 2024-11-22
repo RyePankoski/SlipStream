@@ -19,9 +19,19 @@ public class Door {
 
     Music doorClosingSound;
 
-    public Door(int posX, int posY, Player player, Pixmap pixmap) {
+    int sector;
+
+    int instantiationNumber;
+    int width;
+    int height;
+
+    public Door(int posX, int posY,int width, int height, int sector,int instantiationNumber, Player player, Pixmap pixmap) {
         this.posX = posX;
         this.posY = posY;
+        this.width = width;
+        this.height = height;
+        this.sector = sector;
+        this.instantiationNumber = instantiationNumber;
         this.player = player;
         this.pixmap = pixmap;
 
@@ -34,6 +44,7 @@ public class Door {
     }
 
     public void updateDoor() {
+//        System.out.println("Door " + instantiationNumber + "checking in!");
         isPlayerNear();  // Check if the player is near and update door state
     }
 
@@ -45,7 +56,7 @@ public class Door {
             }
             hasStateChanged = true;
             pixmap.setColor(0f, 0f, 0f, 0f);  // Set to transparent
-            pixmap.fillRectangle(posX, pixmap.getHeight() - posY, 96, 32);  // Open door by making it transparent (using correct width and height)
+            pixmap.fillRectangle(posX, pixmap.getHeight() - posY - height, width, height);  // Open door by making it transparent (using correct width and height)
         }
     }
 
@@ -56,7 +67,7 @@ public class Door {
             }
             hasStateChanged = false;
             pixmap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
-            pixmap.fillRectangle(posX, pixmap.getHeight() -posY, 96, 32);  // Close door by drawing opaque rectangle (using correct width and height)
+            pixmap.fillRectangle(posX, pixmap.getHeight() -posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
         }
     }
 
@@ -68,5 +79,9 @@ public class Door {
         } else {
             close();
         }
+    }
+
+    public int getSector() {
+        return sector;
     }
 }

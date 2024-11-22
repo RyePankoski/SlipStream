@@ -13,11 +13,11 @@
             "scaleInDock": 1
         },
         "MainMapDarknessGame.tmx": {
-            "scale": 0.125,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 7640,
-                "y": 4864
+                "x": 9359,
+                "y": 5135
             }
         },
         "SpaceStation3.tsx": {
@@ -50,7 +50,7 @@
     "last.exportedFilePath": "C:/Users/frank/IdeaProjects/InTheDark Game/assets/CollisionMap",
     "last.imagePath": "C:/Users/frank/IdeaProjects/InTheDark Game/assets/Tiled Maps/DarknessGameMaps/Map1",
     "map.height": 78,
-    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
     "map.width": 78,
     "openFiles": [
         "dfgsdsf.tsx",

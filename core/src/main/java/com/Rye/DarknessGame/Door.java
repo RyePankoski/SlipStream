@@ -40,7 +40,6 @@ public class Door {
         doorClosingSound = Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/doorClose.mp3"));
 
         shapeRenderer = new ShapeRenderer();
-        close();
     }
 
     public void updateDoor() {

@@ -34,7 +34,6 @@ public class Main extends ApplicationAdapter {
     Pixmap sectorMap;
 
     Tram tram;
-
     Color sectorColor;
     int playerSector;
     private boolean canRenderFast = true;
@@ -67,6 +66,7 @@ public class Main extends ApplicationAdapter {
         stage();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
 
+        //if you ever get an out-of-bounds error related to doors, its probably this.
         doors = new Door[25][50];
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
 

@@ -255,7 +255,7 @@ public class Monster {
 
     public void initVariables() {
         dx = 1;
-        coorX = 2000;
+        coorX = 9000;
         coorY = 5000;
         health = 100;
         ran = new Random();

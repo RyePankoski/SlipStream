@@ -12,7 +12,7 @@ public class Door {
     Player player;
     boolean hasStateChanged = true;
 
-    Pixmap pixmap;
+    Pixmap collisionMap;
     ShapeRenderer shapeRenderer;
 
     Music doorOpeningSound;
@@ -31,7 +31,7 @@ public class Door {
 
     boolean locked;
 
-    public Door(int posX, int posY,int width, int height, int sector,int instantiationNumber, boolean locked, Player player, Pixmap pixmap) {
+    public Door(int posX, int posY,int width, int height, int sector,int instantiationNumber, boolean locked, Player player, Pixmap collisionMap) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -39,7 +39,7 @@ public class Door {
         this.sector = sector;
         this.instantiationNumber = instantiationNumber;
         this.player = player;
-        this.pixmap = pixmap;
+        this.collisionMap = collisionMap;
         this.locked = locked;
 
         doorOpeningSound = Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/openDoor.mp3"));
@@ -61,8 +61,8 @@ public class Door {
                 doorOpeningSound.play();
             }
             hasStateChanged = true;
-            pixmap.setColor(0f, 0f, 0f, 0f);  // Set to transparent
-            pixmap.fillRectangle(posX, pixmap.getHeight() - posY - height, width, height);  // Open door by making it transparent (using correct width and height)
+            collisionMap.setColor(0f, 0f, 0f, 0f);  // Set to transparent
+            collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height);  // Open door by making it transparent (using correct width and height)
         }
     }
 
@@ -72,8 +72,8 @@ public class Door {
                 doorClosingSound.play();
             }
             hasStateChanged = false;
-            pixmap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
-            pixmap.fillRectangle(posX, pixmap.getHeight() - posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
+            collisionMap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
+            collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
         }
         justInsantiated = false;
     }

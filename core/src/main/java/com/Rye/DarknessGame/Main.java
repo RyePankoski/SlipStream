@@ -35,55 +35,54 @@ public class Main extends ApplicationAdapter implements Screen {
     Pixmap sectorMap;
 
     Tram tram;
-    Color sectorColor;
+
     int playerSector;
     private boolean canRenderFast = true;
     double RenderFastTimer;
-    Door door;
-    Door[][] doors;
+
     LOS los;
     private boolean renderGame = true;
     private boolean canRenderVeryFast = true;
     private long renderVeryFastTimer;
+    Color sectorColor;
 
     LightingManager lightingManager;
 
+    DoorManager doorManager;
+
     public void create() {
+        //non-dependent objects
+        sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         hud = new Hud();
         handler = new InputHandler();
 
+        //dependent objects
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
+        doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), playcor);
         los = new LOS(playcor);
         tram = new Tram(playcor);
-        hud.setPlayer(playcor);
-        monster.setPlayer(playcor);
-        hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
-
-
         lightingManager = new LightingManager(collisionMask.getPixmap());
         darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources());
 
+        //setters
+        hud.setPlayer(playcor);
+        monster.setPlayer(playcor);
+        hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
         collisionMask.setCamera(playcor.getCamera());
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
         Gdx.input.setCursorCatched(true);
 
+        //inits
         initScenes();
         prepareScenes();
-        sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
-
-        //if you ever get an out-of-bounds error related to doors, its probably this.
-        doors = new Door[25][50];
-        loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
     }
 
     public void initScenes() {
-
         Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")), DJ, playcor, image = new Texture("FloorTex/MainMapDarknessGame.png"));
         Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))), DJ, playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
-
         sceneManager = new SceneManager();
         sceneManager.addScene(levelOne);
         sceneManager.addScene(levelTwo);
@@ -92,8 +91,6 @@ public class Main extends ApplicationAdapter implements Screen {
     public void prepareScenes() {
         sceneToRender = sceneManager.getScenes().get(sceneNumber);
     }
-
-
 
     public void killMonster(Monster monster) {
         monster = null;
@@ -140,47 +137,6 @@ public class Main extends ApplicationAdapter implements Screen {
         return sector;
     }
 
-    public void updateDoors(int playerSector) {
-        for (int i = 0; i < 500; i++) {
-            if (doors[playerSector][i] != null) {
-                doors[playerSector][i].updateDoor();
-            } else {
-                break;
-            }
-        }
-    }
-
-    public void loadMapAndInstantiateDoors(String mapPath) {
-
-        int[] numberDoorsInSector = new int[25];
-        TmxMapLoader mapLoader = new TmxMapLoader();
-        TiledMap map = mapLoader.load(mapPath);
-        MapLayer objectLayer = map.getLayers().get("doorLayer");
-
-        if (objectLayer == null) {
-            System.out.println("No 'Objects' layer found in the map.");
-            return;
-        }
-
-        MapObjects objects = objectLayer.getObjects();
-        for (MapObject object : objects) {
-
-            String objectClass = object.getProperties().get("type", String.class);
-            if ("Door".equals(objectClass)) {
-
-                float x = object.getProperties().get("x", Float.class);
-                float y = object.getProperties().get("y", Float.class);
-                float width = object.getProperties().get("width", Float.class);
-                float height = object.getProperties().get("height", Float.class);
-                boolean isLocked = object.getProperties().get("locked", Boolean.class);
-                int sector = findSector((int)x, (int)y);
-
-                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector],isLocked, playcor, collisionMask.getPixmap());
-                doors[sector][numberDoorsInSector[sector]] = door;
-                numberDoorsInSector[sector]++;
-            }
-        }
-    }
 
     public void render() {
 
@@ -191,12 +147,12 @@ public class Main extends ApplicationAdapter implements Screen {
             if (System.currentTimeMillis() >= renderVeryFastTimer) canRenderVeryFast = true;
 
             //only for drawn elements!
-            if(canRenderVeryFast){
+            if (canRenderVeryFast) {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
                 sceneToRender.renderScene();
-                if(playerSector == 24){
+                if (playerSector == 24) {
                     tram.updateTram();
                 }
                 playcor.updatePlayer();
@@ -215,9 +171,8 @@ public class Main extends ApplicationAdapter implements Screen {
             if (canRenderFast) {
                 canRenderFast = false;
                 RenderFastTimer = System.currentTimeMillis() + 250;
-
                 playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
-                updateDoors(playerSector);
+                doorManager.updateDoors(playerSector);
             }
         }
     }

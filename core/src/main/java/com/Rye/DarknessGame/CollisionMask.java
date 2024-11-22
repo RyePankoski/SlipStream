@@ -12,7 +12,8 @@ public class CollisionMask {
     SpriteBatch spriteBatch;
     Texture collisionMap;
     OrthographicCamera camera;
-    Pixmap pixmap;
+
+    private final Pixmap pixmap;
 
 
     public CollisionMask() {

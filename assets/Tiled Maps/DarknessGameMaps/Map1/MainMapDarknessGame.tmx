@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="468" height="312" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="38">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="468" height="312" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="41">
  <editorsettings>
   <export target="../../../CollisionMap/objectMap.tmx" format="tmx"/>
  </editorsettings>
@@ -1279,19 +1279,25 @@
 </data>
  </layer>
  <objectgroup id="9" name="doorLayer">
-  <object id="17" type="Door" x="9088" y="5216" width="96" height="32"/>
-  <object id="19" type="Door" x="9088" y="4672" width="96" height="32"/>
-  <object id="21" type="Door" x="9088" y="4160" width="96" height="32"/>
-  <object id="22" type="Door" x="9088" y="4032" width="96" height="32"/>
-  <object id="23" type="Door" x="9088" y="3904" width="96" height="32"/>
-  <object id="26" type="Door" x="9184" y="4416" width="32" height="96"/>
-  <object id="27" type="Door" x="9056" y="4416" width="32" height="96"/>
-  <object id="31" type="Door" x="4928" y="4672" width="160" height="32"/>
-  <object id="32" type="Door" x="4928" y="5216" width="160" height="32"/>
-  <object id="33" type="Door" x="12832" y="5216" width="96" height="32"/>
-  <object id="34" type="Door" x="13024" y="5216" width="96" height="32"/>
-  <object id="35" type="Door" x="12992" y="4672" width="128" height="32"/>
-  <object id="36" type="Door" x="3296" y="4672" width="160" height="32"/>
-  <object id="37" type="Door" x="3296" y="5216" width="160" height="32"/>
+  <object id="19" type="Door" x="9088" y="4672" width="96" height="32">
+   <properties>
+    <property name="locked" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="38" type="Door" x="9088" y="4160" width="96" height="32">
+   <properties>
+    <property name="locked" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="39" type="Door" x="9088" y="4032" width="96" height="32">
+   <properties>
+    <property name="locked" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="40" type="Door" x="9088" y="3904" width="96" height="32">
+   <properties>
+    <property name="locked" type="bool" value="true"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

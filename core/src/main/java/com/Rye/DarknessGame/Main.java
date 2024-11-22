@@ -2,6 +2,7 @@ package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
@@ -41,6 +42,7 @@ public class Main extends ApplicationAdapter {
     Door door;
     Door[][] doors;
     LOS los;
+    private boolean renderGame = true;
 
     public void create() {
         DJ = new SoundPlayer();
@@ -72,10 +74,8 @@ public class Main extends ApplicationAdapter {
 
     public void initScenes() {
 
-        Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")),
-            DJ, playcor, image = new Texture("FloorTex/MainMapDarknessGame.png"));
-        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))),
-            DJ, playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
+        Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")), DJ, playcor, image = new Texture("FloorTex/MainMapDarknessGame.png"));
+        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))), DJ, playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
 
         sceneManager = new SceneManager();
         sceneManager.addScene(levelOne);
@@ -84,14 +84,10 @@ public class Main extends ApplicationAdapter {
 
     public void initLightSources() {
         staticLightSources = new ArrayList<>();
-        StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(200, 181
-            , 90, 3200, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(200, 181
-            , 90, 4800, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight3 = new StaticLightSource(5050, 9150, .5f, MathFunctions.rayCast(250, 181
-            , 90, 9150, 5050, collisionMask.getPixmap()));
-        StaticLightSource stationLight4 = new StaticLightSource(4930, 12900, .5f, MathFunctions.rayCast(200, 181
-            , 90, 12900, 4930, collisionMask.getPixmap()));
+        StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(200, 181, 90, 3200, 4930, collisionMask.getPixmap()));
+        StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(200, 181, 90, 4800, 4930, collisionMask.getPixmap()));
+        StaticLightSource stationLight3 = new StaticLightSource(5050, 9150, .5f, MathFunctions.rayCast(250, 181, 90, 9150, 5050, collisionMask.getPixmap()));
+        StaticLightSource stationLight4 = new StaticLightSource(4930, 12900, .5f, MathFunctions.rayCast(200, 181, 90, 12900, 4930, collisionMask.getPixmap()));
 
         staticLightSources.add(stationLight1);
         staticLightSources.add(stationLight2);
@@ -116,7 +112,6 @@ public class Main extends ApplicationAdapter {
     public int findSector(int x, int y) {
 
         int sector = 0;
-        System.out.println(playerSector);
 
         int[] colorValues = {255, 200, 180, 160, 140, 120, 100, 80, 60, 40};
         sectorColor = (MathFunctions.getPixelColor(x, y, sectorMap));
@@ -198,30 +193,37 @@ public class Main extends ApplicationAdapter {
 
     public void render() {
 
-        if (System.currentTimeMillis() >= RenderTimerFast) canRenderFast = true;
-        if (canRenderFast) {
-            canRenderFast = false;
-            RenderTimerFast = System.currentTimeMillis() + 250;
-            playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
-            updateDoors(playerSector);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            renderGame = !renderGame;
         }
 
-        sceneToRender.renderScene();
+        if (renderGame) {
+            if (System.currentTimeMillis() >= RenderTimerFast) canRenderFast = true;
 
-        if (playerSector == 24 || tram.moving) {
-            tram.updateTram();
+            if (canRenderFast) {
+                canRenderFast = false;
+                RenderTimerFast = System.currentTimeMillis() + 250;
+                playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
+                updateDoors(playerSector);
+            }
+
+            sceneToRender.renderScene();
+
+            if (playerSector == 24 || tram.moving) {
+                tram.updateTram();
+            }
+
+            playcor.updatePlayer();
+            playcor.checkBullets();
+
+            if (monsterAlive) {
+                monster.updateMonster();
+            }
+
+            darknessLayer.render(0f);
+            los.render(0f);
+
+            hud.renderHud();
         }
-
-        playcor.updatePlayer();
-        playcor.checkBullets();
-
-        if (monsterAlive) {
-            monster.updateMonster();
-        }
-
-        darknessLayer.render(0f);
-        los.render(0f);
-
-        hud.renderHud();
     }
 }

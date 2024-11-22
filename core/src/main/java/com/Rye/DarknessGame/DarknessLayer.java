@@ -117,7 +117,7 @@ public class DarknessLayer implements Screen {
     }
 
     private void renderBulletStrike() {
-        shapeRenderer.setColor(1f, 1f, 0f, (float) bulletStrikeState.getStrikeSize() / 300);
+        shapeRenderer.setColor(1f, 1f, 0f, (float)(bulletStrikeState.getStrikeSize()/300f));
         shapeRenderer.circle(
             bulletStrikeState.getPosition().x,
             bulletStrikeState.getPosition().y,
@@ -128,7 +128,7 @@ public class DarknessLayer implements Screen {
 
     private void renderFlashEffect() {
 
-        float alpha = flashState.getCurrentFrame() / (float) FLASH_TOTAL_FRAMES - .5f;
+        float alpha = flashState.getCurrentFrame() / (float) FLASH_TOTAL_FRAMES;
         shapeRenderer.setColor(1f, 1f, 0f, alpha);
 
         float[] lightVertices = MathFunctions.rayCast(

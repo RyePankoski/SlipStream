@@ -25,7 +25,13 @@ public class Door {
     int width;
     int height;
 
-    public Door(int posX, int posY,int width, int height, int sector,int instantiationNumber, Player player, Pixmap pixmap) {
+    boolean justInsantiated = true;
+
+    Music lockedDoorSound;
+
+    boolean locked;
+
+    public Door(int posX, int posY,int width, int height, int sector,int instantiationNumber, boolean locked, Player player, Pixmap pixmap) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -34,16 +40,17 @@ public class Door {
         this.instantiationNumber = instantiationNumber;
         this.player = player;
         this.pixmap = pixmap;
-
+        this.locked = locked;
 
         doorOpeningSound = Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/openDoor.mp3"));
         doorClosingSound = Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/doorClose.mp3"));
+        lockedDoorSound = Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/lockedDoorSound.mp3"));
 
         shapeRenderer = new ShapeRenderer();
     }
 
     public void updateDoor() {
-//        System.out.println("Door " + instantiationNumber + "checking in!");
+        System.out.println("Door in " + sector + ", number:" + instantiationNumber + " checking in!");
         isPlayerNear();  // Check if the player is near and update door state
     }
 
@@ -61,19 +68,26 @@ public class Door {
 
     public void close() {
         if (hasStateChanged) {
-            if(!doorClosingSound.isPlaying()){
+            if(!doorClosingSound.isPlaying() && !justInsantiated){
                 doorClosingSound.play();
             }
             hasStateChanged = false;
             pixmap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
             pixmap.fillRectangle(posX, pixmap.getHeight() - posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
         }
+        justInsantiated = false;
     }
 
     public void isPlayerNear() {
-        // Check if the player is close to the door
         double playerDistance = MathFunctions.distanceFromMe(posX + (double)width/2, posY + (double)height/2, player.getCoorX(), player.getCoorY());
-        if (playerDistance < 100) {
+
+        if (playerDistance < 100 && locked){
+            if(!lockedDoorSound.isPlaying()){
+                lockedDoorSound.play();
+            }
+        }
+
+        if (playerDistance < 100 && !locked) {
             open();
         } else {
             close();

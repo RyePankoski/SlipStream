@@ -58,3 +58,8 @@ Ship Contexts:
     Ship might exist in different physical spaces.
     The ship may need point defense to protect against asteroids, emc if going through interstellar space at relativistic speeds, orbiting a star (radiation shielding.)
 
+
+
+
+TO fix the overlap triangles, do 180, then fill darkspot with last triangle using vertex coordinates of first and last coordinates.
+

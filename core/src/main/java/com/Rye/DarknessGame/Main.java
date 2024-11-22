@@ -176,17 +176,17 @@ public class Main extends ApplicationAdapter {
 
             String objectClass = object.getProperties().get("type", String.class);
             if ("Door".equals(objectClass)) {
-                doorNum++;
                 // Retrieve position and size properties
                 float x = object.getProperties().get("x", Float.class);
                 float y = object.getProperties().get("y", Float.class);
                 float width = object.getProperties().get("width", Float.class);
                 float height = object.getProperties().get("height", Float.class);
+                boolean isLocked = object.getProperties().get("locked", Boolean.class);
+                int sector = findSector((int)x, (int)y);
 
-                door = new Door((int) x, (int) y, (int) width, (int) height, findSector((int) x, (int) y), doorNum, playcor, collisionMask.getPixmap());
-
-                doors[door.getSector()][numberDoorsInSector[door.getSector()]] = door;
-                numberDoorsInSector[door.getSector()]++;
+                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector],isLocked, playcor, collisionMask.getPixmap());
+                doors[sector][numberDoorsInSector[sector]] = door;
+                numberDoorsInSector[sector]++;
             }
         }
     }

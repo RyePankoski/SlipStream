@@ -148,10 +148,10 @@ public class Monster {
 
         int textureSize = monsterTexture.getWidth() / 2;
 
-        moveSpeed = 1;
-        moveSpeed = angry ? moveSpeed * 3 : moveSpeed;
+        moveSpeed = 2;
+        moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
 
-        //out of bounds
+        //region out of bounds detection
         if (coorX + dx > pixmap.getWidth()) {
             dx *= -1;
             dy += ran.nextDouble(-2,2);
@@ -167,8 +167,9 @@ public class Monster {
             dy *= -1;
             dx += ran.nextDouble(-2,2);
         }
+        //endregion
 
-        //wall collision
+        //region wall collision
         if (dx > 0) {
             dx = moveSpeed;
             if (getPixelColor((int) coorX + textureSize, (int) coorY).equals(white)) {
@@ -187,15 +188,16 @@ public class Monster {
             dy = moveSpeed;
             if (getPixelColor((int) coorX, (int) coorY + textureSize).equals(white)) {
                 dy *= -1;
-                dx += ran.nextDouble(-5, 5);
+                dx += ran.nextDouble(-2, 2);
             }
         } else if (dy < 0) {
             dy = -moveSpeed;
             if (getPixelColor((int) coorX, (int) coorY - textureSize).equals(white)) {
                 dy *= -1;
-                dx += ran.nextDouble(-5, 5);
+                dx += ran.nextDouble(-2, 2);
             }
         }
+        //endregion
 
         coorX += dx;
         coorY += dy;

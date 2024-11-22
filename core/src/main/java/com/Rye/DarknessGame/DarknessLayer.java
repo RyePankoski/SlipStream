@@ -135,7 +135,7 @@ public class DarknessLayer implements Screen {
             200, 181,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
-            (int) player.getCoorY(),
+            (int) player.getCoorY(), 3,
             player.pixmap
         );
 
@@ -158,7 +158,7 @@ public class DarknessLayer implements Screen {
             RAYCAST_DISTANCE, RAYCAST_RAYS,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
-            (int) player.getCoorY(),
+            (int) player.getCoorY(),2,
             player.pixmap
         );
 
@@ -171,7 +171,7 @@ public class DarknessLayer implements Screen {
             RAYCAST_DISTANCE, 180,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
-            (int) player.getCoorY(),
+            (int) player.getCoorY(),4,
             player.pixmap
         );
         shapeRenderer.setColor(1, 1, 1, AMBIENT_ALPHA);

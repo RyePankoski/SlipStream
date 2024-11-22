@@ -50,7 +50,7 @@ public class Monster {
     }
 
     public void updateMonster() {
-        if (System.nanoTime() >= angerTime) angry = false;
+        if (System.currentTimeMillis() >= angerTime) angry = false;
         monitorHealth();
 
         if (alive) {
@@ -105,12 +105,12 @@ public class Monster {
     public void hitByMelee() {
         health -= 4;
         angry = true;
-        angerTime = System.nanoTime() + player.main.secondsToNano(5);
+        angerTime = System.currentTimeMillis() + 5000;
     }
 
     public void hitByBullet(Weapon weapon) {
         angry = true;
-        angerTime = System.nanoTime() + player.main.secondsToNano(7);
+        angerTime = System.currentTimeMillis() + 7000;
         health -= weapon.getDamage();
         tpAwayTimer = 1000;
     }

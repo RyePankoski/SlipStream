@@ -74,7 +74,6 @@ public class Bullet {
     }
 
     public void die() {
-        System.out.println("Im dead!");
         alive = false;
     }
 

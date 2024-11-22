@@ -134,11 +134,11 @@ public class Player {
     public void updatePlayer() {
         keyStrokes = handler.getPressedKeysHash();
         pressedMouseHash = handler.getPressedMouseHash();
-        if (System.nanoTime() >= haltUntil) staminaRegen = true;
-        if (System.nanoTime() >= timeTillCanFlash) canFlashLight = true;
-        if (System.nanoTime() >= timeTillChange) canChangeGun = true;
-        if (System.nanoTime() >= timeTillMelee) canMelee = true;
-        if (System.nanoTime() >= timeTillCanToggleSearch) canToggleSearch = true;
+        if (System.currentTimeMillis() >= haltUntil) staminaRegen = true;
+        if (System.currentTimeMillis() >= timeTillCanFlash) canFlashLight = true;
+        if (System.currentTimeMillis() >= timeTillChange) canChangeGun = true;
+        if (System.currentTimeMillis() >= timeTillMelee) canMelee = true;
+        if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
         move();
         pointInFront();
@@ -237,7 +237,7 @@ public class Player {
             flashLightSound.play();
             flashLightIsOn = !flashLightIsOn;
             canFlashLight = false;
-            timeTillCanFlash = System.nanoTime() + main.secondsToNano(1);
+            timeTillCanFlash = System.currentTimeMillis() + 1000;
         }
     }
 
@@ -249,7 +249,7 @@ public class Player {
                 changeGun.play();
 
                 canChangeGun = false;
-                timeTillChange = System.nanoTime() + main.secondsToNano(1.5f);
+                timeTillChange = System.currentTimeMillis() + 1500;
 
                 equippedWeaponName = "SMG";
                 equippedWeapon = smg;
@@ -258,7 +258,7 @@ public class Player {
                 changeGun.play();
 
                 canChangeGun = false;
-                timeTillChange = System.nanoTime() + main.secondsToNano(1.5f);
+                timeTillChange = System.currentTimeMillis() + 1500;
 
                 equippedWeaponName = "RIFLE";
                 equippedWeapon = rifle;
@@ -270,7 +270,7 @@ public class Player {
             if (equippedWeapon.getAmmo() > 0) {
                 staminaRegen = false;
             }
-            haltUntil = System.nanoTime() + main.secondsToNano(1);
+            haltUntil = System.currentTimeMillis() + 1000;
         }
         if (keyStrokes.contains(Input.Keys.R) && canChangeGun) {
             equippedWeapon.reloadWeapon();
@@ -290,7 +290,7 @@ public class Player {
                     meleeMiss.play();
                 }
                 canMelee = false;
-                timeTillMelee = main.secondsToNano(2);
+                timeTillMelee = MathFunctions.secondsToNano(2);
             }
         }
     }
@@ -301,7 +301,7 @@ public class Player {
             turnOnSearch.play();
             searchPattern = !searchPattern;
             canToggleSearch = false;
-            timeTillCanToggleSearch = System.nanoTime() + main.secondsToNano(1);
+            timeTillCanToggleSearch = System.currentTimeMillis() + 1000;
         }
         if (searchPattern) {
             if (!searchPatternSound.isPlaying()) {
@@ -400,9 +400,9 @@ public class Player {
         if (stamina <= 0) {
             if (!staminaPause) {
                 staminaPause = true;
-                waitUntil = System.nanoTime() + main.secondsToNano(3);
+                waitUntil = System.currentTimeMillis() + 3000;
             }
-            if (System.nanoTime() >= waitUntil) {
+            if (System.currentTimeMillis() >= waitUntil) {
                 staminaPause = false;
             }
         }
@@ -537,7 +537,7 @@ public class Player {
     }
 
     public void initWeapons() {
-        smg = new SubMachineGun(0.11f, 3, 35, 6, initWeaponSounds("smg"), camera, this, hud, 15, this.monster, 50, 3);
+        smg = new SubMachineGun(0.12f, 3, 35, 6, initWeaponSounds("smg"), camera, this, hud, 15, this.monster, 50, 3);
         rifle = new Rifle(2, 15, 1, 25, initWeaponSounds("rifle"), camera, this, hud, 30, this.monster, 80, 15);
 
         equippedWeapon = smg;

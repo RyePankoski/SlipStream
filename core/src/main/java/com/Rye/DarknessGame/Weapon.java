@@ -79,8 +79,7 @@ public class Weapon {
 
             player.main.darknessLayer.setJustFired(true);
 
-            bullet = new Bullet(player.getCollisionMask(), player, bulletSpeed, monster, this);
-            player.updateBullets(bullet);
+            player.updateBullets(new Bullet(player.getCollisionMask(), player, bulletSpeed, monster, this));
 
             gunShotOne.play();
 
@@ -97,7 +96,7 @@ public class Weapon {
             ammo--;
             canFire = false;
 
-            timeTillNextShot = System.nanoTime() + player.main.secondsToNano(fireRate);
+            timeTillNextShot = System.nanoTime() + MathFunctions.secondsToNano(fireRate);
         }
         if (System.nanoTime() >= timeTillNextShot) {
             canFire = true;
@@ -107,10 +106,10 @@ public class Weapon {
         if (canDryFire && ammo == 0) {
             emptyGunSound.play();
             canDryFire = false;
-            double dryFireRate = 1;
-            timeTillNextDryFire = System.nanoTime() + player.main.secondsToNano((float) dryFireRate);
+            double dryFireRate = 500;
+            timeTillNextDryFire = System.currentTimeMillis() + dryFireRate;
         }
-        if (System.nanoTime() >= timeTillNextDryFire) {
+        if (System.currentTimeMillis() >= timeTillNextDryFire) {
             canDryFire = true;
         }
         updateInfo();
@@ -123,9 +122,9 @@ public class Weapon {
             ammo = magazineSize;
             magazines--;
             canReload = false;
-            timeTillReload = System.nanoTime() + player.main.secondsToNano(2);
+            timeTillReload = System.currentTimeMillis() + 2000;
         }
-        if (System.nanoTime() >= timeTillReload) {
+        if (System.currentTimeMillis() >= timeTillReload) {
             canReload = true;
         }
         updateInfo();

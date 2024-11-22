@@ -3,6 +3,7 @@ package com.Rye.DarknessGame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapLayer;
@@ -14,7 +15,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Main extends ApplicationAdapter {
+public class Main extends ApplicationAdapter implements Screen {
 
     //region Variables
     Player playcor;
@@ -37,39 +38,45 @@ public class Main extends ApplicationAdapter {
     Color sectorColor;
     int playerSector;
     private boolean canRenderFast = true;
-    double RenderTimerFast;
+    double RenderFastTimer;
     Door door;
     Door[][] doors;
     LOS los;
     private boolean renderGame = true;
+    private boolean canRenderVeryFast = true;
+    private long renderVeryFastTimer;
+
+    LightingManager lightingManager;
 
     public void create() {
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         hud = new Hud();
         handler = new InputHandler();
+
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask, monster, this);
-
         los = new LOS(playcor);
         tram = new Tram(playcor);
-        initLightSources();
-        darknessLayer = new DarknessLayer(playcor, staticLightSources);
         hud.setPlayer(playcor);
         monster.setPlayer(playcor);
-        collisionMask.setCamera(playcor.getCamera());
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
+
+
+        lightingManager = new LightingManager(collisionMask.getPixmap());
+        darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources());
+
+        collisionMask.setCamera(playcor.getCamera());
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
         Gdx.input.setCursorCatched(true);
 
         initScenes();
-        stage();
+        prepareScenes();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
 
         //if you ever get an out-of-bounds error related to doors, its probably this.
         doors = new Door[25][50];
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
-
     }
 
     public void initScenes() {
@@ -82,26 +89,11 @@ public class Main extends ApplicationAdapter {
         sceneManager.addScene(levelTwo);
     }
 
-    public void initLightSources() {
-        staticLightSources = new ArrayList<>();
-        StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(200, 181, 90, 3200, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(200, 181, 90, 4800, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight3 = new StaticLightSource(5050, 9150, .5f, MathFunctions.rayCast(250, 181, 90, 9150, 5050, collisionMask.getPixmap()));
-        StaticLightSource stationLight4 = new StaticLightSource(4930, 12900, .5f, MathFunctions.rayCast(200, 181, 90, 12900, 4930, collisionMask.getPixmap()));
-
-        staticLightSources.add(stationLight1);
-        staticLightSources.add(stationLight2);
-        staticLightSources.add(stationLight3);
-        staticLightSources.add(stationLight4);
-    }
-
-    public void stage() {
+    public void prepareScenes() {
         sceneToRender = sceneManager.getScenes().get(sceneNumber);
     }
 
-    public float secondsToNano(float seconds) {
-        return (seconds * 1000000000);
-    }
+
 
     public void killMonster(Monster monster) {
         monster = null;
@@ -161,7 +153,6 @@ public class Main extends ApplicationAdapter {
     public void loadMapAndInstantiateDoors(String mapPath) {
 
         int[] numberDoorsInSector = new int[25];
-        int doorNum = 0;
         TmxMapLoader mapLoader = new TmxMapLoader();
         TiledMap map = mapLoader.load(mapPath);
         MapLayer objectLayer = map.getLayers().get("doorLayer");
@@ -176,7 +167,7 @@ public class Main extends ApplicationAdapter {
 
             String objectClass = object.getProperties().get("type", String.class);
             if ("Door".equals(objectClass)) {
-                // Retrieve position and size properties
+
                 float x = object.getProperties().get("x", Float.class);
                 float y = object.getProperties().get("y", Float.class);
                 float width = object.getProperties().get("width", Float.class);
@@ -193,37 +184,56 @@ public class Main extends ApplicationAdapter {
 
     public void render() {
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            renderGame = !renderGame;
-        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) renderGame = !renderGame;
 
         if (renderGame) {
-            if (System.currentTimeMillis() >= RenderTimerFast) canRenderFast = true;
+            if (System.currentTimeMillis() >= RenderFastTimer) canRenderFast = true;
+            if (System.currentTimeMillis() >= renderVeryFastTimer) canRenderVeryFast = true;
 
+            //only for drawn elements!
+            if(canRenderVeryFast){
+                canRenderVeryFast = false;
+                renderVeryFastTimer = System.currentTimeMillis() + 8;
+
+                sceneToRender.renderScene();
+                if(playerSector == 24){
+                    tram.updateTram();
+                }
+                playcor.updatePlayer();
+                playcor.checkBullets();
+
+                if (monsterAlive) {
+                    monster.updateMonster();
+                }
+
+                darknessLayer.render(0f);
+                los.render(0f);
+                hud.renderHud();
+            }
+
+            //use this mostly for updates.
             if (canRenderFast) {
                 canRenderFast = false;
-                RenderTimerFast = System.currentTimeMillis() + 250;
+                RenderFastTimer = System.currentTimeMillis() + 250;
+
                 playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
                 updateDoors(playerSector);
             }
-
-            sceneToRender.renderScene();
-
-            if (playerSector == 24 || tram.moving) {
-                tram.updateTram();
-            }
-
-            playcor.updatePlayer();
-            playcor.checkBullets();
-
-            if (monsterAlive) {
-                monster.updateMonster();
-            }
-
-            darknessLayer.render(0f);
-            los.render(0f);
-
-            hud.renderHud();
         }
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float v) {
+
+    }
+
+    @Override
+    public void hide() {
+
     }
 }

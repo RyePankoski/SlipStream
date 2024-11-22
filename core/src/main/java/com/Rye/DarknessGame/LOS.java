@@ -62,7 +62,7 @@ public class LOS implements Screen {
             400, 181,
             0,
             (int) player.getCoorX(),
-            (int) player.getCoorY(),
+            (int) player.getCoorY(),2,
             player.pixmap
         );
         shapeRenderer.setColor(1, 1, 1, 1);

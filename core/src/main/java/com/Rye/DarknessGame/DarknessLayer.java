@@ -68,6 +68,8 @@ public class DarknessLayer implements Screen {
         endLightBufferRendering();
     }
 
+
+
     private void beginLightBufferRendering() {
 
         lightBuffer.begin();
@@ -77,6 +79,7 @@ public class DarknessLayer implements Screen {
         } else {
             Gdx.gl.glClearColor(0, 0, 0, DARKNESS_ALPHA);
         }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);

@@ -42,6 +42,8 @@ public class Main extends ApplicationAdapter {
 
     ArrayList<Door> doors;
 
+    LOS los;
+
     public void create() {
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
@@ -50,6 +52,7 @@ public class Main extends ApplicationAdapter {
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask, monster, this);
 
+        los = new LOS(playcor);
         tram = new Tram(playcor);
         initLightSources();
         darknessLayer = new DarknessLayer(playcor, staticLightSources);
@@ -123,13 +126,13 @@ public class Main extends ApplicationAdapter {
 
     public void initLightSources() {
         staticLightSources = new ArrayList<>();
-        StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(500, 181
+        StaticLightSource stationLight1 = new StaticLightSource(4930, 3200, .5f, MathFunctions.rayCast(200, 181
             , 90, 3200, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(500, 181
+        StaticLightSource stationLight2 = new StaticLightSource(4930, 4800, .5f, MathFunctions.rayCast(200, 181
             , 90, 4800, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight3 = new StaticLightSource(4930, 9000, .5f, MathFunctions.rayCast(500, 181
-            , 90, 9000, 4930, collisionMask.getPixmap()));
-        StaticLightSource stationLight4 = new StaticLightSource(4930, 12900, .5f, MathFunctions.rayCast(500, 181
+        StaticLightSource stationLight3 = new StaticLightSource(5050, 9150, .5f, MathFunctions.rayCast(250, 181
+            , 90, 9150, 5050, collisionMask.getPixmap()));
+        StaticLightSource stationLight4 = new StaticLightSource(4930, 12900, .5f, MathFunctions.rayCast(200, 181
             , 90, 12900, 4930, collisionMask.getPixmap()));
 
         staticLightSources.add(stationLight1);
@@ -217,6 +220,7 @@ public class Main extends ApplicationAdapter {
         }
 
         darknessLayer.render(0f);
+        los.render(0f);
         hud.renderHud();
     }
 }

@@ -12,12 +12,20 @@
         "CollisionMapWhite.tsx": {
             "scaleInDock": 1
         },
+        "JavisSet.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "JavisTiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "MainMapDarknessGame.tmx": {
-            "scale": 1,
+            "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 9359,
-                "y": 5135
+                "x": 8778.666666666666,
+                "y": 4784
             }
         },
         "SpaceStation3.tsx": {
@@ -55,13 +63,15 @@
     "openFiles": [
         "dfgsdsf.tsx",
         "MainMapDarknessGame.tmx",
-        "TramTile.tsx"
+        "JavisTiles.tsx"
     ],
     "project": "SectorColors.tsx.tiled-project",
     "recentFiles": [
         "dfgsdsf.tsx",
+        "JavisTiles.tsx",
+        "MainMapDarknessGame.tmx",
         "TramTile.tsx",
-        "MainMapDarknessGame.tmx"
+        "JavisSet.tsx"
     ],
     "tileset.lastUsedFormat": "tsx"
 }

@@ -136,7 +136,7 @@ public class DarknessLayer implements Screen {
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(), 3,
-            player.pixmap
+            player.getCollisionMap()
         );
 
         renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
@@ -159,7 +159,7 @@ public class DarknessLayer implements Screen {
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(),2,
-            player.pixmap
+            player.getCollisionMap()
         );
 
         shapeRenderer.setColor(1, 1, 1, (float) lightState.getBrightness() / 100 + 0.1f);
@@ -172,7 +172,7 @@ public class DarknessLayer implements Screen {
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(),4,
-            player.pixmap
+            player.getCollisionMap()
         );
         shapeRenderer.setColor(1, 1, 1, AMBIENT_ALPHA);
         renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());

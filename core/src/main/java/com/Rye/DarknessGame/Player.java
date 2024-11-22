@@ -71,7 +71,7 @@ public class Player {
     private SpriteBatch spriteBatch;
     BitmapFont bitmapFont;
     ShapeRenderer shapeRenderer;
-    Pixmap pixmap;
+
     Color white;
 
     // **Collision and Vectors**
@@ -109,10 +109,12 @@ public class Player {
 
     double beepTimer;
 
+    public Pixmap collisionMap;
+
     //endregion
 
     public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
-                  CollisionMask collisionMask, Monster monster, Main main) {
+                  Pixmap collisionMap, Monster monster, Main main) {
 
         this.main = main;
         this.handler = handler;
@@ -121,7 +123,7 @@ public class Player {
         this.coorY = y;
         this.speed = speed;
         this.hud = hud;
-        this.collisionMask = collisionMask;
+        this.collisionMap = collisionMap;
         this.monster = monster;
 
         initVariables();
@@ -453,29 +455,29 @@ public class Player {
             coorX = 10;
         } else if (coorY + dy < 10) {
             coorY = 10;
-        } else if (coorX + dx > pixmap.getWidth() - 10) {
-            coorX = pixmap.getWidth() - 10;
-        } else if (coorY + dy > pixmap.getHeight() - 10) {
-            coorY = pixmap.getHeight() - 10;
+        } else if (coorX + dx > collisionMap.getWidth() - 10) {
+            coorX = collisionMap.getWidth() - 10;
+        } else if (coorY + dy > collisionMap.getHeight() - 10) {
+            coorY = collisionMap.getHeight() - 10;
         }
         //endregion
 
         //region collision
         if (movingRight) {
-            if (MathFunctions.getPixelColor((int) coorX + 10, (int) coorY, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX + 10, (int) coorY, collisionMap).equals(white)) {
                 dx = 0;
             }
         } else if (movingLeft) {
-            if (MathFunctions.getPixelColor((int) coorX - 10, (int) coorY, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX - 10, (int) coorY, collisionMap).equals(white)) {
                 dx = 0;
             }
         }
         if (movingUp) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 10, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 10, collisionMap).equals(white)) {
                 dy = 0;
             }
         } else if (movingDown) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 10, pixmap).equals(white)) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 10, collisionMap).equals(white)) {
                 dy = 0;
             }
         }
@@ -563,7 +565,6 @@ public class Player {
 
         Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
         Texture mouseCursor = new Texture(Gdx.files.internal("TexSprites/crosshair003.png"));
-        pixmap = collisionMask.getPixmap();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
         playerSprite = new Sprite(playerTexture);
@@ -641,8 +642,8 @@ public class Player {
         return flashlightBattery;
     }
 
-    public CollisionMask getCollisionMask() {
-        return collisionMask;
+    public Pixmap getCollisionMap() {
+        return collisionMap;
     }
 
     public double[] getPointInFrontVector() {

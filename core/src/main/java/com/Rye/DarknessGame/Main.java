@@ -55,7 +55,7 @@ public class Main extends ApplicationAdapter implements Screen {
         handler = new InputHandler();
 
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask, monster, this);
+        playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
         los = new LOS(playcor);
         tram = new Tram(playcor);
         hud.setPlayer(playcor);

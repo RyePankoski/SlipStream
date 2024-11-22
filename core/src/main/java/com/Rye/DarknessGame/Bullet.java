@@ -12,7 +12,6 @@ import java.awt.*;
 public class Bullet {
 
     CollisionMask collisionMask;
-    Pixmap pixmap;
     double startX;
     double startY;
     double facingX;
@@ -34,8 +33,10 @@ public class Bullet {
     double dx;
     double dy;
 
-    public Bullet(CollisionMask collisionMask, Player player, double bulletSpeed, Monster monster, Weapon weapon) {
-        this.collisionMask = collisionMask;
+    Pixmap collisionMap;
+
+    public Bullet(Pixmap collisionMap, Player player, double bulletSpeed, Monster monster, Weapon weapon) {
+        this.collisionMap = collisionMap;
         this.player = player;
         this.bulletSpeed = bulletSpeed;
         this.monster = monster;
@@ -127,13 +128,13 @@ public class Bullet {
         if (posX < 0 || posY < 0) {
             die();
         }
-        if (posX > pixmap.getWidth() || posY > pixmap.getHeight()) {
+        if (posX > collisionMap.getWidth() || posY > collisionMap.getHeight()) {
             die();
         }
     }
 
     private Color getPixelColor(int x, int y) {
-        int pixel = pixmap.getPixel(x, pixmap.getHeight() - y);
+        int pixel = collisionMap.getPixel(x, collisionMap.getHeight() - y);
 
         float r = ((pixel >> 24) & 0xFF) / 255f; // Red component
         float g = ((pixel >> 16) & 0xFF) / 255f; // Green component
@@ -158,11 +159,9 @@ public class Bullet {
     }
 
     public void initDrawParams() {
-        pixmap = collisionMask.getPixmap();
         white = new Color(255, 255, 255);
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
-        pixmap = collisionMask.getPixmap();
     }
 
     public void initSounds() {

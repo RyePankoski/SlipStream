@@ -79,7 +79,7 @@ public class Weapon {
 
             player.main.darknessLayer.setJustFired(true);
 
-            player.updateBullets(new Bullet(player.getCollisionMask(), player, bulletSpeed, monster, this));
+            player.updateBullets(new Bullet(player.getCollisionMap(), player, bulletSpeed, monster, this));
 
             gunShotOne.play();
 

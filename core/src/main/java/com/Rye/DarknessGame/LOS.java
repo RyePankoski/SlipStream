@@ -13,16 +13,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
 
 public class LOS implements Screen {
-    // Constants
-    private static final int FLASH_TOTAL_FRAMES = 8;
-    private static final float AMBIENT_ALPHA = 0.05f;
-    private static final float DARKNESS_ALPHA = 1f;
-    private static final float MIN_BATTERY_THRESHOLD = 20f;
-    private static final float BRIGHTNESS_DECAY_RATE = 0.5f;
-    private static final int RAYCAST_DISTANCE = 250;
-    private static final int RAYCAST_RAYS = 15;
-
-    // Rendering components
 
     private final ShapeRenderer shapeRenderer;
     private FrameBuffer lightBuffer;
@@ -30,10 +20,7 @@ public class LOS implements Screen {
     private final OrthographicCamera camera;
     SpriteBatch batch;
 
-    // Light state
     private final Player player;
-
-    ArrayList<StaticLightSource> staticLights;
 
     public LOS(Player player) {
         this.player = player;
@@ -62,15 +49,13 @@ public class LOS implements Screen {
 
     private void beginLightBufferRendering() {
         lightBuffer.begin();
-        Gdx.gl.glClearColor(0f, 0, 0, DARKNESS_ALPHA);
+        Gdx.gl.glClearColor(0f, 0, 0, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_ZERO, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
     }
-
-
 
     public void renderLOS() {
         float[] lightVertices = MathFunctions.rayCast(
@@ -80,15 +65,16 @@ public class LOS implements Screen {
             (int) player.getCoorY(),
             player.pixmap
         );
-        shapeRenderer.setColor(1,1,1,1);
+        shapeRenderer.setColor(1, 1, 1, 1);
         for (int i = 0; i < lightVertices.length - 2; i += 2) {
             shapeRenderer.triangle(
-                player.getCoorX(),player.getCoorY(),
+                player.getCoorX(), player.getCoorY(),
                 lightVertices[i], lightVertices[i + 1],
                 lightVertices[i + 2], lightVertices[i + 3]
             );
         }
     }
+
     private void endLightBufferRendering() {
         shapeRenderer.end();
         lightBuffer.end();
@@ -102,7 +88,6 @@ public class LOS implements Screen {
         batch.draw(lightBufferRegion, x, y, camera.viewportWidth, camera.viewportHeight);
         batch.end();
     }
-
 
     @Override
     public void show() {
@@ -133,6 +118,4 @@ public class LOS implements Screen {
     public void dispose() {
 
     }
-
-
 }

@@ -39,9 +39,7 @@ public class Main extends ApplicationAdapter {
     private boolean canRenderFast = true;
     double RenderTimerFast;
     Door door;
-
-    ArrayList<Door> doors;
-
+    Door[][] doors;
     LOS los;
 
     public void create() {
@@ -61,55 +59,15 @@ public class Main extends ApplicationAdapter {
         collisionMask.setCamera(playcor.getCamera());
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
+        Gdx.input.setCursorCatched(true);
+
         initScenes();
         stage();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
 
-        doors = new ArrayList<>();
+        doors = new Door[25][50];
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
 
-    }
-
-    public void updateDoors(int playerSector) {
-        for (Door door : doors) {
-            // Check if the door's sector matches the player's current sector
-            if (door.getSector() == playerSector) {
-                // Only update the door if it belongs to the same sector as the player
-                door.updateDoor();
-            }
-        }
-    }
-
-    public void loadMapAndInstantiateDoors(String mapPath) {
-
-        int doorNum = 0;
-        TmxMapLoader mapLoader = new TmxMapLoader();
-        TiledMap map = mapLoader.load(mapPath);
-        MapLayer objectLayer = map.getLayers().get("doorLayer");
-
-        if (objectLayer == null) {
-            System.out.println("No 'Objects' layer found in the map.");
-            return;
-        }
-
-        MapObjects objects = objectLayer.getObjects();
-        for (MapObject object : objects) {
-
-            String objectClass = object.getProperties().get("type", String.class);
-            if ("Door".equals(objectClass)) {
-                doorNum++;
-                // Retrieve position and size properties
-                float x = object.getProperties().get("x", Float.class);
-                float y = object.getProperties().get("y", Float.class);
-                float width = object.getProperties().get("width", Float.class);
-                float height = object.getProperties().get("height", Float.class);
-
-                door = new Door((int) x, (int) y, (int)width, (int)height, findSector((int) x, (int) y),doorNum, playcor, collisionMask.getPixmap());
-
-
-                doors.add(door);
-            }
-        }
     }
 
     public void initScenes() {
@@ -167,7 +125,6 @@ public class Main extends ApplicationAdapter {
         int blue = sectorColor.getBlue();
 
 
-
         if (red > 0) {
             for (int i = 0; i < colorValues.length; i++) {
                 if (red == colorValues[i]) {
@@ -191,9 +148,52 @@ public class Main extends ApplicationAdapter {
         }
 
         if (red == 255 && green == 255) {
-            sector = 100;
+            sector = 24;
         }
         return sector;
+    }
+
+    public void updateDoors(int playerSector) {
+        for (int i = 0; i < 500; i++) {
+            if (doors[playerSector][i] != null) {
+                doors[playerSector][i].updateDoor();
+            } else {
+                break;
+            }
+        }
+    }
+
+    public void loadMapAndInstantiateDoors(String mapPath) {
+
+        int[] numberDoorsInSector = new int[25];
+        int doorNum = 0;
+        TmxMapLoader mapLoader = new TmxMapLoader();
+        TiledMap map = mapLoader.load(mapPath);
+        MapLayer objectLayer = map.getLayers().get("doorLayer");
+
+        if (objectLayer == null) {
+            System.out.println("No 'Objects' layer found in the map.");
+            return;
+        }
+
+        MapObjects objects = objectLayer.getObjects();
+        for (MapObject object : objects) {
+
+            String objectClass = object.getProperties().get("type", String.class);
+            if ("Door".equals(objectClass)) {
+                doorNum++;
+                // Retrieve position and size properties
+                float x = object.getProperties().get("x", Float.class);
+                float y = object.getProperties().get("y", Float.class);
+                float width = object.getProperties().get("width", Float.class);
+                float height = object.getProperties().get("height", Float.class);
+
+                door = new Door((int) x, (int) y, (int) width, (int) height, findSector((int) x, (int) y), doorNum, playcor, collisionMask.getPixmap());
+
+                doors[door.getSector()][numberDoorsInSector[door.getSector()]] = door;
+                numberDoorsInSector[door.getSector()]++;
+            }
+        }
     }
 
     public void render() {
@@ -208,7 +208,7 @@ public class Main extends ApplicationAdapter {
 
         sceneToRender.renderScene();
 
-        if (playerSector == 100 || tram.moving) {
+        if (playerSector == 24 || tram.moving) {
             tram.updateTram();
         }
 
@@ -221,6 +221,7 @@ public class Main extends ApplicationAdapter {
 
         darknessLayer.render(0f);
         los.render(0f);
+
         hud.renderHud();
     }
 }

@@ -179,7 +179,7 @@ public class DarknessLayer implements Screen {
 
         if(player.flashLightIsOn) {
             shapeRenderer.setColor(1f, 1f, 1f, .5f);
-            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 20);
+            shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 15);
         }
     }
 

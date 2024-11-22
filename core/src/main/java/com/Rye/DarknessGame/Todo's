@@ -13,7 +13,7 @@ TODOd: Look into shaders more,Player Health
 
 11/19/2024
 TODOd: Look into TILE level editor, cats color function no working on health;
-TODOd: Sectors for culling calls to objects
+TODOd: Sectors for culling calls to objects, LOS, Doors
 
 
 --------------------
@@ -26,7 +26,7 @@ TIER 1:
 TODO: More cleanup across the board. This is super important. Get help for code review.
 TODO: Map layers, vent system
 TODO: Add way to switch between scenes, clamp renderer like camera,
-TODO: Settings, Options, Doors, LOS, PathFinding, Drop Weapons/Tools
+TODO: Settings, Options, PathFinding, Drop Weapons/Tools
 TODO: Undo Reference Spaghetti
 
 TIER 2:

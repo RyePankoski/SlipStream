@@ -66,6 +66,8 @@ public class Player {
 
     // **Graphics and Rendering**
     private Sprite playerSprite;
+
+    private Sprite mouseCursorSprite;
     private SpriteBatch spriteBatch;
     BitmapFont bitmapFont;
     ShapeRenderer shapeRenderer;
@@ -139,16 +141,21 @@ public class Player {
         if (System.nanoTime() >= timeTillCanToggleSearch) canToggleSearch = true;
 
         move();
+        pointInFront();
+        distanceToMonster();
         handleMouse();
         facingAngle();
         updateCamera();
-        drawMyself();
-        weapon();
-        distanceToMonster();
         manageHealth();
+
+        startShapeRender();
+        drawMyself();
+        drawCursor();
+        stopShapeRender();
+
+        weapon();
         melee();
         flashLight();
-        pointInFront();
         ronaldProximity();
 
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
@@ -499,15 +506,27 @@ public class Player {
         camera.update();
     }
 
-    public void drawMyself() {
+    public void startShapeRender(){
         spriteBatch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
+    }
+
+    public void stopShapeRender(){
+        spriteBatch.end();
+        shapeRenderer.end();
+    }
+
+    public void drawCursor(){
+        mouseCursorSprite.setPosition(faceX - mouseCursorSprite.getWidth()/2,faceY-mouseCursorSprite.getWidth()/2);
+        mouseCursorSprite.draw(spriteBatch);
+    }
+
+    public void drawMyself() {
         playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
         playerSprite.setRotation(getFacingAngle() + 90);
         playerSprite.draw(spriteBatch);
-        spriteBatch.end();
-        shapeRenderer.end();
+
     }
 
     public void facingAngle() {
@@ -543,10 +562,12 @@ public class Player {
     public void initDrawParams() {
 
         Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
+        Texture mouseCursor = new Texture(Gdx.files.internal("TexSprites/crosshair003.png"));
         pixmap = collisionMask.getPixmap();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
         playerSprite = new Sprite(playerTexture);
+        mouseCursorSprite = new Sprite(mouseCursor);
         spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
 

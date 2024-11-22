@@ -67,13 +67,13 @@ public class Door {
             }
             hasStateChanged = false;
             pixmap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
-            pixmap.fillRectangle(posX, pixmap.getHeight() -posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
+            pixmap.fillRectangle(posX, pixmap.getHeight() - posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
         }
     }
 
     public void isPlayerNear() {
         // Check if the player is close to the door
-        double playerDistance = MathFunctions.distanceFromMe(posX, posY, player.getCoorX(), player.getCoorY());
+        double playerDistance = MathFunctions.distanceFromMe(posX + (double)width/2, posY + (double)height/2, player.getCoorX(), player.getCoorY());
         if (playerDistance < 100) {
             open();
         } else {

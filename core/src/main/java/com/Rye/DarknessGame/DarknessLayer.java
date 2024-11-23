@@ -69,7 +69,6 @@ public class DarknessLayer implements Screen {
     }
 
 
-
     private void beginLightBufferRendering() {
 
         lightBuffer.begin();
@@ -93,6 +92,15 @@ public class DarknessLayer implements Screen {
         for (StaticLightSource light : staticLights) {
             shapeRenderer.setColor(1, 1, 1, light.brightness);
             renderLightTriangles(light.getVertices(), light.getX(), light.getY());
+            if (light.getAngle() ==180){
+                float[] lightVertices = light.getVertices();
+                float[] finalVertices = new float[4];
+                finalVertices[0] = lightVertices[0];
+                finalVertices[1] = lightVertices[1];
+                finalVertices[2] = lightVertices[lightVertices.length -2];
+                finalVertices[3] = lightVertices[lightVertices.length - 1];
+                renderLightTriangles(finalVertices, light.x, light.y);
+            }
         }
     }
 
@@ -117,7 +125,7 @@ public class DarknessLayer implements Screen {
     }
 
     private void renderBulletStrike() {
-        shapeRenderer.setColor(1f, 1f, 0f, (float)(bulletStrikeState.getStrikeSize()/300f));
+        shapeRenderer.setColor(1f, 1f, 0f, (float) (bulletStrikeState.getStrikeSize() / 300f));
         shapeRenderer.circle(
             bulletStrikeState.getPosition().x,
             bulletStrikeState.getPosition().y,
@@ -132,7 +140,7 @@ public class DarknessLayer implements Screen {
         shapeRenderer.setColor(1f, 1f, 0f, alpha);
 
         float[] lightVertices = MathFunctions.rayCast(
-            200, 181,
+            200, 180,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(), 3,
@@ -141,6 +149,14 @@ public class DarknessLayer implements Screen {
 
         renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
         flashState.update();
+
+        float[] finalVertices = new float[4];
+        finalVertices[0] = lightVertices[0];
+        finalVertices[1] = lightVertices[1];
+        finalVertices[2] = lightVertices[lightVertices.length -2];
+        finalVertices[3] = lightVertices[lightVertices.length - 1];
+
+        renderLightTriangles(finalVertices, player.getCoorX(), player.getCoorY());
     }
 
     private void renderPlayerLight() {
@@ -158,7 +174,7 @@ public class DarknessLayer implements Screen {
             RAYCAST_DISTANCE, RAYCAST_RAYS,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
-            (int) player.getCoorY(),2,
+            (int) player.getCoorY(), 2,
             player.getCollisionMap()
         );
 
@@ -167,17 +183,26 @@ public class DarknessLayer implements Screen {
     }
 
     private void renderAmbientLight() {
+
+
         float[] lightVertices = MathFunctions.rayCast(
             RAYCAST_DISTANCE, 180,
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
-            (int) player.getCoorY(),4,
+            (int) player.getCoorY(), 4,
             player.getCollisionMap()
         );
         shapeRenderer.setColor(1, 1, 1, AMBIENT_ALPHA);
         renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
 
-        if(player.flashLightIsOn) {
+        float[] finalVertices = new float[4];
+        finalVertices[0] = lightVertices[0];
+        finalVertices[1] = lightVertices[1];
+        finalVertices[2] = lightVertices[lightVertices.length -2];
+        finalVertices[3] = lightVertices[lightVertices.length - 1];
+        renderLightTriangles(finalVertices, player.getCoorX(), player.getCoorY());
+
+        if (player.flashLightIsOn) {
             shapeRenderer.setColor(1f, 1f, 1f, .5f);
             shapeRenderer.circle(player.getCoorX(), player.getCoorY(), 15);
         }

@@ -148,7 +148,7 @@ public class Monster {
 
         int textureSize = monsterTexture.getWidth() / 2;
 
-        moveSpeed = 0;
+        moveSpeed = 2;
         moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
 
         //region out of bounds detection

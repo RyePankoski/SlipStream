@@ -57,7 +57,7 @@ public class Player {
 
     // **Sound Effects**
     private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound, searchBeep;
-    private Music flashLightWarning, playerDamagedSound, searchPatternSound,turnOnSearch;
+    private Music flashLightWarning, playerDamagedSound, searchPatternSound, turnOnSearch;
     SoundPlayer soundManager;
 
     // **Input Handling**
@@ -110,11 +110,13 @@ public class Player {
 
     public Pixmap collisionMap;
 
+    WalkingAnimation walkingAnimation;
+    boolean moving;
+
     //endregion
 
     public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
                   Pixmap collisionMap, Monster monster, Main main) {
-
         this.main = main;
         this.handler = handler;
         this.soundManager = soundManager;
@@ -125,11 +127,13 @@ public class Player {
         this.collisionMap = collisionMap;
         this.monster = monster;
 
+        initObjects();
         initVariables();
         initDrawParams();
         initPlayerSounds();
         initCamera();
         initWeapons();
+
     }
 
     public void updatePlayer() {
@@ -171,7 +175,7 @@ public class Player {
 
         double newX = x2 - x1;
         double newY = y2 - y1;
-        monsterDistance = MathFunctions.fastSqrt((float)((newX * newX) + (newY * newY)));
+        monsterDistance = MathFunctions.fastSqrt((float) ((newX * newX) + (newY * newY)));
     }
 
     public void manageHealth() {
@@ -312,25 +316,25 @@ public class Player {
             searchPatternSound.stop();
         }
 
-        if(searchPattern && monsterDistance < 7000){
-            flashlightBattery-= 0.02;
-            if(beepTimer <= 0){
-                if (monsterDistance < 500){
-                  beepTimer = 10;
-                } else if(monsterDistance < 2000) {
+        if (searchPattern && monsterDistance < 7000) {
+            flashlightBattery -= 0.02;
+            if (beepTimer <= 0) {
+                if (monsterDistance < 500) {
+                    beepTimer = 10;
+                } else if (monsterDistance < 2000) {
                     beepTimer = 20;
-                } else if (monsterDistance < 3500){
+                } else if (monsterDistance < 3500) {
                     beepTimer = 40;
-                } else if(monsterDistance < 5000) {
+                } else if (monsterDistance < 5000) {
                     beepTimer = 80;
-                } else if(monsterDistance < 6500) {
+                } else if (monsterDistance < 6500) {
                     beepTimer = 160;
                 } else {
                     beepTimer = 320;
                 }
                 searchBeep.play();
             }
-            if(beepTimer > 0){
+            if (beepTimer > 0) {
                 beepTimer--;
             }
         }
@@ -353,13 +357,14 @@ public class Player {
         bullets.add(bulletz);
     }
 
-    public void handleMouse(){
+    public void handleMouse() {
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mousePos);
         setFacing(mousePos.x, mousePos.y);
     }
 
     public void move() {
+        moving = false;
         boolean movingUp = false;
         boolean movingDown = false;
         boolean movingLeft = false;
@@ -382,18 +387,22 @@ public class Player {
         if (keyStrokes.contains(Input.Keys.W)) {
             dy = moveSpeed;
             movingUp = true;
+            moving = true;
         }
         if (keyStrokes.contains(Input.Keys.S)) {
             dy = -moveSpeed;
             movingDown = true;
+            moving = true;
         }
         if (keyStrokes.contains(Input.Keys.D)) {
             dx = moveSpeed;
             movingRight = true;
+            moving = true;
         }
         if (keyStrokes.contains(Input.Keys.A)) {
             dx = -moveSpeed;
             movingLeft = true;
+            moving = true;
         }
         //endregion
 
@@ -507,26 +516,30 @@ public class Player {
         camera.update();
     }
 
-    public void startShapeRender(){
+    public void startShapeRender() {
         spriteBatch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
     }
 
-    public void stopShapeRender(){
+    public void stopShapeRender() {
         spriteBatch.end();
         shapeRenderer.end();
     }
 
-    public void drawCursor(){
-        mouseCursorSprite.setPosition(faceX - mouseCursorSprite.getWidth()/2,faceY-mouseCursorSprite.getWidth()/2);
+    public void drawCursor() {
+        mouseCursorSprite.setPosition(faceX - mouseCursorSprite.getWidth() / 2, faceY - mouseCursorSprite.getWidth() / 2);
         mouseCursorSprite.draw(spriteBatch);
     }
 
     public void drawMyself() {
-        playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
-        playerSprite.setRotation(getFacingAngle() + 90);
-        playerSprite.draw(spriteBatch);
+        if (moving) {
+            walkingAnimation.render(spriteBatch, coorX - 32, coorY - 32);
+        } else {
+            playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
+            playerSprite.setRotation(getFacingAngle() + 90);
+            playerSprite.draw(spriteBatch);
+        }
 
     }
 
@@ -535,6 +548,10 @@ public class Player {
         float delY = getFaceY() - getCoorY();
 
         this.facingAngle = (float) Math.toDegrees(Math.atan2(delY, delX));
+    }
+
+    public void initObjects() {
+        walkingAnimation = new WalkingAnimation(this);
     }
 
     public void initWeapons() {
@@ -564,13 +581,13 @@ public class Player {
 
         Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
         Texture mouseCursor = new Texture(Gdx.files.internal("TexSprites/crosshair003.png"));
+        walkingAnimation.initialize();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
         playerSprite = new Sprite(playerTexture);
         mouseCursorSprite = new Sprite(mouseCursor);
         spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
-
     }
 
     public void initPlayerSounds() {
@@ -649,8 +666,14 @@ public class Player {
         return pointInFrontVector;
     }
 
-    public void addToCoors(int x, int y){
+    public void addToCoors(int x, int y) {
         coorX += x;
         coorY += y;
+    }
+    public boolean getMoving(){
+        return moving;
+    }
+    public boolean getSprint(){
+        return sprint;
     }
 }

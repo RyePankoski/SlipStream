@@ -41,7 +41,6 @@ public class Weapon {
     Sound outOfAmmoSound;
     Monster monster;
     public int hitSize;
-
     int maxMagazines;
 
 

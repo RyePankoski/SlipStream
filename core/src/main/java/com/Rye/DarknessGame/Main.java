@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
-
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
 

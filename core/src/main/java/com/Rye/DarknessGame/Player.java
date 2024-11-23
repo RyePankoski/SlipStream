@@ -110,7 +110,6 @@ public class Player {
 
     public Pixmap collisionMap;
 
-    WalkingAnimation walkingAnimation;
     boolean moving;
 
     //endregion
@@ -127,7 +126,6 @@ public class Player {
         this.collisionMap = collisionMap;
         this.monster = monster;
 
-        initObjects();
         initVariables();
         initDrawParams();
         initPlayerSounds();
@@ -533,13 +531,12 @@ public class Player {
     }
 
     public void drawMyself() {
-        if (moving) {
-            walkingAnimation.render(spriteBatch, coorX - 32, coorY - 32);
-        } else {
+
+
             playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
             playerSprite.setRotation(getFacingAngle() + 90);
             playerSprite.draw(spriteBatch);
-        }
+
 
     }
 
@@ -548,10 +545,6 @@ public class Player {
         float delY = getFaceY() - getCoorY();
 
         this.facingAngle = (float) Math.toDegrees(Math.atan2(delY, delX));
-    }
-
-    public void initObjects() {
-        walkingAnimation = new WalkingAnimation(this);
     }
 
     public void initWeapons() {
@@ -581,7 +574,6 @@ public class Player {
 
         Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
         Texture mouseCursor = new Texture(Gdx.files.internal("TexSprites/crosshair003.png"));
-        walkingAnimation.initialize();
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
         playerSprite = new Sprite(playerTexture);

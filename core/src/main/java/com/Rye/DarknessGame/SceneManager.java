@@ -33,7 +33,4 @@ ArrayList<Scene> scenes;
     public ArrayList<Scene> getScenes() {
         return scenes;
     }
-    public void setScenes(ArrayList<Scene> scenes) {
-        this.scenes = scenes;
-    }
 }

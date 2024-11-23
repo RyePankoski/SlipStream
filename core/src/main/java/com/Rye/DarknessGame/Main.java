@@ -3,18 +3,11 @@ package com.Rye.DarknessGame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
-import java.awt.*;
-import java.util.ArrayList;
 
+@SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
 
     //region Variables
@@ -71,11 +64,13 @@ public class Main extends ApplicationAdapter {
         //init
         sceneManager.initScenes();
     }
+
     public void killMonster(Monster monster) {
         monster = null;
         monsterAlive = false;
         System.gc();
     }
+
     public void render() {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) renderGame = !renderGame;

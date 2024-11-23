@@ -13,7 +13,6 @@ public class Scene {
     String stageName;
     Player player;
     Texture image;
-    Room room;
     private final ShapeRenderer shapeRenderer;
     private final SpriteBatch batch;
     Matrix4 projection;
@@ -48,9 +47,5 @@ public class Scene {
         batch.end();
 
         soundPlayer.playSound(stageName, ambience);
-    }
-
-    public void dispose(){
-        shapeRenderer.dispose();
     }
 }

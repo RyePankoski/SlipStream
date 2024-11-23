@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class Hud {
     BitmapFont bitmapFont;
-    String ammoNumberString;
-    String staminaValue;
     SpriteBatch spriteBatch;
     FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
@@ -33,8 +31,6 @@ public class Hud {
     double maxMagazines;
     double health;
     Player player;
-    double redTotal;
-    double greenTotal;
 
     public Hud() {
         spriteBatch = new SpriteBatch();
@@ -77,6 +73,7 @@ public class Hud {
     public void drawHealthInfo() {
         float[] colors = redGreenValues(health, 100);
 
+        bitmapFont.setColor(Color.GREEN);
         bitmapFont.draw(spriteBatch, "+:", (camera.position.x - 120), (float) (camera.position.y + cameraZoom / 2 - 30));
         bitmapFont.setColor(colors[0], colors[1], 0, 1f);
         bitmapFont.draw(spriteBatch, String.valueOf((int) health), (camera.position.x - 100), (float) (camera.position.y + cameraZoom / 2 - 30));

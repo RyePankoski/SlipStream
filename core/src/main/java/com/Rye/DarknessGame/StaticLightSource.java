@@ -1,7 +1,5 @@
 package com.Rye.DarknessGame;
 
-import java.util.ArrayList;
-
 public class StaticLightSource {
 
 

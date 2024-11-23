@@ -93,8 +93,4 @@ public class Door {
             close();
         }
     }
-
-    public int getSector() {
-        return sector;
-    }
 }

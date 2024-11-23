@@ -76,7 +76,6 @@ public class Player {
 
     // **Collision and Vectors**
     double[] pointInFrontVector;
-    CollisionMask collisionMask;
 
     // **HUD and UI Elements**
     Hud hud;
@@ -220,9 +219,9 @@ public class Player {
         }
 
         if (flashlightBattery <= 0) {
-            flashLightSound.play();
             flashlightBattery = 0;
             flashLightIsOn = false;
+            searchPattern = false;
         }
 
 

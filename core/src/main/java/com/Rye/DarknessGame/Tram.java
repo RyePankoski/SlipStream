@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 
 
@@ -60,10 +59,7 @@ public class Tram {
     public void move() {
         Rectangle interactionZone = new Rectangle(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
         int tramSpeed = 3;
-//        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//        shapeRenderer.rect(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
-//        shapeRenderer.end();
+
         if (moving && !tramMovingSound.isPlaying()) {
             tramMovingSound.play();
         }

@@ -33,7 +33,6 @@ public class Weapon {
     Sound reloadSound;
     Hud hud;
     double[] pointInFrontVector;
-    Bullet bullet;
     double bulletSpeed;
     SpriteBatch spriteBatch;
     Texture gunFlashTexture;

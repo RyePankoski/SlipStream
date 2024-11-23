@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.awt.*;
 
 public class Bullet {
-
-    CollisionMask collisionMask;
     double startX;
     double startY;
     double facingX;

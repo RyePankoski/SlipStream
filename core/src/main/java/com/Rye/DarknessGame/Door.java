@@ -50,7 +50,7 @@ public class Door {
     }
 
     public void updateDoor() {
-//        System.out.println("Door in " + sector + ", number:" + instantiationNumber + " checking in!");
+        System.out.println("Door in sector:" + sector + ", number:" + instantiationNumber + " checking in!");
         isPlayerNear();  // Check if the player is near and update door state
     }
 

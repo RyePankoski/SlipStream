@@ -148,7 +148,7 @@ public class Monster {
 
         int textureSize = monsterTexture.getWidth() / 2;
 
-        moveSpeed = 2;
+        moveSpeed = 0;
         moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
 
         //region out of bounds detection
@@ -231,7 +231,6 @@ public class Monster {
         shapeRenderer.setColor(255, 0, 0, (float) (1 - (health / 100)));
         shapeRenderer.circle((float) coorX, (float) coorY, 10);
         shapeRenderer.end();
-
     }
 
     public void die() {

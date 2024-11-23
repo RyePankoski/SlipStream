@@ -15,41 +15,33 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Main extends ApplicationAdapter implements Screen {
+public class Main extends ApplicationAdapter {
 
     //region Variables
-    Player playcor;
+    public Player playcor;
     InputHandler handler;
     Texture image;
-    SceneManager sceneManager;
     int sceneNumber = 0;
-    Scene sceneToRender;
     Hud hud;
     CollisionMask collisionMask;
     DarknessLayer darknessLayer;
     Monster monster;
     boolean monsterAlive = true;
     SoundPlayer DJ;
-    ArrayList<StaticLightSource> staticLightSources;
-
     Pixmap sectorMap;
-
     Tram tram;
-
     int playerSector;
     private boolean canRenderFast = true;
     double RenderFastTimer;
-
     LOS los;
     private boolean renderGame = true;
     private boolean canRenderVeryFast = true;
     private long renderVeryFastTimer;
-    Color sectorColor;
-
+    SceneManager sceneManager;
     LightingManager lightingManager;
-
     DoorManager doorManager;
 
+    //endregion
     public void create() {
         //non-dependent objects
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
@@ -66,6 +58,7 @@ public class Main extends ApplicationAdapter implements Screen {
         tram = new Tram(playcor);
         lightingManager = new LightingManager(collisionMask.getPixmap());
         darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources());
+        sceneManager = new SceneManager(playcor, DJ);
 
         //setters
         hud.setPlayer(playcor);
@@ -75,69 +68,14 @@ public class Main extends ApplicationAdapter implements Screen {
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
         Gdx.input.setCursorCatched(true);
 
-        //inits
-        initScenes();
-        prepareScenes();
+        //init
+        sceneManager.initScenes();
     }
-
-    public void initScenes() {
-        Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")), DJ, playcor, image = new Texture("FloorTex/MainMapDarknessGame.png"));
-        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))), DJ, playcor, image = new Texture("FloorTex/MenuScreen.jpg"));
-        sceneManager = new SceneManager();
-        sceneManager.addScene(levelOne);
-        sceneManager.addScene(levelTwo);
-    }
-
-    public void prepareScenes() {
-        sceneToRender = sceneManager.getScenes().get(sceneNumber);
-    }
-
     public void killMonster(Monster monster) {
         monster = null;
         monsterAlive = false;
         System.gc();
     }
-
-    public int findSector(int x, int y) {
-
-        int sector = 0;
-
-        int[] colorValues = {255, 200, 180, 160, 140, 120, 100, 80, 60, 40};
-        sectorColor = (MathFunctions.getPixelColor(x, y, sectorMap));
-        int red = sectorColor.getRed();
-        int green = sectorColor.getGreen();
-        int blue = sectorColor.getBlue();
-
-
-        if (red > 0) {
-            for (int i = 0; i < colorValues.length; i++) {
-                if (red == colorValues[i]) {
-                    sector = i;
-                }
-            }
-        }
-        if (green > 0) {
-            for (int i = 0; i < colorValues.length; i++) {
-                if (green == colorValues[i]) {
-                    sector = i + 10;
-                }
-            }
-        }
-        if (blue > 0) {
-            for (int i = 0; i < colorValues.length; i++) {
-                if (blue == colorValues[i]) {
-                    sector = i + 20;
-                }
-            }
-        }
-
-        if (red == 255 && green == 255) {
-            sector = 24;
-        }
-        return sector;
-    }
-
-
     public void render() {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) renderGame = !renderGame;
@@ -151,7 +89,7 @@ public class Main extends ApplicationAdapter implements Screen {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
-                sceneToRender.renderScene();
+                sceneManager.getScenes().get(sceneNumber).renderScene();
                 if (playerSector == 24) {
                     tram.updateTram();
                 }
@@ -171,24 +109,9 @@ public class Main extends ApplicationAdapter implements Screen {
             if (canRenderFast) {
                 canRenderFast = false;
                 RenderFastTimer = System.currentTimeMillis() + 250;
-                playerSector = findSector((int) playcor.getCoorX(), (int) playcor.getCoorY());
+                playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
                 doorManager.updateDoors(playerSector);
             }
         }
-    }
-
-    @Override
-    public void show() {
-
-    }
-
-    @Override
-    public void render(float v) {
-
-    }
-
-    @Override
-    public void hide() {
-
     }
 }

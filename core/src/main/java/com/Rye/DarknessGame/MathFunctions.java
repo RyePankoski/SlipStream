@@ -1,9 +1,53 @@
 package com.Rye.DarknessGame;
+
 import com.badlogic.gdx.graphics.Pixmap;
+
 import java.awt.*;
+
 public class MathFunctions {
 
     public MathFunctions() {}
+
+    public static int findSector(int x, int y, Pixmap sectorMap) {
+
+
+        int sector = 0;
+
+        int[] colorValues = {255, 200, 180, 160, 140, 120, 100, 80, 60, 40};
+        Color sectorColor = (MathFunctions.getPixelColor(x, y, sectorMap));
+        int red = sectorColor.getRed();
+        int green = sectorColor.getGreen();
+        int blue = sectorColor.getBlue();
+
+
+        if (red > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (red == colorValues[i]) {
+                    sector = i;
+                }
+            }
+        }
+        if (green > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (green == colorValues[i]) {
+                    sector = i + 10;
+                }
+            }
+        }
+        if (blue > 0) {
+            for (int i = 0; i < colorValues.length; i++) {
+                if (blue == colorValues[i]) {
+                    sector = i + 20;
+                }
+            }
+        }
+
+        if (red == 255 && green == 255) {
+            sector = 24;
+        }
+        return sector;
+    }
+
     public static java.awt.Color getPixelColor(int x, int y, Pixmap pixmap) {
 
         int pixel = pixmap.getPixel(x, pixmap.getHeight() - y);
@@ -15,6 +59,7 @@ public class MathFunctions {
 
         return new Color(r, g, b, a);
     }
+
     public static float[] rayCast(int length, int lightAngle, int facingAngle, int coorX, int coorY, int fineness, Pixmap pixmap) {
 
         Color white = new Color(255, 255, 255);
@@ -31,7 +76,7 @@ public class MathFunctions {
         double y1;
         int iterator;
         int verticesIndex = 0;
-        length = length/fineness;
+        length = length / fineness;
 
         for (int i = facingAngle - lightAngle; i < facingAngle + lightAngle; i++) {
             iterator = 0;
@@ -43,11 +88,11 @@ public class MathFunctions {
                 //check for collision, we are multiplying by some value n, so it can see into the wall a little bit.
                 if (white.equals(getPixelColor((int) x1, (int) y1, pixmap))) {
                     if (i < 0) {
-                        x1 += (2* cosines[i + 360]);
-                        y1 += (2* sins[i + 360]);
+                        x1 += (2 * cosines[i + 360]);
+                        y1 += (2 * sins[i + 360]);
                     } else {
-                        x1 += (2* cosines[i]);
-                        y1 += (2* sins[i]);
+                        x1 += (2 * cosines[i]);
+                        y1 += (2 * sins[i]);
                     }
                     break;
                 }
@@ -68,8 +113,9 @@ public class MathFunctions {
             shapeVertices[2 * (verticesIndex) + 1] = (float) y1;
             verticesIndex++;
         }
-        return  shapeVertices;
+        return shapeVertices;
     }
+
     public static float fastInvSqrt(float x) {
         float half = 0.5f * x;
         int i = Float.floatToIntBits(x); // Bitwise representation of the float
@@ -78,14 +124,15 @@ public class MathFunctions {
         x = x * (1.5f - half * x * x);    // Newton-Raphson method
         return x;
     }
+
     public static float fastSqrt(float x) {
         return 1.0f / fastInvSqrt(x);  // Invert the result to get sqrt(x)
     }
 
-    public static double distanceFromMe(double x1, double y1, double x2, double y2){
-        float dx = (float)(x2 - x1);
-        float dy = (float)(y2 - y1);
-        return (MathFunctions.fastSqrt((dx*dx)+(dy*dy)));
+    public static double distanceFromMe(double x1, double y1, double x2, double y2) {
+        float dx = (float) (x2 - x1);
+        float dy = (float) (y2 - y1);
+        return (MathFunctions.fastSqrt((dx * dx) + (dy * dy)));
     }
 
     public static float secondsToNano(float seconds) {

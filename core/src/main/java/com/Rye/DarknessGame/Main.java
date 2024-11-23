@@ -3,6 +3,7 @@ package com.Rye.DarknessGame;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -23,8 +24,8 @@ public class Main extends ApplicationAdapter {
     Pixmap sectorMap;
     Tram tram;
     int playerSector;
-    private boolean canRenderFast = true;
-    double RenderFastTimer;
+    private boolean canRenderSlow = true;
+    double RenderSlowTimer;
     LOS los;
     private boolean renderGame = true;
     private boolean canRenderVeryFast = true;
@@ -32,24 +33,43 @@ public class Main extends ApplicationAdapter {
     SceneManager sceneManager;
     LightingManager lightingManager;
     DoorManager doorManager;
+    private boolean canRenderFast;
+    private long renderFastTimer;
+
+    boolean lightsOn = true;
+
+    double lightsOffTimer;
+
+    double lightsOffWarningTimer;
+
+    Sound warningSound;
+
+    LightMask lightMask;
 
     //endregion
     public void create() {
         //non-dependent objects
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
+        warningSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/shutDownAlert.mp3"));
+
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
+        lightMask = new LightMask();
         hud = new Hud();
         handler = new InputHandler();
+        lightsOffTimer = System.currentTimeMillis() + 60000;
+        lightsOffWarningTimer = lightsOffTimer - 10000;
+
 
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(9152, 4800, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
-        doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), playcor);
-        los = new LOS(playcor);
+        playcor = new Player(7800, 200, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
+        doorManager = new DoorManager(sectorMap, lightMask.getPixmap(), playcor);
+        los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
-        lightingManager = new LightingManager(collisionMask.getPixmap());
-        darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources());
+
+        lightingManager = new LightingManager(lightMask.getPixmap());
+        darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources(),lightMask.getPixmap());
         sceneManager = new SceneManager(playcor, DJ);
 
         //setters
@@ -64,6 +84,25 @@ public class Main extends ApplicationAdapter {
         sceneManager.initScenes();
     }
 
+//    public void scheduleEvent(){
+//        Timer timer = new Timer();
+//
+//        // Define the task to run
+//        TimerTask task = new TimerTask() {
+//
+//            public void run() {
+//                System.out.println("Event triggered at: " + new Date());
+//                // Add your event logic here
+//            }
+//        };
+//
+//        // Schedule the task for a specific time
+//        Date scheduledTime = new Date(System.currentTimeMillis() + 5000); // 5 seconds from now
+//        timer.schedule(task, scheduledTime);
+//
+//        System.out.println("Task scheduled for: " + scheduledTime);
+//    }
+
     public void killMonster(Monster monster) {
         monster = null;
         monsterAlive = false;
@@ -75,8 +114,11 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) renderGame = !renderGame;
 
         if (renderGame) {
-            if (System.currentTimeMillis() >= RenderFastTimer) canRenderFast = true;
+            if (System.currentTimeMillis() >= RenderSlowTimer) canRenderSlow = true;
             if (System.currentTimeMillis() >= renderVeryFastTimer) canRenderVeryFast = true;
+            if (System.currentTimeMillis() >= renderFastTimer) canRenderFast = true;
+            if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
+
 
             //only for drawn elements!
             if (canRenderVeryFast) {
@@ -94,17 +136,29 @@ public class Main extends ApplicationAdapter {
                     monster.updateMonster();
                 }
 
-                darknessLayer.render(0f);
+                if (System.currentTimeMillis() >= lightsOffWarningTimer && System.currentTimeMillis() < lightsOffWarningTimer + 10) {
+                    warningSound.play();
+                }
+
+                if (!lightsOn) {
+                    darknessLayer.render(0f);
+                }
+
                 los.render(0f);
                 hud.renderHud();
             }
 
-            //use this mostly for updates.
             if (canRenderFast) {
                 canRenderFast = false;
-                RenderFastTimer = System.currentTimeMillis() + 250;
-                playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
+                renderFastTimer = System.currentTimeMillis() + 20;
                 doorManager.updateDoors(playerSector);
+            }
+
+            if (canRenderSlow) {
+                canRenderSlow = false;
+                RenderSlowTimer = System.currentTimeMillis() + 250;
+                playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
+
             }
         }
     }

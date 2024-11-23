@@ -21,10 +21,13 @@ public class LOS implements Screen {
 
     private final Player player;
 
-    public LOS(Player player) {
+    Pixmap lightMap;
+
+    public LOS(Player player,Pixmap lightMap) {
         this.player = player;
         this.camera = player.getCamera();
         this.batch = new SpriteBatch();
+        this.lightMap = lightMap;
         this.shapeRenderer = new ShapeRenderer();
 
         initializeLightBuffer();
@@ -62,7 +65,7 @@ public class LOS implements Screen {
             0,
             (int) player.getCoorX(),
             (int) player.getCoorY(),2,
-            player.getCollisionMap()
+            lightMap
         );
         shapeRenderer.setColor(1, 1, 1, 1);
         for (int i = 0; i < lightVertices.length - 2; i += 2) {

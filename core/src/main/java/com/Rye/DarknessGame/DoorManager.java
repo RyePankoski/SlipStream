@@ -69,6 +69,7 @@ public class DoorManager {
     public void updateDoors(int playerSector) {
         for (int i = 0; i < 500; i++) {
             if (doors[playerSector][i] != null) {
+
                 doors[playerSector][i].updateDoor();
             } else {
                 break;

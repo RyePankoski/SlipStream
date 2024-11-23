@@ -21,9 +21,9 @@ ArrayList<Scene> scenes;
 
     public void initScenes() {
         Scene levelOne = new Scene("First Stage", Gdx.audio.newSound(Gdx.files.internal("Ambience/Ambience.mp3")), DJ, player, image = new Texture("FloorTex/MainMapDarknessGame.png"));
-        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))), DJ, player, image = new Texture("FloorTex/MenuScreen.jpg"));
+//        Scene levelTwo = new Scene("Second Stage", Gdx.audio.newSound(Gdx.files.internal(("Music/MenuTheme.mp3"))), DJ, player, image = new Texture("FloorTex/MenuScreen.jpg"));
         addScene(levelOne);
-        addScene(levelTwo);
+//        addScene(levelTwo);
         sceneToRender = getScenes().get(sceneNumber);
     }
 

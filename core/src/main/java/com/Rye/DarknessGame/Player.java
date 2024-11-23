@@ -25,7 +25,7 @@ public class Player {
     //region Variables
 
     // **Booleans**
-    boolean sprint, staminaPause, staminaRegen, canChangeGun = true, flashLightIsOn = true, canMelee = true, canFlashLight;
+    boolean sprint, staminaPause, staminaRegen, canChangeGun = true, flashLightIsOn = false, canMelee = true, canFlashLight;
 
     // **Coordinates and Positioning**
     private float coorX;

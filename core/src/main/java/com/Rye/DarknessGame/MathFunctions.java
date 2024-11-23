@@ -62,7 +62,7 @@ public class MathFunctions {
 
     public static float[] rayCast(int length, int lightAngle, int facingAngle, int coorX, int coorY, int fineness, Pixmap pixmap) {
 
-        Color white = new Color(255, 255, 255);
+        Color clear = new Color(0, 0, 0,0);
 
         float[] shapeVertices = new float[(lightAngle * 4)];
 
@@ -86,7 +86,7 @@ public class MathFunctions {
             while (iterator < length) {
 
                 //check for collision, we are multiplying by some value n, so it can see into the wall a little bit.
-                if (white.equals(getPixelColor((int) x1, (int) y1, pixmap))) {
+                if (!clear.equals(getPixelColor((int) x1, (int) y1, pixmap))) {
                     if (i < 0) {
                         x1 += (2 * cosines[i + 360]);
                         y1 += (2 * sins[i + 360]);

@@ -36,9 +36,11 @@ public class DarknessLayer implements Screen {
     private final FlashState flashState;
     private final BulletStrikeState bulletStrikeState;
     ArrayList<StaticLightSource> staticLights;
+    Pixmap lightMap;
 
 
-    public DarknessLayer(Player player, ArrayList<StaticLightSource> lights) {
+    public DarknessLayer(Player player, ArrayList<StaticLightSource> lights,Pixmap lightMap) {
+        this.lightMap = lightMap;
         this.player = player;
         this.camera = player.getCamera();
         this.batch = new SpriteBatch();
@@ -144,7 +146,7 @@ public class DarknessLayer implements Screen {
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(), 3,
-            player.getCollisionMap()
+            lightMap
         );
 
         renderLightTriangles(lightVertices, player.getCoorX(), player.getCoorY());
@@ -175,7 +177,7 @@ public class DarknessLayer implements Screen {
             (int) player.getFacingAngle(),
             (int) player.getCoorX(),
             (int) player.getCoorY(), 2,
-            player.getCollisionMap()
+            lightMap
         );
 
         shapeRenderer.setColor(1, 1, 1, (float) lightState.getBrightness() / 100 + 0.1f);

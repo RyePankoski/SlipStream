@@ -34,16 +34,27 @@ public class Scene {
         batch.begin();
         batch.setProjectionMatrix(projection);
 
+        float margin = player.cameraZoom * 0.25f;
+
+// Calculate the area to draw
+        float drawWidth = player.cameraZoom + margin * 2.5f;  // Add margin
+        float drawHeight = player.cameraZoom + margin * 2.5f;
+
+// Calculate the starting texture coordinates
+        float startXInTexture = player.getCoorX() - drawWidth / 2;
+        float startYInTexture = player.getCoorY() + drawHeight / 2;
+
+// Draw the image with a larger texture region
         batch.draw(image,
-            (int)(player.getCoorX() - player.cameraZoom/2),  // Screen X (centered on player)
-            (int)(player.getCoorY() - player.cameraZoom/2),  // Screen Y (centered on player)
-            (int)player.cameraZoom,                          // Width to draw on screen
-            (int)player.cameraZoom,                          // Height to draw on screen
-            (int)(player.getCoorX() - player.cameraZoom/2),  // Start X in texture
-            (int)(image.getHeight() - (player.getCoorY() + player.cameraZoom/2)),  // Start Y in texture, flipped
-            (int)player.cameraZoom,                          // Width of texture region
-            (int)player.cameraZoom,                          // Height of texture region
-            false, false);                                   // No flipping needed anymore
+            (int)(player.getCoorX() - drawWidth / 2),  // Adjust for margin
+            (int)(player.getCoorY() - drawHeight / 2), // Adjust for margin
+            (int)drawWidth,                            // Adjusted width
+            (int)drawHeight,                           // Adjusted height
+            (int)startXInTexture,                      // Start X in texture
+            (int)(image.getHeight() - startYInTexture),// Start Y in texture
+            (int)drawWidth,                            // Width of texture region
+            (int)drawHeight,                           // Height of texture region
+            false, false);
         batch.end();
 
         soundPlayer.playSound(stageName, ambience);

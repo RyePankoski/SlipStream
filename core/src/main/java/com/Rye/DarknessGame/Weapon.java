@@ -81,12 +81,13 @@ public class Weapon {
 
             gunShotOne.play();
 
-            pointInFrontVector = player.getPointInFrontVector();
             spriteBatch.setProjectionMatrix(camera.combined);
-
             spriteBatch.begin();
-            gunFlashSprite.setPosition((float) pointInFrontVector[0] - gunFlashSprite.getWidth() / 2,
-                (float) pointInFrontVector[1] - gunFlashSprite.getHeight() / 2);
+            double[] pointOutFront = (MathFunctions.pointInFront(player.getCoorX(),player.getCoorY(),player.getFaceX(),player.getFaceY(),15));
+            gunFlashSprite.setPosition(
+                (float)(pointOutFront[0] - gunFlashSprite.getOriginX()),
+                (float)(pointOutFront[1] - gunFlashSprite.getOriginY())
+            );
             gunFlashSprite.setRotation(player.getFacingAngle() + 90);
             gunFlashSprite.draw(spriteBatch);
             spriteBatch.end();

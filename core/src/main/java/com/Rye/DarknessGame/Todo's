@@ -23,7 +23,7 @@ TODO: Fix the point out front problem for the bullet.
 TODO: Add laser gun; Battery drained less is laser shorter (based on mouse pos);
 
 TIER 1:
-TODO: Tasks
+TODO: Tasks, Add bullet color or mask for collisions
 TODO: Map layers, vent system
 TODO: Add way to switch between scenes, clamp renderer like camera,
 TODO: Settings, Options, PathFinding, Drop Weapons/Tools

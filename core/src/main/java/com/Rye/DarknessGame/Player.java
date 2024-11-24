@@ -75,7 +75,7 @@ public class Player {
     Color white;
 
     // **Collision and Vectors**
-    double[] pointInFrontVector;
+
 
     // **HUD and UI Elements**
     Hud hud;
@@ -85,7 +85,7 @@ public class Player {
     double monsterDistance;
 
     // **Temporary Vectors**
-    private final Vector2 tempVector = new Vector2();
+
 
     // **Flashlight Battery**
     double flashlightBattery;
@@ -111,6 +111,8 @@ public class Player {
     public Pixmap collisionMap;
 
     boolean moving;
+
+
 
     //endregion
 
@@ -144,7 +146,6 @@ public class Player {
         if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
         move();
-        pointInFront();
         distanceToMonster();
         handleMouse();
         facingAngle();
@@ -201,16 +202,7 @@ public class Player {
 
     }
 
-    public void pointInFront() {
-        tempVector.set(faceX - coorX + 5, faceY - coorY + 5);
-        float distance = tempVector.len();
 
-        if (distance != 0) {
-            tempVector.scl(18f / distance);
-            pointInFrontVector[0] = coorX + tempVector.x;
-            pointInFrontVector[1] = coorY + tempVector.y;
-        }
-    }
 
     public void flashLight() {
 
@@ -494,6 +486,7 @@ public class Player {
     }
 
     public void updateCamera() {
+
         if (coorX + (cameraZoom / 2) > roomWidth) {
             camX = roomWidth - cameraZoom / 2;
         } else if (coorX - (cameraZoom / 2) < 0) {
@@ -508,6 +501,12 @@ public class Player {
             camY = cameraZoom / 2;
         } else {
             camY = coorY;
+        }
+
+        if (pressedMouseHash.contains(Input.Buttons.RIGHT)){
+            double[] aimPosition = MathFunctions.pointInFront(coorX,coorY,faceX,faceY,150);
+            camX = (float)aimPosition[0];
+            camY = (float)aimPosition[1];
         }
 
         camera.position.set(camX, camY, 0);
@@ -562,7 +561,7 @@ public class Player {
     public void initVariables() {
         health = 100;
         bullets = new ArrayList<>();
-        pointInFrontVector = new double[2];
+
         equippedWeaponName = "SMG";
         cameraZoom = 500;
         roomWidth = 15000;
@@ -653,11 +652,6 @@ public class Player {
     public Pixmap getCollisionMap() {
         return collisionMap;
     }
-
-    public double[] getPointInFrontVector() {
-        return pointInFrontVector;
-    }
-
     public void addToCoors(int x, int y) {
         coorX += x;
         coorY += y;

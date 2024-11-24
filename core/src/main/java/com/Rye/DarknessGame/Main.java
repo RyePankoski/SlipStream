@@ -35,31 +35,29 @@ public class Main extends ApplicationAdapter {
     DoorManager doorManager;
     private boolean canRenderFast;
     private long renderFastTimer;
-
     boolean lightsOn = true;
-
     double lightsOffTimer;
-
     double lightsOffWarningTimer;
-
     Sound warningSound;
-
     LightMask lightMask;
+
+    PASystem paSystem;
 
     //endregion
     public void create() {
         //non-dependent objects
+        paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         warningSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/shutDownAlert.mp3"));
-
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
         handler = new InputHandler();
-        lightsOffTimer = System.currentTimeMillis() + 60000;
-        lightsOffWarningTimer = lightsOffTimer - 10000;
 
+        //temp stuff
+        lightsOffTimer = System.currentTimeMillis() + 70000;
+        lightsOffWarningTimer = lightsOffTimer - 10000;
 
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
@@ -67,7 +65,6 @@ public class Main extends ApplicationAdapter {
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
         los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
-
         lightingManager = new LightingManager(lightMask.getPixmap());
         darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources(), lightMask.getPixmap());
         sceneManager = new SceneManager(playcor, DJ);
@@ -82,25 +79,6 @@ public class Main extends ApplicationAdapter {
         //init
         sceneManager.initScenes();
     }
-
-//    public void scheduleEvent(){
-//        Timer timer = new Timer();
-//
-//        // Define the task to run
-//        TimerTask task = new TimerTask() {
-//
-//            public void run() {
-//                System.out.println("Event triggered at: " + new Date());
-//                // Add your event logic here
-//            }
-//        };
-//
-//        // Schedule the task for a specific time
-//        Date scheduledTime = new Date(System.currentTimeMillis() + 5000); // 5 seconds from now
-//        timer.schedule(task, scheduledTime);
-//
-//        System.out.println("Task scheduled for: " + scheduledTime);
-//    }
 
     public void killMonster(Monster monster) {
         monster = null;
@@ -152,14 +130,11 @@ public class Main extends ApplicationAdapter {
                 los.render(0f);
                 hud.renderHud();
             }
-
-
-
             if (canRenderSlow) {
                 canRenderSlow = false;
                 RenderSlowTimer = System.currentTimeMillis() + 250;
                 playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
-
+                paSystem.updatePA();
             }
         }
     }

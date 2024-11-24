@@ -64,19 +64,18 @@ public class Main extends ApplicationAdapter {
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(7800, 200, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
-        doorManager = new DoorManager(sectorMap, lightMask.getPixmap(), playcor);
+        doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
         los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
 
         lightingManager = new LightingManager(lightMask.getPixmap());
-        darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources(),lightMask.getPixmap());
+        darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources(), lightMask.getPixmap());
         sceneManager = new SceneManager(playcor, DJ);
 
         //setters
         hud.setPlayer(playcor);
         monster.setPlayer(playcor);
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
-        collisionMask.setCamera(playcor.getCamera());
         com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
         Gdx.input.setCursorCatched(true);
 
@@ -120,6 +119,12 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
 
 
+            if (canRenderFast) {
+                canRenderFast = false;
+                renderFastTimer = System.currentTimeMillis() + 20;
+                doorManager.updateDoors(playerSector);
+            }
+
             //only for drawn elements!
             if (canRenderVeryFast) {
                 canRenderVeryFast = false;
@@ -148,11 +153,7 @@ public class Main extends ApplicationAdapter {
                 hud.renderHud();
             }
 
-            if (canRenderFast) {
-                canRenderFast = false;
-                renderFastTimer = System.currentTimeMillis() + 20;
-                doorManager.updateDoors(playerSector);
-            }
+
 
             if (canRenderSlow) {
                 canRenderSlow = false;

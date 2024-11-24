@@ -13,15 +13,16 @@ public class DoorManager {
 
     Pixmap collisionMap;
     Pixmap sectorMap;
-
     Color sectorColor;
 
     Door door;
     Door[][] doors;
     Player player;
+    Pixmap lightMap;
 
-    public DoorManager(Pixmap sectorMap,Pixmap collisionMap,Player player){
+    public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player){
         this.sectorMap = sectorMap;
+        this.lightMap = lightMap;
         this.collisionMap = collisionMap;
         this.player = player;
         doors = new Door[25][50];
@@ -102,7 +103,7 @@ public class DoorManager {
                 boolean isLocked = object.getProperties().get("locked", Boolean.class);
                 int sector = findSector((int)x, (int)y);
 
-                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector],isLocked, player, collisionMap);
+                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector],isLocked, player, collisionMap, lightMap);
                 doors[sector][numberDoorsInSector[sector]] = door;
                 numberDoorsInSector[sector]++;
             }

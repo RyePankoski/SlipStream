@@ -10,7 +10,6 @@ public class CollisionMask {
 
     SpriteBatch spriteBatch;
     Texture collisionMap;
-    OrthographicCamera camera;
 
     private final Pixmap pixmap;
 
@@ -21,9 +20,6 @@ public class CollisionMask {
         collisionMap = new Texture(pixmap);
     }
 
-    public void setCamera(OrthographicCamera camera) {
-        this.camera = camera;
-    }
 
     public Pixmap getPixmap() {
         return pixmap;

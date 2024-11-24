@@ -35,18 +35,20 @@ public class Door {
     int openIncrement;
 
     boolean orientedHorizontal;
+    Pixmap lightMap;
 
 
-    public Door(int posX, int posY, int width, int height, int sector, int instantiationNumber, boolean locked, Player player, Pixmap collisionMap) {
+    public Door(int posX, int posY, int width, int height, int sector, int instantiationNumber, boolean locked, Player player, Pixmap collisionMap, Pixmap lightMap) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
         this.height = height;
         this.sector = sector;
         this.instantiationNumber = instantiationNumber;
+        this.locked = locked;
         this.player = player;
         this.collisionMap = collisionMap;
-        this.locked = locked;
+        this.lightMap = lightMap;
 
         if (width > height){
             orientedHorizontal = true;
@@ -76,11 +78,15 @@ public class Door {
             if (openIncrement > 0 && orientedHorizontal) {
                 collisionMap.setColor(0f, 0f, 0f, 0f);  // Set to transparent
                 collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width - openIncrement, height);
+                lightMap.setColor(0, 0, 0, 0);  // Set to opaque (white color)
+                lightMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width - openIncrement, height);
                 openIncrement -= 4;
             }
             if (openIncrement > 0 && !orientedHorizontal) {
                 collisionMap.setColor(0f, 0f, 0f, 0f);  // Set to transparent
                 collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width , height- openIncrement);
+                lightMap.setColor(0, 0, 0, 0);  // Set to opaque (white color)
+                lightMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height - openIncrement);
                 openIncrement -= 4;
             }
 
@@ -98,7 +104,9 @@ public class Door {
             }
             hasStateChanged = false;
             collisionMap.setColor(1, 1, 1, 1);  // Set to opaque (white color)
-            collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height);  // Close door by drawing opaque rectangle (using correct width and height)
+            collisionMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height);
+            lightMap.setColor(0, 0, 0, 1);  // Set to opaque (white color)
+            lightMap.fillRectangle(posX, collisionMap.getHeight() - posY - height, width, height);// Close door by drawing opaque rectangle (using correct width and height)
         }
         justInsantiated = false;
     }

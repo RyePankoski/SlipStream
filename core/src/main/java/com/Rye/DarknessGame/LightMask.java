@@ -10,7 +10,6 @@ public class LightMask {
 
     SpriteBatch spriteBatch;
     Texture collisionMap;
-    OrthographicCamera camera;
 
     private final Pixmap pixmap;
 
@@ -19,10 +18,6 @@ public class LightMask {
         pixmap = new Pixmap((Gdx.files.internal("CollisionMap/lightMap.png")));
         pixmap.setBlending(Pixmap.Blending.None);
         collisionMap = new Texture(pixmap);
-    }
-
-    public void setCamera(OrthographicCamera camera) {
-        this.camera = camera;
     }
 
     public Pixmap getPixmap() {

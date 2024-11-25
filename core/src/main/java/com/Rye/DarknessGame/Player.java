@@ -10,12 +10,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Math.sqrt;
@@ -55,6 +56,7 @@ public class Player {
     Rifle rifle;
     ArrayList<Bullet> bullets;
 
+    Map<String, Key> keys;
     // **Sound Effects**
     private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound, searchBeep;
     private Music flashLightWarning, playerDamagedSound, searchPatternSound, turnOnSearch;
@@ -561,6 +563,7 @@ public class Player {
     public void initVariables() {
         health = 100;
         bullets = new ArrayList<>();
+        keys = new HashMap<>();
 
         equippedWeaponName = "SMG";
         cameraZoom = 500;
@@ -655,6 +658,14 @@ public class Player {
     public void addToCoors(int x, int y) {
         coorX += x;
         coorY += y;
+    }
+
+    public Map<String,Key> getKeys(){
+        return keys;
+    }
+
+    public void addKey(String sectorAndNumber, Key key){
+        keys.put(sectorAndNumber, key);
     }
     public boolean getMoving(){
         return moving;

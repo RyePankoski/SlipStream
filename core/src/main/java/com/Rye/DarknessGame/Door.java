@@ -115,6 +115,11 @@ public class Door {
         double playerDistance = MathFunctions.distanceFromMe(posX + (double) width / 2, posY + (double) height / 2, player.getCoorX(), player.getCoorY());
 
         if (playerDistance < 100 && locked) {
+            if (player.getKeys().get(String.valueOf(this.sector) + String.valueOf(this.instantiationNumber)) != null){
+                SoundEffects.playSound("unlockDoor");
+                locked = false;
+            }
+
             if (!lockedDoorSound.isPlaying()) {
                 lockedDoorSound.play();
             }

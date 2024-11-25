@@ -40,12 +40,15 @@ public class Main extends ApplicationAdapter {
     double lightsOffWarningTimer;
     Sound warningSound;
     LightMask lightMask;
-
     PASystem paSystem;
+    TaskManager taskManager;
+
+    Key key1;
 
     //endregion
     public void create() {
         //non-dependent objects
+        SoundEffects.initSounds();
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         warningSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/shutDownAlert.mp3"));
@@ -62,6 +65,10 @@ public class Main extends ApplicationAdapter {
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(7800, 200, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
+
+        key1 = new Key(7800,300,7,0,playcor);
+
+        taskManager = new TaskManager(playcor);
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
         los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
@@ -109,6 +116,8 @@ public class Main extends ApplicationAdapter {
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
                 sceneManager.getScenes().get(sceneNumber).renderScene();
+                key1.updateKey();
+
                 if (playerSector == 24) {
                     tram.updateTram();
                 }

@@ -2,6 +2,7 @@ package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -71,7 +72,6 @@ public class Door {
 
         orientedHorizontal = width > height;
         openIncrement = Math.max(width, height);
-
 
         initSounds();
         initDrawParams();

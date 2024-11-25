@@ -9,6 +9,8 @@ import java.util.Map;
 public class SoundEffects {
     private static Map<String, Music> sounds;
 
+    static boolean playingSound;
+
     public SoundEffects() {}
 
     public static void initSounds() {
@@ -22,5 +24,8 @@ public class SoundEffects {
         if(!music.isPlaying()) {
             music.play();
         }
+    }
+    public static boolean isPlaying(){
+        return playingSound;
     }
 }

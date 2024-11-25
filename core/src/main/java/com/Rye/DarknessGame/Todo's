@@ -23,6 +23,7 @@ TODOd: Aiming
 TODO: Fix the point out front problem for the bullet.
 
 TIER 1:
+TODO: MIgrate all batch and shaperender calls for being end to main render loop
 TODO: Rework the render clamps (its not robust and forces me to add things into places I don't want them)
 TODO: Tasks, Add bullet color or mask for collisions, make centralized popup manager, make it so tapping e opens the door, make key manager, make doors slide closed
 TODO: Centralize sound effects. Sound effect class.
@@ -39,7 +40,7 @@ TODO: look up at ceiling mechanic (thanks cat)
 TODO: Add blur around lights & RayTrace other light sources.
 
 TIER 3:
-TODO: Tools(Traps, Deployable Lights) Parts,  More Guns (LaserGun,)
+TODO: Tools(Traps, Deployable Lights) Parts, More Guns
 TODO: Monster AI,
 
 TIER 4:

@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.awt.*;
 
@@ -20,6 +21,7 @@ public class DoorManager {
     Player player;
     Pixmap lightMap;
 
+
     public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player){
         this.sectorMap = sectorMap;
         this.lightMap = lightMap;
@@ -28,6 +30,7 @@ public class DoorManager {
         doors = new Door[25][50];
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
     }
+
     public int findSector(int x, int y) {
 
         int sector = 0;

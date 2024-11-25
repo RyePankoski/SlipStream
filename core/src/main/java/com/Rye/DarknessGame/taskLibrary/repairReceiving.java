@@ -12,8 +12,6 @@ public class repairReceiving extends Task{
     @Override
     public void updateTask(){
 
-
-
     }
 
 }

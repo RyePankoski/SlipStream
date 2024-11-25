@@ -42,13 +42,15 @@ public class Main extends ApplicationAdapter {
     LightMask lightMask;
     PASystem paSystem;
     TaskManager taskManager;
-
     Key key1;
+
+
 
     //endregion
     public void create() {
         //non-dependent objects
         SoundEffects.initSounds();
+
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         warningSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/shutDownAlert.mp3"));
@@ -66,7 +68,7 @@ public class Main extends ApplicationAdapter {
         monster = new Monster(collisionMask.getPixmap());
         playcor = new Player(7800, 200, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
 
-        key1 = new Key(7800,300,7,0,playcor);
+        key1 = new Key(8530,180,3,30,playcor);
 
         taskManager = new TaskManager(playcor);
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
@@ -104,18 +106,13 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
 
 
-            if (canRenderFast) {
-                canRenderFast = false;
-                renderFastTimer = System.currentTimeMillis() + 20;
-                doorManager.updateDoors(playerSector);
-            }
-
             //only for drawn elements!
             if (canRenderVeryFast) {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
                 sceneManager.getScenes().get(sceneNumber).renderScene();
+
                 key1.updateKey();
 
                 if (playerSector == 24) {
@@ -138,6 +135,12 @@ public class Main extends ApplicationAdapter {
 
                 los.render(0f);
                 hud.renderHud();
+            }
+
+            if (canRenderFast) {
+                canRenderFast = false;
+                renderFastTimer = System.currentTimeMillis() + 20;
+                doorManager.updateDoors(playerSector);
             }
             if (canRenderSlow) {
                 canRenderSlow = false;

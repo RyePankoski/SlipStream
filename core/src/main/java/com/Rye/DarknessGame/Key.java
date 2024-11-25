@@ -11,6 +11,7 @@ public class Key {
     int doorNumber;
     ShapeRenderer shapeRenderer;
     Player player;
+    boolean pickedUp = false;
 
     public Key(int x, int y, int sector, int doorNumber, Player player) {
         this.x = x;
@@ -27,15 +28,18 @@ public class Key {
     }
 
     public void drawMyself() {
-        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.circle(x, y, 5);
-        shapeRenderer.end();
+        if(!pickedUp) {
+            shapeRenderer.setProjectionMatrix(player.getCamera().combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.GREEN);
+            shapeRenderer.circle(x, y, 5);
+            shapeRenderer.end();
+        }
     }
 
     public void isPlayerNear() {
         if (MathFunctions.distanceFromMe(x, y, player.getCoorX(), player.getCoorY()) < 10) {
+            pickedUp = true;
             SoundEffects.playSound("subObjectiveComplete");
             player.addKey(String.valueOf(sector) + String.valueOf(doorNumber),this);
             System.out.println(String.valueOf(sector) + String.valueOf(doorNumber));

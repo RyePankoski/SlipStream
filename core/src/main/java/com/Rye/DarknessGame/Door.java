@@ -5,21 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
 
 public class Door {
-
-    int posX;
-    int posY;
+    int posX, posY, sector, instantiationNumber, width, height, openIncrement;
+    boolean hasStateChanged = true, justInstantiated = true, locked, orientedHorizontal;
     Player player;
-    boolean hasStateChanged = true;
-    Pixmap collisionMap;
-    int sector;
-    int instantiationNumber;
-    int width;
-    int height;
-    boolean justInstantiated = true;
-    boolean locked;
-    int openIncrement;
-    boolean orientedHorizontal;
-    Pixmap lightMap;
+    Pixmap collisionMap, lightMap;
+
 
     public Door(int posX, int posY, int width, int height, int sector, int instantiationNumber,
                 boolean locked, Player player, Pixmap collisionMap, Pixmap lightMap) {
@@ -36,7 +26,6 @@ public class Door {
 
         orientedHorizontal = width > height;
         openIncrement = Math.max(width, height);
-
     }
 
     public void updateDoor() {
@@ -87,11 +76,11 @@ public class Door {
 
         double playerDistance = MathFunctions.distanceFromMe(posX + (double) width / 2, posY + (double) height / 2, player.getCoorX(), player.getCoorY());
 
-        if(playerDistance < 75){
-            System.out.println(String.valueOf(sector) + instantiationNumber);
-        }
+//        if(playerDistance < 75){
+//            System.out.println(String.valueOf(sector) + instantiationNumber);
+//        }
 
-        if (player.getKeys().get(String.valueOf(this.sector) + String.valueOf(this.instantiationNumber)) != null && playerDistance < 100 && locked) {
+        if (player.getKeys().get(String.valueOf(this.sector) + String.valueOf(this.instantiationNumber)) != null && playerDistance < 75 && locked) {
             SoundEffects.playMusic("unlockDoor");
             locked = false;
         }

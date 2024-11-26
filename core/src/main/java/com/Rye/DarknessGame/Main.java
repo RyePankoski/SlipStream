@@ -6,45 +6,43 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
 
     //region Variables
-    public Player playcor;
-    Texture image;
-    int sceneNumber = 0;
+// boolean variables
+    public boolean monsterAlive = true, canRenderSlow = true, renderGame = true, canRenderVeryFast = true, canRenderFast, lightsOn = true;
+
+    // int variables
+    int sceneNumber = 0, playerSector;
+
+    // long variables
+    private long renderVeryFastTimer, renderFastTimer;
+
+    // double variables
+    double RenderSlowTimer, lightsOffTimer, lightsOffWarningTimer;
+
+    // Object variables
+    Player playcor;
     Hud hud;
     CollisionMask collisionMask;
     DarknessLayer darknessLayer;
     Monster monster;
-    boolean monsterAlive = true;
     Pixmap sectorMap;
     Tram tram;
-    int playerSector;
-    private boolean canRenderSlow = true;
-    double RenderSlowTimer;
     LOS los;
-    private boolean renderGame = true;
-    private boolean canRenderVeryFast = true;
-    private long renderVeryFastTimer;
     SceneManager sceneManager;
     LightingManager lightingManager;
     DoorManager doorManager;
-    private boolean canRenderFast;
-    private long renderFastTimer;
-    boolean lightsOn = true;
-    double lightsOffTimer;
-    double lightsOffWarningTimer;
     LightMask lightMask;
     PASystem paSystem;
     TaskManager taskManager;
     Key key1;
-    public KeyPad keyPad;
-
+    KeyPad keyPad;
     PDA testPDA;
     PartManager partManager;
+
 
     //endregion
     public void create() {

@@ -10,27 +10,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.awt.*;
 
 public class Bullet {
-    double startX;
-    double startY;
-    double facingX;
-    double facingY;
-    double posX;
-    double posY;
+    double startX, startY, facingX, facingY, posX, posY, dx, dy, bulletSpeed;
     boolean alive;
-    Color white;
-    Sound bulletStrike;
-
-    Sound monsterStrike;
-    ShapeRenderer shapeRenderer;
-    double bulletSpeed;
-    Texture bulletStrikeTexture;
-    SpriteBatch spriteBatch;
     Player player;
     Monster monster;
     Weapon weapon;
-    double dx;
-    double dy;
-
+    Color white;
+    Texture bulletStrikeTexture;
+    ShapeRenderer shapeRenderer;
+    SpriteBatch spriteBatch;
     Pixmap collisionMap;
 
     public Bullet(Pixmap collisionMap, Player player, double bulletSpeed, Monster monster, Weapon weapon) {
@@ -76,23 +64,13 @@ public class Bullet {
     }
 
     public void checkForWall() {
+
         if (getPixelColor((int) posX, (int) posY).equals(white)) {
+            double distance = MathFunctions.distanceFromMe(startX,startY,facingX,facingY);
+            double percent = ((500 - distance) / 500);
+            percent = Math.max(0, Math.min(1, percent));
 
-            double max = 1000;
-            double xzes = facingX - startX;
-            double yzes = facingY - startY;
-            double distance = Math.sqrt((xzes * xzes) + (yzes * yzes));
-            double percent = ((max - distance) / max);
-
-            // Clamp percent to the range [0.0, 1.0]
-            if (percent < 0) {
-                percent = 0;
-            } else if (percent > 1) {
-                percent = 1;
-            }
-
-            // Play the sound with the calculated volume
-            SoundEffects.playSoundWithParameters("bulletStrike",(float)percent,1f);
+            SoundEffects.playSoundWithParameters("bulletStrike",(float)percent, 1f);
 
             spriteBatch.setProjectionMatrix(player.getCamera().combined);
             spriteBatch.begin();
@@ -100,21 +78,13 @@ public class Bullet {
             spriteBatch.end();
 
             player.main.darknessLayer.setBulletStrike(true, posX, posY, weapon.getWeaponType().hitSize);
+
             die();
         }
     }
 
     public void checkForMonster() {
-        double x1 = posX;
-        double y1 = posY;
-
-        double x2 = monster.coorX;
-        double y2 = monster.coorY;
-
-        double newX = x2 - x1;
-        double newY = y2 - y1;
-        double distance = Math.sqrt((newX * newX) + (newY * newY));
-
+        double distance = MathFunctions.distanceFromMe(posX,posY,monster.getCoorX(),monster.getCoorY());
         if (distance < 20) {
             monster.hitByBullet(weapon.getWeaponType());
             SoundEffects.playSound("monsterStrikeSound");

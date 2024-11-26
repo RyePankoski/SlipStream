@@ -21,14 +21,15 @@ import java.util.Map;
 public class Player {
     //region Variables
 
-    boolean sprint, staminaPause, staminaRegen, canChangeGun, flashLightIsOn = false, canMelee, canFlashLight;
-    float camX,camY;
-    private float coorX,coorY,faceX,faceY, facingAngle,factor;
-    public float speed,cameraZoom;
+    boolean sprint, staminaPause, staminaRegen, canChangeGun, flashLightIsOn, canMelee, canFlashLight;
+    float camX, camY;
+    private float coorX, coorY, faceX, faceY, facingAngle, factor;
+    public float speed, cameraZoom;
     OrthographicCamera camera;
     int mapWidth, mapHeight;
-    double monsterDistance,flashlightBattery,health,beepTimer;
-    private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash,timeTillCanToggleSearch;
+    double monsterDistance, flashlightBattery, health, beepTimer;
+    private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash, timeTillCanToggleSearch;
+    public boolean playerHurt, searchPattern, canToggleSearch, moving, inPopUp;
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;
@@ -42,8 +43,8 @@ public class Player {
     Color white;
     Hud hud;
     Monster monster;
+
     public Main main;
-    public boolean playerHurt,searchPattern,canToggleSearch,moving,inPopUp;
     public Pixmap collisionMap;
     //endregion
 
@@ -91,7 +92,7 @@ public class Player {
         ronaldProximity();
     }
 
-    public void variableUpdates(){
+    public void variableUpdates() {
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
         facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);

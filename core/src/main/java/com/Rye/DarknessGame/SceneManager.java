@@ -5,9 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import java.util.ArrayList;
 
 public class SceneManager extends Main {
-
     Scene sceneToRender;
-
     Player player;
 
 
@@ -19,7 +17,7 @@ ArrayList<Scene> scenes;
     }
 
     public void initScenes() {
-        Scene levelOne = new Scene("First Stage", player, image = new Texture("FloorTex/MainMapDarknessGame.png"));
+        Scene levelOne = new Scene("First Stage", player, new Texture("FloorTex/MainMapDarknessGame.png"));
         addScene(levelOne);
         sceneToRender = getScenes().get(sceneNumber);
     }

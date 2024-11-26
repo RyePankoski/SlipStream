@@ -132,9 +132,10 @@ public class MathFunctions {
         float dy = (float) (y2 - y1);
         return (MathFunctions.fastSqrt((dx * dx) + (dy * dy)));
     }
+
     public static double facingAngle(double x1, double y1, double x2, double y2) {
-        double delX = x2-x1;
-        double delY = y2-y1;
+        double delX = x2 - x1;
+        double delY = y2 - y1;
 
         return Math.toDegrees(Math.atan2(delY, delX));
     }

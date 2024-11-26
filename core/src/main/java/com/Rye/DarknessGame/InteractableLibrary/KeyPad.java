@@ -17,8 +17,8 @@ public class KeyPad extends Interactable {
     }
 
     public void isPlayerNear() {
-        double playerDistance = MathFunctions.distanceFromMe(x, y, player.getCoorX(), player.getCoorY());
 
+        double playerDistance = MathFunctions.distanceFromMe(x, y, player.getCoorX(), player.getCoorY());
         if (playerDistance < 50) {
             PopUpManager.displayPopUp(8340, 250, "E", player);
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {

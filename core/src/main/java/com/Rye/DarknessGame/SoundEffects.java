@@ -37,6 +37,7 @@ public class SoundEffects {
         musics.put("tramMoving", Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/tramMoving.mp3")));
         musics.put("shutdownAlert",Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/shutDownAlert.mp3")));
         musics.put("pdaFound", Gdx.audio.newMusic(Gdx.files.internal("SoundEffects/pdaFound.mp3")));
+        musics.put("ambience",Gdx.audio.newMusic(Gdx.files.internal("Ambience/Ambience.mp3")));
 
         sounds.put("monsterStrikeSound", Gdx.audio.newSound(Gdx.files.internal("BulletSFX/monsterStrikeSound.mp3")));
         sounds.put("changeGun", Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/changeGuns.mp3")));

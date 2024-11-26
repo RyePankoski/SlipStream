@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 public class Scene {
 
     Sound ambience;
-    SoundPlayer soundPlayer;
     String stageName;
     Player player;
     Texture image;
@@ -17,34 +16,31 @@ public class Scene {
     private final SpriteBatch batch;
     Matrix4 projection;
 
-    public Scene(String stageName, Sound ambience, SoundPlayer soundPlayerRef, Player player, Texture image) {
+    public Scene(String stageName, Player player, Texture image) {
         this.stageName = stageName;
-        this.ambience = ambience;
         this.image = image;
         this.player = player;
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
-        soundPlayer = soundPlayerRef;
 
         projection = player.getCamera().combined;
         shapeRenderer.setProjectionMatrix(projection);
     }
 
     public void renderScene() {
+
+        SoundEffects.playMusic("ambience");
+
         batch.begin();
         batch.setProjectionMatrix(projection);
 
         float margin = player.cameraZoom * 0.25f;
-
-// Calculate the area to draw
         float drawWidth = player.cameraZoom + margin * 2.5f;  // Add margin
         float drawHeight = player.cameraZoom + margin * 2.5f;
 
-// Calculate the starting texture coordinates
         float startXInTexture = player.getCoorX() - drawWidth / 2;
         float startYInTexture = player.getCoorY() + drawHeight / 2;
 
-// Draw the image with a larger texture region
         batch.draw(image,
             (int)(player.getCoorX() - drawWidth / 2),  // Adjust for margin
             (int)(player.getCoorY() - drawHeight / 2), // Adjust for margin
@@ -56,7 +52,5 @@ public class Scene {
             (int)drawHeight,                           // Height of texture region
             false, false);
         batch.end();
-
-        soundPlayer.playSound(stageName, ambience);
     }
 }

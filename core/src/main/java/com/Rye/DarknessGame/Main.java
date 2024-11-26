@@ -80,7 +80,7 @@ public class Main extends ApplicationAdapter {
         tram = new Tram(playcor);
         lightingManager = new LightingManager(lightMask.getPixmap());
         darknessLayer = new DarknessLayer(playcor, lightingManager.getStaticLightSources(), lightMask.getPixmap());
-        sceneManager = new SceneManager(playcor, DJ);
+        sceneManager = new SceneManager(playcor);
 
         //setters
         hud.setPlayer(playcor);

@@ -3,7 +3,6 @@ package com.Rye.DarknessGame;
 import com.Rye.DarknessGame.KeyLibrary.Key;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,71 +19,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Player {
-
     //region Variables
 
-    // **Booleans**
     boolean sprint, staminaPause, staminaRegen, canChangeGun, flashLightIsOn = false, canMelee, canFlashLight;
-
-    private float coorX;
-    private float coorY;
-    private float faceX;
-    private float faceY;
-
-    // **Camera and Viewport**
+    float camX,camY;
+    private float coorX,coorY,faceX,faceY, facingAngle,factor;
+    public float speed,cameraZoom;
     OrthographicCamera camera;
-    float cameraZoom;
-    public float speed;
-    float facingAngle;
-    float factor = 1.8f;
-
-    int roomWidth, roomHeight;
-
-    private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash;
-
+    int mapWidth, mapHeight;
+    double monsterDistance,flashlightBattery,health,beepTimer;
+    private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash,timeTillCanToggleSearch;
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;
     Rifle rifle;
     ArrayList<Bullet> bullets;
     Map<String, Key> keys;
-    private Sprite playerSprite;
-    private Sprite mouseCursorSprite;
+    private Sprite playerSprite, mouseCursorSprite;
     private SpriteBatch spriteBatch;
     BitmapFont bitmapFont;
     ShapeRenderer shapeRenderer;
     Color white;
     Hud hud;
     Monster monster;
-    double monsterDistance;
-    double flashlightBattery;
-
-    // **Game Main Reference**
     public Main main;
-    double health;
-    public boolean playerHurt;
-    float camX;
-    float camY;
-
-    public boolean searchPattern;
-
-    boolean canToggleSearch = true;
-
-    private double timeTillCanToggleSearch;
-
-    double beepTimer;
-
+    public boolean playerHurt,searchPattern,canToggleSearch,moving,inPopUp;
     public Pixmap collisionMap;
-
-    boolean moving;
-
-    boolean inPopUp = false;
-
     //endregion
 
     public Player(int x, int y, int speed, Hud hud,
                   Pixmap collisionMap, Monster monster, Main main) {
-
         this.main = main;
         this.coorX = x;
         this.coorY = y;
@@ -106,13 +70,14 @@ public class Player {
         if (System.currentTimeMillis() >= timeTillMelee) canMelee = true;
         if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
+
         if (!inPopUp) {
+            handleMouse();
             move();
+            weapon();
         }
 
-        handleMouse();
-        facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
-        monsterDistance = (float) MathFunctions.distanceFromMe(coorX, coorY, monster.getCoorX(), monster.getCoorY());
+        variableUpdates();
         updateCamera();
         manageHealth();
 
@@ -121,16 +86,16 @@ public class Player {
         drawCursor();
         stopShapeRender();
 
-        if (!inPopUp) {
-            weapon();
-        }
-
         melee();
         flashLight();
         ronaldProximity();
+    }
 
+    public void variableUpdates(){
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
+        facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
+        monsterDistance = (float) MathFunctions.distanceFromMe(coorX, coorY, monster.getCoorX(), monster.getCoorY());
     }
 
     public void manageHealth() {
@@ -431,16 +396,16 @@ public class Player {
 
     public void updateCamera() {
 
-        if (coorX + (cameraZoom / 2) > roomWidth) {
-            camX = roomWidth - cameraZoom / 2;
+        if (coorX + (cameraZoom / 2) > mapWidth) {
+            camX = mapWidth - cameraZoom / 2;
         } else if (coorX - (cameraZoom / 2) < 0) {
             camX = cameraZoom / 2;
         } else {
             camX = coorX;
         }
 
-        if (coorY + (cameraZoom / 2) > roomHeight) {
-            camY = roomHeight - cameraZoom / 2;
+        if (coorY + (cameraZoom / 2) > mapHeight) {
+            camY = mapHeight - cameraZoom / 2;
         } else if (coorY - (cameraZoom / 2) < 0) {
             camY = cameraZoom / 2;
         } else {
@@ -492,15 +457,17 @@ public class Player {
     }
 
     public void initVariables() {
-        health = 100;
         bullets = new ArrayList<>();
         keys = new HashMap<>();
 
+        health = 100;
+        stamina = 100;
         equippedWeaponName = "SMG";
         cameraZoom = 500;
-        roomWidth = 15000;
-        roomHeight = 10000;
+        mapWidth = 15000;
+        mapHeight = 10000;
         flashlightBattery = 100;
+        factor = 1.8f;
     }
 
     public void initDrawParams() {

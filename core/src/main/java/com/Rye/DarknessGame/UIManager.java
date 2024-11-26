@@ -16,12 +16,10 @@ public class UIManager {
     private Skin skin;
     private InputProcessor originalInputProcessor;
 
-    // Private constructor to prevent direct instantiation
-    private UIManager() {
-        // Initialize the stage
-        uiStage = new Stage();
+    public boolean popUpOpen;
 
-        // Load UI skin
+    private UIManager() {
+        uiStage = new Stage();
         skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
 
@@ -32,12 +30,10 @@ public class UIManager {
         return instance;
     }
 
-    // Method to show a keypad popup
     public void showKeyPadPopup(String title, Consumer<String> onSubmit) {
-        // Clear any existing popups
         uiStage.clear();
+        popUpOpen = true;
 
-        // Create popup window
         Window popup = new Window(title, skin);
         popup.setSize(300, 200);
         popup.setPosition(
@@ -46,11 +42,9 @@ public class UIManager {
         );
         popup.setTouchable(Touchable.enabled);
 
-        // Create text field
         TextField textField = new TextField("", skin);
         textField.setTouchable(Touchable.enabled);
 
-        // Submit button
         TextButton submitButton = new TextButton("Submit", skin);
         submitButton.addListener(new ClickListener() {
             @Override
@@ -61,42 +55,26 @@ public class UIManager {
             }
         });
 
-        // Cancel button
-        TextButton cancelButton = new TextButton("Cancel", skin);
-        cancelButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                hidePopup();
-            }
-        });
 
-        // Layout the popup
         popup.add(textField).width(200).pad(10);
         popup.row();
         popup.add(submitButton).pad(10);
-        popup.add(cancelButton).pad(10);
 
-        // Add popup to stage
         uiStage.addActor(popup);
-
-        // Store and replace input processor
-        originalInputProcessor = Gdx.input.getInputProcessor();
-        System.out.println(originalInputProcessor);
         Gdx.input.setInputProcessor(uiStage);
-
-        // Set focus
         uiStage.setKeyboardFocus(textField);
     }
 
     public void hidePopup() {
+        popUpOpen = false;
         uiStage.clear();
-        if (originalInputProcessor != null) {
-            System.out.println(originalInputProcessor);
-            Gdx.input.setInputProcessor(originalInputProcessor);
-        }
     }
     public void render(float delta) {
         uiStage.act(delta);
         uiStage.draw();
+    }
+
+    public boolean getStatus(){
+        return popUpOpen;
     }
 }

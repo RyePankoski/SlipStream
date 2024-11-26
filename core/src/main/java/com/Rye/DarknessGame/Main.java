@@ -1,6 +1,7 @@
 package com.Rye.DarknessGame;
-import com.Rye.DarknessGame.interactableLibrary.Interactable;
-import com.Rye.DarknessGame.interactableLibrary.KeyPad;
+import com.Rye.DarknessGame.InteractableLibrary.KeyPad;
+import com.Rye.DarknessGame.KeyLibrary.Key;
+import com.Rye.DarknessGame.PartsLibrary.PartManager;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -19,7 +20,6 @@ public class Main extends ApplicationAdapter {
     DarknessLayer darknessLayer;
     Monster monster;
     boolean monsterAlive = true;
-    SoundPlayer DJ;
     Pixmap sectorMap;
     Tram tram;
     int playerSector;
@@ -44,16 +44,15 @@ public class Main extends ApplicationAdapter {
     public KeyPad keyPad;
 
     PDA testPDA;
+    PartManager partManager;
 
-    Interactable interactable;
     //endregion
     public void create() {
         //non-dependent objects
-        PopUpManager.init();
-        SoundEffects.initSounds();
+
+
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
-        DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
@@ -63,18 +62,19 @@ public class Main extends ApplicationAdapter {
 
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(7800, 200, 2, DJ, hud, collisionMask.getPixmap(), monster, this);
+        playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), monster, this);
 
 
-        //test classes to be later removed
+        //test classes to be later removed or implemented;
+        partManager = new PartManager(playcor);
         key1 = new Key(8530, 180, 3, 30, playcor);
-        testPDA = new PDA(playcor);
 
+        testPDA = new PDA(playcor);
 
         taskManager = new TaskManager(playcor);
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
 
-        keyPad = new KeyPad(playcor,doorManager.getDoor(3,7));
+        keyPad = new KeyPad(playcor, doorManager.getDoor(3, 7));
 
         los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
@@ -90,6 +90,8 @@ public class Main extends ApplicationAdapter {
 
         //init
         sceneManager.initScenes();
+        PopUpManager.init();
+        SoundEffects.initSounds();
     }
 
     public void killMonster(Monster monster) {

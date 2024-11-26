@@ -47,11 +47,7 @@ public class SoundEffects {
         sounds.put("escapeSound", Gdx.audio.newSound(Gdx.files.internal("MonsterSFX/monsterEscape.mp3")));
         sounds.put("accessDenied", Gdx.audio.newSound(Gdx.files.internal("SoundEffects/deniedComputer.mp3")));
         sounds.put("accessGranted", Gdx.audio.newSound(Gdx.files.internal("SoundEffects/successComputer.mp3")));
-
-
-
     }
-
 
 
     public static void playMusic(String path) {

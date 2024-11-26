@@ -1,5 +1,6 @@
 package com.Rye.DarknessGame;
 
+import com.Rye.DarknessGame.KeyLibrary.Key;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
@@ -17,18 +18,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import static java.lang.Math.sqrt;
 
 public class Player {
 
     //region Variables
 
     // **Booleans**
-    boolean sprint, staminaPause, staminaRegen, canChangeGun = true, flashLightIsOn = false, canMelee = true, canFlashLight;
+    boolean sprint, staminaPause, staminaRegen, canChangeGun, flashLightIsOn = false, canMelee, canFlashLight;
 
-    // **Coordinates and Positioning**
     private float coorX;
     private float coorY;
     private float faceX;
@@ -37,68 +34,35 @@ public class Player {
     // **Camera and Viewport**
     OrthographicCamera camera;
     float cameraZoom;
-
-    // **Speed, Angles, and Movement Factors**
     public float speed;
     float facingAngle;
     float factor = 1.8f;
 
-    // **Room Dimensions and Overlaps**
     int roomWidth, roomHeight;
 
-    // **Stamina and Timing Control**
-    private double stamina = 100, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash;
+    private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash;
 
-    // **Weapon and Shooting Mechanics**
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;
     Rifle rifle;
     ArrayList<Bullet> bullets;
-
     Map<String, Key> keys;
-    // **Sound Effects**
-    private Sound running, walking, changeGun, meleeHit, meleeMiss, flashLightSound, searchBeep;
-    private Music flashLightWarning, playerDamagedSound, searchPatternSound, turnOnSearch;
-    SoundPlayer soundManager;
-
-    // **Input Handling**
-
-    Set<Integer> keyStrokes, pressedMouseHash;
-
-    // **Graphics and Rendering**
     private Sprite playerSprite;
-
     private Sprite mouseCursorSprite;
     private SpriteBatch spriteBatch;
     BitmapFont bitmapFont;
     ShapeRenderer shapeRenderer;
-
     Color white;
-
-    // **Collision and Vectors**
-
-
-    // **HUD and UI Elements**
     Hud hud;
-
-    // **Monster and Interaction**
     Monster monster;
     double monsterDistance;
-
-    // **Temporary Vectors**
-
-
-    // **Flashlight Battery**
     double flashlightBattery;
 
     // **Game Main Reference**
     public Main main;
-
     double health;
-
     public boolean playerHurt;
-    public Music playerDamagedGrunt;
     float camX;
     float camY;
 
@@ -118,10 +82,10 @@ public class Player {
 
     //endregion
 
-    public Player(int x, int y, int speed, SoundPlayer soundManager, Hud hud,
+    public Player(int x, int y, int speed, Hud hud,
                   Pixmap collisionMap, Monster monster, Main main) {
+
         this.main = main;
-        this.soundManager = soundManager;
         this.coorX = x;
         this.coorY = y;
         this.speed = speed;
@@ -133,7 +97,6 @@ public class Player {
         initDrawParams();
         initCamera();
         initWeapons();
-
     }
 
     public void updatePlayer() {
@@ -146,9 +109,10 @@ public class Player {
         if (!inPopUp) {
             move();
         }
-        distanceToMonster();
+
         handleMouse();
         facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
+        monsterDistance = (float) MathFunctions.distanceFromMe(coorX, coorY, monster.getCoorX(), monster.getCoorY());
         updateCamera();
         manageHealth();
 
@@ -157,7 +121,7 @@ public class Player {
         drawCursor();
         stopShapeRender();
 
-        if(!inPopUp) {
+        if (!inPopUp) {
             weapon();
         }
 
@@ -167,17 +131,6 @@ public class Player {
 
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
-    }
-
-    public void distanceToMonster() {
-        double x1 = coorX;
-        double y1 = coorY;
-        double x2 = monster.getCoorX();
-        double y2 = monster.getCoorY();
-
-        double newX = x2 - x1;
-        double newY = y2 - y1;
-        monsterDistance = MathFunctions.fastSqrt((float) ((newX * newX) + (newY * newY)));
     }
 
     public void manageHealth() {
@@ -203,9 +156,7 @@ public class Player {
     public void flashLight() {
 
         if ((int) (flashlightBattery) == 20 && flashLightIsOn) {
-            if (!flashLightWarning.isPlaying()) {
-                SoundEffects.playMusic("flashLightWarning");
-            }
+            SoundEffects.playMusic("flashLightWarning");
         }
 
         if (flashlightBattery <= 0) {
@@ -255,13 +206,13 @@ public class Player {
             }
         }
 
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && canChangeGun) {
-                equippedWeapon.fireWeapon();
-                if (equippedWeapon.getAmmo() > 0) {
-                    staminaRegen = false;
-                }
-                haltUntil = System.currentTimeMillis() + 1000;
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && canChangeGun) {
+            equippedWeapon.fireWeapon();
+            if (equippedWeapon.getAmmo() > 0) {
+                staminaRegen = false;
             }
+            haltUntil = System.currentTimeMillis() + 1000;
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.R) && canChangeGun) {
             equippedWeapon.reloadWeapon();
         }
@@ -356,6 +307,7 @@ public class Player {
         float moveSpeed;
 
         sprint = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
+
         if (stamina <= 0) {
             sprint = false;
         }
@@ -430,11 +382,12 @@ public class Player {
         //region Normalization
         float inputX = Math.abs(dx);
         float inputY = Math.abs(dy);
-        double magnitude = sqrt((dx * dx) + (dy * dy));
+        double magnitude = MathFunctions.fastSqrt((dx * dx) + (dy * dy));
         if (magnitude != 0) {
             dx /= (float) magnitude;
             dy /= (float) magnitude;
         }
+
         dx *= inputX;
         dy *= inputY;
         //endregion

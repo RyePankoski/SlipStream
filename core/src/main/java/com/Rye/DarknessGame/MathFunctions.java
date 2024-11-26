@@ -143,7 +143,6 @@ public class MathFunctions {
         return (seconds * 1000000000);
     }
 
-
     public static double[] pointInFront(float x1, float y1, float x2, float y2, float length) {
         double[] point = new double[2];
 

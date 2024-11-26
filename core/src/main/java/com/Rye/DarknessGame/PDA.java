@@ -7,17 +7,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class PDA {
-
     Player player;
-
     Sprite PDA;
-
     int x;
     int y;
-
     boolean pickedUp = false;
     SpriteBatch spriteBatch;
-
 
     public PDA(Player player) {
         this.player = player;
@@ -30,9 +25,7 @@ public class PDA {
 
         Texture pdaTexture = new Texture(Gdx.files.internal("TexSprites/PDA.png"));
         PDA = new Sprite(pdaTexture);
-
     }
-
 
     public void updatePDA() {
         isPlayerNear();
@@ -61,6 +54,4 @@ public class PDA {
         PDA.draw(spriteBatch);
         spriteBatch.end();
     }
-
-
 }

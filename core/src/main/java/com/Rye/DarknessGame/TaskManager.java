@@ -1,6 +1,5 @@
 package com.Rye.DarknessGame;
-import com.Rye.DarknessGame.taskLibrary.Task;
-import com.Rye.DarknessGame.taskLibrary.*;
+import com.Rye.DarknessGame.TaskLibrary.*;
 
 public class TaskManager {
 

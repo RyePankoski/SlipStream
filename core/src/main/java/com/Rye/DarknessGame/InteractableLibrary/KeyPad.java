@@ -31,24 +31,15 @@ public class KeyPad extends Interactable {
 
     public void interact() {
 
-        UIManager.getInstance().showKeyPadPopup("Enter Code", (input) -> {
+        UIManager.getInstance().showKeyPadPopup("CODE:", (input) -> {
             if (input.equals("0723")) {
                 player.setInPopUp(false);
                 door.setLocked(false);
                 SoundEffects.playSound("accessGranted");
-                System.out.println("Correct code entered!");
             } else {
                 player.setInPopUp(false);
                 SoundEffects.playSound("accessDenied");
-                System.out.println("Incorrect code");
             }
-
-            boolean status = UIManager.getInstance().getStatus();
-
-            if (status) {
-                player.setInPopUp(false);
-            }
-
         });
     }
 }

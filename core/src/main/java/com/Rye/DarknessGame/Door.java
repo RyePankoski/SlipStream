@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 
 public class Door {
     int posX, posY, sector, instantiationNumber, width, height, openIncrement;
-    boolean hasStateChanged = true, justInstantiated = true, locked, orientedHorizontal;
+    boolean hasStateChanged = true, justInstantiated = true, locked, orientedHorizontal, opening;
     Player player;
     Pixmap collisionMap, lightMap;
 
@@ -31,6 +31,9 @@ public class Door {
     public void updateDoor() {
 //        System.out.println("Door in sector: " + sector + " number: " + instantiationNumber + " checking in");
         isPlayerNear();
+        if(opening){
+            open();
+        }
     }
 
     public void open() {
@@ -54,6 +57,7 @@ public class Door {
             }
 
             if (openIncrement == 0) {
+                opening = false;
                 hasStateChanged = true;
                 openIncrement = Math.max(width, height);
             }
@@ -88,20 +92,22 @@ public class Door {
         if (playerDistance < 75 && locked) {
             double[] points = MathFunctions.pointInFront(player.getCoorX(), player.getCoorY(), player.getFaceX(), player.getFaceY(), 25);
             PopUpManager.displayPopUp((float) points[0], (float) points[1], "LOCKED", player);
-            SoundEffects.playMusic("lockedDoorSound");
+            if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+                SoundEffects.playMusic("lockedDoorSound");
+            }
         }
 
         if (playerDistance < 75 && !locked) {
             double[] points = MathFunctions.pointInFront(player.getCoorX(), player.getCoorY(), player.getFaceX(), player.getFaceY(), 25);
             PopUpManager.displayPopUp((float) points[0], (float) points[1], "E", player);
             if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+                opening = true;
                 open();
             }
         } else {
             close();
         }
     }
-
     public void setLocked(boolean locked) {
         this.locked = locked;
     }

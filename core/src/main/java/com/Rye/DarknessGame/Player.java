@@ -29,7 +29,7 @@ public class Player {
     int mapWidth, mapHeight;
     double monsterDistance, flashlightBattery, health, beepTimer;
     private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash, timeTillCanToggleSearch;
-    public boolean playerHurt, searchPattern, canToggleSearch, moving, inPopUp;
+    public boolean playerHurt, searchPatternIsOn, canToggleSearch, moving, inPopUp;
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;
@@ -81,12 +81,10 @@ public class Player {
         variableUpdates();
         updateCamera();
         manageHealth();
-
         startShapeRender();
         drawMyself();
         drawCursor();
         stopShapeRender();
-
         melee();
         flashLight();
         ronaldProximity();
@@ -104,16 +102,17 @@ public class Player {
         if (health < 100) {
             health += 0.01;
         }
+
         if (monsterDistance < 50) {
             playerHurt = true;
 
             SoundEffects.playMusic("playerDamagedSound");
             SoundEffects.playMusic("playerDamagedGrunt");
-
             health -= .5;
         } else {
             SoundEffects.stopMusic("playerDamagedGrunt");
         }
+
         if (health <= 0) {
             health = 0;
         }
@@ -128,13 +127,13 @@ public class Player {
         if (flashlightBattery <= 0) {
             flashlightBattery = 0;
             flashLightIsOn = false;
-            searchPattern = false;
+            searchPatternIsOn = false;
         }
 
 
         if (flashLightIsOn && flashlightBattery > 0) {
             flashlightBattery -= 0.005;
-        } else if (flashlightBattery <= 100 && !searchPattern) {
+        } else if (flashlightBattery <= 100 && !searchPatternIsOn) {
             flashlightBattery += 0.02;
             if (flashlightBattery > 100) {
                 flashlightBattery = 100;
@@ -204,17 +203,17 @@ public class Player {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.T) && canToggleSearch) {
             SoundEffects.playMusic("turnOnSearch");
-            searchPattern = !searchPattern;
+            searchPatternIsOn = !searchPatternIsOn;
             canToggleSearch = false;
             timeTillCanToggleSearch = System.currentTimeMillis() + 1000;
         }
-        if (searchPattern) {
+        if (searchPatternIsOn) {
             SoundEffects.playMusic("searchPatternSound");
         } else {
             SoundEffects.stopMusic("searchPatternSound");
         }
 
-        if (searchPattern && monsterDistance < 7000) {
+        if (searchPatternIsOn && monsterDistance < 7000) {
             flashlightBattery -= 0.02;
             if (beepTimer <= 0) {
                 if (monsterDistance < 500) {

@@ -90,7 +90,7 @@ public class Hud {
         bitmapFont.setColor(colors[0], colors[1], 0, 1f);
         flashlightBatteryString = String.valueOf((int) Math.ceil(flashlightBattery));
         bitmapFont.draw(spriteBatch, flashlightBatteryString + "%", (camera.position.x - 200), (float) (camera.position.y + cameraZoom / 2 - 30));
-        if (player.searchPattern) {
+        if (player.searchPatternIsOn) {
             bitmapFont.setColor(Color.RED);
             bitmapFont.draw(spriteBatch, "<-", (camera.position.x - 160), (float) (camera.position.y + cameraZoom / 2 - 30));
         }

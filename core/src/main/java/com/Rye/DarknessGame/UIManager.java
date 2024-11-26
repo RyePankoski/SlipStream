@@ -14,9 +14,7 @@ public class UIManager {
     private static UIManager instance;
     private Stage uiStage;
     private Skin skin;
-    private InputProcessor originalInputProcessor;
 
-    public boolean popUpOpen;
 
     private UIManager() {
         uiStage = new Stage();
@@ -30,9 +28,43 @@ public class UIManager {
         return instance;
     }
 
+    public void voltageRegulator(String title, Consumer<String> onSubmit) {
+        uiStage.clear();
+
+
+        Window popup = new Window(title, skin);
+        popup.setSize(300, 200);
+        popup.setPosition(
+            Gdx.graphics.getWidth() / 2f - popup.getWidth() / 2f,
+            Gdx.graphics.getHeight() / 2f - popup.getHeight() / 2f
+        );
+        popup.setTouchable(Touchable.enabled);
+
+        TextField voltage1 = new TextField("", skin);
+        voltage1.setTouchable(Touchable.enabled);
+
+        TextButton submitButton = new TextButton("Submit", skin);
+        submitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String userInput = voltage1.getText();
+                onSubmit.accept(userInput);
+                hidePopup();
+            }
+        });
+
+
+        popup.add(voltage1).width(200).pad(10);
+        popup.row();
+        popup.add(submitButton).pad(10);
+
+        uiStage.addActor(popup);
+        Gdx.input.setInputProcessor(uiStage);
+        uiStage.setKeyboardFocus(voltage1);
+    }
+
     public void showKeyPadPopup(String title, Consumer<String> onSubmit) {
         uiStage.clear();
-        popUpOpen = true;
 
         Window popup = new Window(title, skin);
         popup.setSize(300, 200);
@@ -45,7 +77,7 @@ public class UIManager {
         TextField textField = new TextField("", skin);
         textField.setTouchable(Touchable.enabled);
 
-        TextButton submitButton = new TextButton("Submit", skin);
+        TextButton submitButton = new TextButton("ATTEMPT", skin);
         submitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -66,15 +98,10 @@ public class UIManager {
     }
 
     public void hidePopup() {
-        popUpOpen = false;
         uiStage.clear();
     }
     public void render(float delta) {
         uiStage.act(delta);
         uiStage.draw();
-    }
-
-    public boolean getStatus(){
-        return popUpOpen;
     }
 }

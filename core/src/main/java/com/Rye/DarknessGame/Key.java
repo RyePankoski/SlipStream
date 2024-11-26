@@ -1,7 +1,6 @@
 package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Key {
@@ -40,7 +39,7 @@ public class Key {
     public void isPlayerNear() {
         if (MathFunctions.distanceFromMe(x, y, player.getCoorX(), player.getCoorY()) < 10) {
             pickedUp = true;
-            SoundEffects.playSound("subObjectiveComplete");
+            SoundEffects.playMusic("subObjectiveComplete");
             player.addKey(String.valueOf(sector) + String.valueOf(doorNumber),this);
             System.out.println(String.valueOf(sector) + String.valueOf(doorNumber));
 //            dispose();

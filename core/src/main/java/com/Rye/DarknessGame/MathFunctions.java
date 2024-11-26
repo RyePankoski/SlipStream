@@ -7,10 +7,7 @@ import java.awt.*;
 
 public class MathFunctions {
 
-    public MathFunctions() {}
-
     public static int findSector(int x, int y, Pixmap sectorMap) {
-
 
         int sector = 0;
 
@@ -63,7 +60,7 @@ public class MathFunctions {
 
     public static float[] rayCast(int length, int lightAngle, int facingAngle, int coorX, int coorY, int fineness, Pixmap pixmap) {
 
-        Color clear = new Color(0, 0, 0,0);
+        Color clear = new Color(0, 0, 0, 0);
 
         float[] shapeVertices = new float[(lightAngle * 4)];
 
@@ -135,11 +132,16 @@ public class MathFunctions {
         float dy = (float) (y2 - y1);
         return (MathFunctions.fastSqrt((dx * dx) + (dy * dy)));
     }
+    public static double facingAngle(double x1, double y1, double x2, double y2) {
+        double delX = x2-x1;
+        double delY = y2-y1;
+
+        return Math.toDegrees(Math.atan2(delY, delX));
+    }
 
     public static float secondsToNano(float seconds) {
         return (seconds * 1000000000);
     }
-
 
 
     public static double[] pointInFront(float x1, float y1, float x2, float y2, float length) {
@@ -152,22 +154,14 @@ public class MathFunctions {
         // Calculate the distance between the points
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        System.out.println("Mouse at: (" + x2 + "," + y2 + ")");
-        System.out.println("Direction vector: (" + dx + "," + dy + ")");
-        System.out.println("Distance: " + distance);
-
         if (distance > 0) {
             // Normalize the direction vector by dividing by distance
             float normalizedDx = dx / distance;
             float normalizedDy = dy / distance;
 
-            System.out.println("Normalized direction: (" + normalizedDx + "," + normalizedDy + ")");
-
             // Calculate the point that is 'length' units away from (x1,y1)
             point[0] = x1 + (normalizedDx * length);
             point[1] = y1 + (normalizedDy * length);
-
-            System.out.println("Result point: (" + point[0] + "," + point[1] + ")");
         } else {
             // If points are the same, arbitrarily choose to go right
             point[0] = x1 + length;

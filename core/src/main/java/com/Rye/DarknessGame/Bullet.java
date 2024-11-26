@@ -41,7 +41,6 @@ public class Bullet {
         this.weapon = weapon;
 
         initVariables();
-        initSounds();
         initDrawParams();
         initSprites();
         findXYIncrements();
@@ -93,7 +92,8 @@ public class Bullet {
             }
 
             // Play the sound with the calculated volume
-            bulletStrike.play((float) percent);
+            SoundEffects.playSoundWithParameters("bulletStrike",(float)percent,1f);
+
             spriteBatch.setProjectionMatrix(player.getCamera().combined);
             spriteBatch.begin();
             spriteBatch.draw(bulletStrikeTexture, ((float) (posX - bulletStrikeTexture.getWidth() / 2f)), ((float) (posY - bulletStrikeTexture.getHeight() / 2f)));
@@ -117,7 +117,7 @@ public class Bullet {
 
         if (distance < 20) {
             monster.hitByBullet(weapon.getWeaponType());
-            monsterStrike.play();
+            SoundEffects.playSound("monsterStrikeSound");
             die();
         }
     }
@@ -161,12 +161,6 @@ public class Bullet {
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
     }
-
-    public void initSounds() {
-        bulletStrike = Gdx.audio.newSound(Gdx.files.internal("BulletSFX/bulletStrike.mp3"));
-        monsterStrike = Gdx.audio.newSound((Gdx.files.internal(("BulletSFX/monsterStrikeSound.mp3"))));
-    }
-
     public void initSprites() {
         bulletStrikeTexture = new Texture(Gdx.files.internal("TexSprites/bulletImpactSprite.png"));
     }

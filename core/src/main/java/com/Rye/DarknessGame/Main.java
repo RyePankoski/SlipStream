@@ -1,9 +1,9 @@
 package com.Rye.DarknessGame;
-
+import com.Rye.DarknessGame.interactableLibrary.Interactable;
+import com.Rye.DarknessGame.interactableLibrary.KeyPad;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -12,7 +12,6 @@ public class Main extends ApplicationAdapter {
 
     //region Variables
     public Player playcor;
-    InputHandler handler;
     Texture image;
     int sceneNumber = 0;
     Hud hud;
@@ -38,40 +37,45 @@ public class Main extends ApplicationAdapter {
     boolean lightsOn = true;
     double lightsOffTimer;
     double lightsOffWarningTimer;
-    Sound warningSound;
     LightMask lightMask;
     PASystem paSystem;
     TaskManager taskManager;
     Key key1;
+    public KeyPad keyPad;
 
+    PDA testPDA;
 
-
+    Interactable interactable;
     //endregion
     public void create() {
         //non-dependent objects
+        PopUpManager.init();
         SoundEffects.initSounds();
-
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
-        warningSound = Gdx.audio.newSound(Gdx.files.internal("SoundEffects/shutDownAlert.mp3"));
         DJ = new SoundPlayer();
         collisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
-        handler = new InputHandler();
-
         //temp stuff
         lightsOffTimer = System.currentTimeMillis() + 70000;
         lightsOffWarningTimer = lightsOffTimer - 10000;
 
         //dependent objects
         monster = new Monster(collisionMask.getPixmap());
-        playcor = new Player(7800, 200, 2, DJ, handler, hud, collisionMask.getPixmap(), monster, this);
+        playcor = new Player(7800, 200, 2, DJ, hud, collisionMask.getPixmap(), monster, this);
 
-        key1 = new Key(8530,180,3,30,playcor);
+
+        //test classes to be later removed
+        key1 = new Key(8530, 180, 3, 30, playcor);
+        testPDA = new PDA(playcor);
+
 
         taskManager = new TaskManager(playcor);
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
+
+        keyPad = new KeyPad(playcor,doorManager.getDoor(3,7));
+
         los = new LOS(playcor, lightMask.getPixmap());
         tram = new Tram(playcor);
         lightingManager = new LightingManager(lightMask.getPixmap());
@@ -82,7 +86,6 @@ public class Main extends ApplicationAdapter {
         hud.setPlayer(playcor);
         monster.setPlayer(playcor);
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
-        com.badlogic.gdx.Gdx.input.setInputProcessor(handler);
         Gdx.input.setCursorCatched(true);
 
         //init
@@ -96,7 +99,6 @@ public class Main extends ApplicationAdapter {
     }
 
     public void render() {
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) renderGame = !renderGame;
 
         if (renderGame) {
@@ -104,7 +106,6 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= renderVeryFastTimer) canRenderVeryFast = true;
             if (System.currentTimeMillis() >= renderFastTimer) canRenderFast = true;
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
-
 
             //only for drawn elements!
             if (canRenderVeryFast) {
@@ -124,15 +125,12 @@ public class Main extends ApplicationAdapter {
                 if (monsterAlive) {
                     monster.updateMonster();
                 }
-
                 if (System.currentTimeMillis() >= lightsOffWarningTimer && System.currentTimeMillis() < lightsOffWarningTimer + 10) {
-                    warningSound.play();
+                    SoundEffects.playMusic("shutdownAlert");
                 }
-
                 if (!lightsOn) {
                     darknessLayer.render(0f);
                 }
-
                 los.render(0f);
                 hud.renderHud();
             }
@@ -148,6 +146,10 @@ public class Main extends ApplicationAdapter {
                 playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
                 paSystem.updatePA();
             }
+
+            keyPad.isPlayerNear();
+            testPDA.updatePDA();
+            UIManager.getInstance().render(Gdx.graphics.getDeltaTime());
         }
     }
 }

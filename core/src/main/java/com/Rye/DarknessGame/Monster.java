@@ -41,7 +41,6 @@ public class Monster {
 
     public Monster(Pixmap pixmap) {
         initVariables();
-        initSounds();
         initDrawParams(pixmap);
     }
 
@@ -62,7 +61,7 @@ public class Monster {
             }
         }
 
-        if(tpAwayTimer > 0) {
+        if (tpAwayTimer > 0) {
             shouldITeleport();
         }
     }
@@ -74,11 +73,9 @@ public class Monster {
         double percent = (max - distance) / max;
 
         if (distance < max) {
-            if (eerieMusic.isPlaying()) {
-                eerieMusic.setVolume((float) percent);
-            } else {
-                eerieMusic.play();
-            }
+            SoundEffects.playMusicWithParameters("eerieMusic", (float) percent, 100f);
+        } else {
+            SoundEffects.stopMusic("eerieMusic");
         }
     }
 
@@ -119,22 +116,22 @@ public class Monster {
         return coorX;
     }
 
-    public void teleportAway(){
+    public void teleportAway() {
         health = 100;
-        if(eerieMusic.isPlaying()){
+        if (eerieMusic.isPlaying()) {
             eerieMusic.stop();
         }
         escapeSound.play();
-        coorX = ran.nextInt(100,pixmap.getWidth()-100);
-        coorY = ran.nextInt(100,pixmap.getHeight()-100);
+        coorX = ran.nextInt(100, pixmap.getWidth() - 100);
+        coorY = ran.nextInt(100, pixmap.getHeight() - 100);
     }
 
-    public void shouldITeleport(){
+    public void shouldITeleport() {
 
-        if(tpAwayTimer > 0){
+        if (tpAwayTimer > 0) {
             tpAwayTimer--;
         }
-        if(tpAwayTimer == 0){
+        if (tpAwayTimer == 0) {
             teleportAway();
         }
 
@@ -154,18 +151,18 @@ public class Monster {
         //region out of bounds detection
         if (coorX + dx > pixmap.getWidth()) {
             dx *= -1;
-            dy += ran.nextDouble(-2,2);
+            dy += ran.nextDouble(-2, 2);
         } else if (coorX + dx < 0) {
             dx *= -1;
-            dy += ran.nextDouble(-2,2);
+            dy += ran.nextDouble(-2, 2);
         }
         if (coorY + dy > pixmap.getHeight()) {
             dy *= -1;
-            dx += ran.nextDouble(-2,2);
+            dx += ran.nextDouble(-2, 2);
 
         } else if (coorY + dy < 0) {
             dy *= -1;
-            dx += ran.nextDouble(-2,2);
+            dx += ran.nextDouble(-2, 2);
         }
         //endregion
 
@@ -241,7 +238,7 @@ public class Monster {
         player.main.killMonster(this);
     }
 
-    public void initDrawParams(Pixmap pixmap){
+    public void initDrawParams(Pixmap pixmap) {
         this.pixmap = pixmap;
         monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
         shapeRenderer = new ShapeRenderer();
@@ -249,15 +246,10 @@ public class Monster {
         white = new Color(255, 255, 255);
     }
 
-    public void initSounds(){
-        eerieMusic = Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/eerieMusic.mp3"));
-        escapeSound = Gdx.audio.newSound(Gdx.files.internal("MonsterSFX/monsterEscape.mp3"));
-    }
-
     public void initVariables() {
         dx = 1;
-        coorX = 9000;
-        coorY = 5000;
+        coorX = 7800;
+        coorY = 800;
         health = 100;
         ran = new Random();
     }

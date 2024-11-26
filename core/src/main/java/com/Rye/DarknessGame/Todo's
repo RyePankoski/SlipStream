@@ -16,21 +16,9 @@ TODOd: Look into TILE level editor, cats color function no working on health;
 TODOd: Sectors for culling calls to objects, LOS, Doors, Cleanup, Undo Reference Spaghetti,
 11/24/2024
 TODOd: Rework point in front so it can take a length argument
-TODOd: Aiming
-
+TODOd: Aiming, Centralize sound effects. Sound effect class.
 
 --------------------
-TODO: Fix the point out front problem for the bullet.
-
-TIER 1:
-TODO: MIgrate all batch and shaperender calls for being end to main render loop
-TODO: Rework the render clamps (its not robust and forces me to add things into places I don't want them)
-TODO: Tasks, Add bullet color or mask for collisions, make centralized popup manager, make it so tapping e opens the door, make key manager, make doors slide closed
-TODO: Centralize sound effects. Sound effect class.
-TODO: Add way to switch between scenes, clamp renderer like camera,
-TODO: Settings, Options, PathFinding, Drop Weapons/Tools
-TODO: fix small amount of reference spaghetti left.
-NOTE: For each of the centralized classes, use hashmaps.
 
 TIER 2:
 TODO: Map layers, vent system
@@ -50,10 +38,6 @@ TODO: Co-op, Tweak variables of monster AI
 TODO: Make it so the camera cant see through walls... gulp...
 TODO: Walkie-Talkie and pager. Objectives that mandate splitting up.
 
-
-
-
-
 Power Routing:
     Power is typically routed through walls etc. So sometimes to make a repair you may need to use deployable cables to link parts of the ship to power.
 Alien Sabotage:
@@ -61,9 +45,3 @@ Alien Sabotage:
 Ship Contexts:
     Ship might exist in different physical spaces.
     The ship may need point defense to protect against asteroids, emc if going through interstellar space at relativistic speeds, orbiting a star (radiation shielding.)
-
-
-
-
-TO fix the overlap triangles, do 180, then fill darkspot with last triangle using vertex coordinates of first and last coordinates.
-

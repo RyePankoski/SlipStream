@@ -33,7 +33,6 @@ public class Tram {
         this.player = player;
 
         initDrawParams();
-        initSounds();
         initTexture();
         initVariables();
     }
@@ -43,9 +42,10 @@ public class Tram {
         move();
         drawMyself();
     }
+
     public void handleInputs() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            if (!(whichStop + 1 > tramStops.length-1)) {
+            if (!(whichStop + 1 > tramStops.length - 1)) {
                 whichStop++;
             }
         }
@@ -57,14 +57,13 @@ public class Tram {
     }
 
     public void move() {
-        Rectangle interactionZone = new Rectangle(coorX - (float)tramTexture.getWidth()/2 + 160,coorY + (float)tramTexture.getHeight()/2 - 95, (float)tramTexture.getWidth(), (float)tramTexture.getHeight());
+        Rectangle interactionZone = new Rectangle(coorX - (float) tramTexture.getWidth() / 2 + 160, coorY + (float) tramTexture.getHeight() / 2 - 95, (float) tramTexture.getWidth(), (float) tramTexture.getHeight());
         int tramSpeed = 3;
 
-        if (moving && !tramMovingSound.isPlaying()) {
-            tramMovingSound.play();
-        }
-        if (!moving && tramMovingSound.isPlaying()) {
-            tramMovingSound.stop();
+        if (moving) {
+            SoundEffects.playMusic("tramMoving");
+        } else {
+            SoundEffects.stopMusic("tramMoving");
         }
 
         if (coorX > tramStops[whichStop]) {
@@ -112,10 +111,6 @@ public class Tram {
     public void initTexture() {
         tramTexture = new Texture("TexSprites/tram.png");
     }
-
-    public void initSounds() {
-        tramMovingSound = Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/tramMoving.mp3"));
-    }
-
-
 }
+
+

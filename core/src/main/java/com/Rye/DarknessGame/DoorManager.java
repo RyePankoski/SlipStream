@@ -9,25 +9,27 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DoorManager {
-
     Pixmap collisionMap;
     Pixmap sectorMap;
     Color sectorColor;
-
     Door door;
-    Door[][] doors;
     Player player;
     Pixmap lightMap;
+    Map<String, ArrayList<Door>> sectorsHashMap;
+    ArrayList<Door> sectorDoorsArray;
 
-
-    public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player){
+    public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player) {
         this.sectorMap = sectorMap;
         this.lightMap = lightMap;
         this.collisionMap = collisionMap;
         this.player = player;
-        doors = new Door[25][50];
+
+        sectorsHashMap = new HashMap<>();
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
     }
 
@@ -71,18 +73,17 @@ public class DoorManager {
     }
 
     public void updateDoors(int playerSector) {
-        for (int i = 0; i < 500; i++) {
-            if (doors[playerSector][i] != null) {
 
-                doors[playerSector][i].updateDoor();
-            } else {
-                break;
+        ArrayList<Door> updateDoors = sectorsHashMap.get(String.valueOf(playerSector));
+
+        if (updateDoors != null) {
+            for (Door door : updateDoors) {
+                door.updateDoor();
             }
         }
     }
 
     public void loadMapAndInstantiateDoors(String mapPath) {
-
         int[] numberDoorsInSector = new int[25];
         TmxMapLoader mapLoader = new TmxMapLoader();
         TiledMap map = mapLoader.load(mapPath);
@@ -104,13 +105,26 @@ public class DoorManager {
                 float width = object.getProperties().get("width", Float.class);
                 float height = object.getProperties().get("height", Float.class);
                 boolean isLocked = object.getProperties().get("locked", Boolean.class);
-                int sector = findSector((int)x, (int)y);
 
-                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector],isLocked, player, collisionMap, lightMap);
-                doors[sector][numberDoorsInSector[sector]] = door;
+                int sector = findSector((int) x, (int) y);
+
+                if (!sectorsHashMap.containsKey(String.valueOf(sector))) {
+                    sectorDoorsArray = new ArrayList<>();
+                    sectorsHashMap.put(String.valueOf(sector), sectorDoorsArray);
+                }
+
+                ArrayList<Door> temp = sectorsHashMap.get(String.valueOf(sector));
+
+                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector], isLocked, player, collisionMap, lightMap);
                 numberDoorsInSector[sector]++;
+                temp.add(door);
+
+                sectorsHashMap.put(String.valueOf(sector), temp);
             }
         }
     }
 
+    public Door getDoor(int sector, int number) {
+        return sectorsHashMap.get(String.valueOf(sector)).get(number);
+    }
 }

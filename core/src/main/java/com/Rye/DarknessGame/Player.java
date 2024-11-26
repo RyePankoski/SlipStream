@@ -63,7 +63,7 @@ public class Player {
     SoundPlayer soundManager;
 
     // **Input Handling**
-    InputHandler handler;
+
     Set<Integer> keyStrokes, pressedMouseHash;
 
     // **Graphics and Rendering**
@@ -114,14 +114,13 @@ public class Player {
 
     boolean moving;
 
-
+    boolean inPopUp = false;
 
     //endregion
 
-    public Player(int x, int y, int speed, SoundPlayer soundManager, InputHandler handler, Hud hud,
+    public Player(int x, int y, int speed, SoundPlayer soundManager, Hud hud,
                   Pixmap collisionMap, Monster monster, Main main) {
         this.main = main;
-        this.handler = handler;
         this.soundManager = soundManager;
         this.coorX = x;
         this.coorY = y;
@@ -132,25 +131,24 @@ public class Player {
 
         initVariables();
         initDrawParams();
-        initPlayerSounds();
         initCamera();
         initWeapons();
 
     }
 
     public void updatePlayer() {
-        keyStrokes = handler.getPressedKeysHash();
-        pressedMouseHash = handler.getPressedMouseHash();
         if (System.currentTimeMillis() >= haltUntil) staminaRegen = true;
         if (System.currentTimeMillis() >= timeTillCanFlash) canFlashLight = true;
         if (System.currentTimeMillis() >= timeTillChange) canChangeGun = true;
         if (System.currentTimeMillis() >= timeTillMelee) canMelee = true;
         if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
-        move();
+        if (!inPopUp) {
+            move();
+        }
         distanceToMonster();
         handleMouse();
-        facingAngle();
+        facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
         updateCamera();
         manageHealth();
 
@@ -159,7 +157,10 @@ public class Player {
         drawCursor();
         stopShapeRender();
 
-        weapon();
+        if(!inPopUp) {
+            weapon();
+        }
+
         melee();
         flashLight();
         ronaldProximity();
@@ -184,33 +185,26 @@ public class Player {
         if (health < 100) {
             health += 0.01;
         }
-
         if (monsterDistance < 50) {
             playerHurt = true;
-            if (!playerDamagedSound.isPlaying()) {
-                playerDamagedSound.play();
-            }
-            if (!playerDamagedGrunt.isPlaying()) {
-                playerDamagedGrunt.play();
-            }
+
+            SoundEffects.playMusic("playerDamagedSound");
+            SoundEffects.playMusic("playerDamagedGrunt");
+
             health -= .5;
         } else {
-            playerDamagedGrunt.stop();
+            SoundEffects.stopMusic("playerDamagedGrunt");
         }
-
         if (health <= 0) {
             health = 0;
         }
-
     }
-
-
 
     public void flashLight() {
 
         if ((int) (flashlightBattery) == 20 && flashLightIsOn) {
             if (!flashLightWarning.isPlaying()) {
-                flashLightWarning.play();
+                SoundEffects.playMusic("flashLightWarning");
             }
         }
 
@@ -230,8 +224,8 @@ public class Player {
             }
         }
 
-        if (keyStrokes.contains(Input.Keys.F) && canFlashLight) {
-            flashLightSound.play();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F) && canFlashLight) {
+            SoundEffects.playSound("flashLightSound");
             flashLightIsOn = !flashLightIsOn;
             canFlashLight = false;
             timeTillCanFlash = System.currentTimeMillis() + 1000;
@@ -241,9 +235,8 @@ public class Player {
     public void weapon() {
 
         if (canChangeGun) {
-
-            if (keyStrokes.contains(Input.Keys.NUM_1)) {
-                changeGun.play();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+                SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
                 timeTillChange = System.currentTimeMillis() + 1500;
@@ -251,8 +244,8 @@ public class Player {
                 equippedWeaponName = "SMG";
                 equippedWeapon = smg;
             }
-            if (keyStrokes.contains(Input.Keys.NUM_2)) {
-                changeGun.play();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+                SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
                 timeTillChange = System.currentTimeMillis() + 1500;
@@ -262,29 +255,27 @@ public class Player {
             }
         }
 
-        if (pressedMouseHash.contains(Input.Buttons.LEFT) && canChangeGun) {
-            equippedWeapon.fireWeapon();
-            if (equippedWeapon.getAmmo() > 0) {
-                staminaRegen = false;
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && canChangeGun) {
+                equippedWeapon.fireWeapon();
+                if (equippedWeapon.getAmmo() > 0) {
+                    staminaRegen = false;
+                }
+                haltUntil = System.currentTimeMillis() + 1000;
             }
-            haltUntil = System.currentTimeMillis() + 1000;
-        }
-        if (keyStrokes.contains(Input.Keys.R) && canChangeGun) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R) && canChangeGun) {
             equippedWeapon.reloadWeapon();
         }
-
-
     }
 
     public void melee() {
 
-        if (keyStrokes.contains(Input.Keys.V)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.V)) {
             if (canMelee) {
                 if (monsterDistance < 200) {
                     monster.hitByMelee();
-                    meleeHit.play();
+                    SoundEffects.playSound("meleeHit");
                 } else {
-                    meleeMiss.play();
+                    SoundEffects.playSound("meleeMiss");
                 }
                 canMelee = false;
                 timeTillMelee = MathFunctions.secondsToNano(2);
@@ -294,18 +285,16 @@ public class Player {
 
     public void ronaldProximity() {
 
-        if (keyStrokes.contains(Input.Keys.T) && canToggleSearch) {
-            turnOnSearch.play();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.T) && canToggleSearch) {
+            SoundEffects.playMusic("turnOnSearch");
             searchPattern = !searchPattern;
             canToggleSearch = false;
             timeTillCanToggleSearch = System.currentTimeMillis() + 1000;
         }
         if (searchPattern) {
-            if (!searchPatternSound.isPlaying()) {
-                searchPatternSound.play();
-            }
-        } else if (searchPatternSound.isPlaying() && !searchPattern) {
-            searchPatternSound.stop();
+            SoundEffects.playMusic("searchPatternSound");
+        } else {
+            SoundEffects.stopMusic("searchPatternSound");
         }
 
         if (searchPattern && monsterDistance < 7000) {
@@ -324,7 +313,7 @@ public class Player {
                 } else {
                     beepTimer = 320;
                 }
-                searchBeep.play();
+                SoundEffects.playSound("searchBeep");
             }
             if (beepTimer > 0) {
                 beepTimer--;
@@ -366,7 +355,7 @@ public class Player {
         float dx = 0;
         float moveSpeed;
 
-        sprint = keyStrokes.contains(Input.Keys.SHIFT_LEFT);
+        sprint = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
         if (stamina <= 0) {
             sprint = false;
         }
@@ -376,22 +365,22 @@ public class Player {
 
 
         //region key input management
-        if (keyStrokes.contains(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             dy = moveSpeed;
             movingUp = true;
             moving = true;
         }
-        if (keyStrokes.contains(Input.Keys.S)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             dy = -moveSpeed;
             movingDown = true;
             moving = true;
         }
-        if (keyStrokes.contains(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             dx = moveSpeed;
             movingRight = true;
             moving = true;
         }
-        if (keyStrokes.contains(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             dx = -moveSpeed;
             movingLeft = true;
             moving = true;
@@ -425,16 +414,16 @@ public class Player {
 
         //region sound management
         if (sprint) {
-            soundManager.stopSound("walk", walking);
-            soundManager.playSound("run", running);
+            SoundEffects.stopMusic("walking");
+            SoundEffects.playMusic("running");
         } else {
-            soundManager.stopSound("run", running);
-            soundManager.playSound("walk", walking);
+            SoundEffects.stopMusic("running");
+            SoundEffects.playMusic("walking");
         }
 
         if (dx == 0 && dy == 0) {
-            soundManager.stopSound("run", running);
-            soundManager.stopSound("walk", walking);
+            SoundEffects.stopMusic("walking");
+            SoundEffects.stopMusic("running");
         }
         //endregion
 
@@ -505,10 +494,10 @@ public class Player {
             camY = coorY;
         }
 
-        if (pressedMouseHash.contains(Input.Buttons.RIGHT)){
-            double[] aimPosition = MathFunctions.pointInFront(coorX,coorY,faceX,faceY,150);
-            camX = (float)aimPosition[0];
-            camY = (float)aimPosition[1];
+        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            double[] aimPosition = MathFunctions.pointInFront(coorX, coorY, faceX, faceY, 150);
+            camX = (float) aimPosition[0];
+            camY = (float) aimPosition[1];
         }
 
         camera.position.set(camX, camY, 0);
@@ -532,20 +521,9 @@ public class Player {
     }
 
     public void drawMyself() {
-
-
-            playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
-            playerSprite.setRotation(getFacingAngle() + 90);
-            playerSprite.draw(spriteBatch);
-
-
-    }
-
-    public void facingAngle() {
-        float delX = getFaceX() - getCoorX();
-        float delY = getFaceY() - getCoorY();
-
-        this.facingAngle = (float) Math.toDegrees(Math.atan2(delY, delX));
+        playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
+        playerSprite.setRotation(getFacingAngle() + 90);
+        playerSprite.draw(spriteBatch);
     }
 
     public void initWeapons() {
@@ -582,21 +560,6 @@ public class Player {
         mouseCursorSprite = new Sprite(mouseCursor);
         spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
-    }
-
-    public void initPlayerSounds() {
-        running = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/Running.mp3"));
-        walking = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/Walking.mp3"));
-        changeGun = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/changeGuns.mp3"));
-        meleeHit = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/meleeSound.mp3"));
-        meleeMiss = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/meleeMiss.mp3"));
-        flashLightSound = Gdx.audio.newSound((Gdx.files.internal("PlayerSFX/flashLightSound.mp3")));
-        flashLightWarning = Gdx.audio.newMusic((Gdx.files.internal("PlayerSFX/flashlightWarning.mp3")));
-        playerDamagedSound = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamaged.mp3"));
-        playerDamagedGrunt = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/playerDamagedGrunt.mp3"));
-        searchPatternSound = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/searchStatic.mp3"));
-        turnOnSearch = Gdx.audio.newMusic(Gdx.files.internal("PlayerSFX/turnOnSearch.mp3"));
-        searchBeep = Gdx.audio.newSound(Gdx.files.internal("PlayerSFX/proxBeep.mp3"));
     }
 
     private ArrayList<Sound> initWeaponSounds(String weaponType) {
@@ -655,22 +618,21 @@ public class Player {
     public Pixmap getCollisionMap() {
         return collisionMap;
     }
+
     public void addToCoors(int x, int y) {
         coorX += x;
         coorY += y;
     }
 
-    public Map<String,Key> getKeys(){
+    public Map<String, Key> getKeys() {
         return keys;
     }
 
-    public void addKey(String sectorAndNumber, Key key){
+    public void addKey(String sectorAndNumber, Key key) {
         keys.put(sectorAndNumber, key);
     }
-    public boolean getMoving(){
-        return moving;
-    }
-    public boolean getSprint(){
-        return sprint;
+
+    public void setInPopUp(boolean inPopUp) {
+        this.inPopUp = inPopUp;
     }
 }

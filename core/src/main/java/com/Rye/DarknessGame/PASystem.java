@@ -2,43 +2,71 @@ package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 
-import java.util.Random;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 public class PASystem {
-    Music[] voiceLines = new Music[21];
     Random ran;
     double timeTillVoiceLines;
     boolean canPlayVoiceLine = false;
     Music currentVoiceLine;
 
+    Map<String, Music> voiceLines;
+
     public PASystem() {
-        timeTillVoiceLines = System.currentTimeMillis() + 40000;
+        voiceLines = new HashMap<>();
+        timeTillVoiceLines = System.currentTimeMillis() + 10000;
         ran = new Random();
-        initSounds();
+        loadAudioFromDirectory("assets/paVoiceLines");
     }
 
-    public void initSounds() {
-        voiceLines[0] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/receivingVoiceLine.mp3"));
-        voiceLines[1] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/rerouting.mp3"));
-        voiceLines[2] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown.mp3"));
-        voiceLines[3] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(2).mp3"));
-        voiceLines[4] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(3).mp3"));
-        voiceLines[5] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(4).mp3"));
-        voiceLines[6] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(5).mp3"));
-        voiceLines[7] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(6).mp3"));
-        voiceLines[8] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(7).mp3"));
-        voiceLines[9] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(8).mp3"));
-        voiceLines[10] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(9).mp3"));
-        voiceLines[11] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(10).mp3"));
-        voiceLines[12] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(11).mp3"));
-        voiceLines[13] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(12).mp3"));
-        voiceLines[14] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(13).mp3"));
-        voiceLines[15] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(14).mp3"));
-        voiceLines[16] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(15).mp3"));
-        voiceLines[17] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(16).mp3"));
-        voiceLines[18] = Gdx.audio.newMusic(Gdx.files.internal("paVoiceLines/Mixdown(17).mp3"));
+    public void loadAudioFromDirectory(String directoryPath) {
+        FileHandle dirHandle = Gdx.files.internal(directoryPath);
 
+        // Debug: Print the absolute path to verify the directory
+        System.out.println("Searching in directory: " + dirHandle.path());
+
+        // List ALL files to see what's actually there
+        FileHandle[] allFiles = dirHandle.list();
+        System.out.println("Total files found: " + allFiles.length);
+
+        for (FileHandle file : allFiles) {
+            // Print each file to debug
+            System.out.println("Found file: " + file.name());
+        }
+
+        // Now filter for specific audio files
+        FileHandle[] listOfFiles = dirHandle.list((FileFilter) file ->
+            file.getName().toLowerCase().endsWith(".mp3") ||
+                file.getName().toLowerCase().endsWith(".wav"));
+
+        System.out.println("Audio files found: " + listOfFiles.length);
+
+        for (FileHandle file : listOfFiles) {
+            String fileName = file.name();
+            String key = fileName.substring(0, fileName.lastIndexOf('.'));
+
+            Music music = Gdx.audio.newMusic(file);
+            voiceLines.put(key, music);
+        }
+    }
+
+    public Music getRandomSound() {
+        List<String> keys = new ArrayList<>(voiceLines.keySet());
+
+        if (keys.isEmpty()) {
+            return null;
+        }
+
+        // Generate a random index to pick a key
+        int randomIndex = random.nextInt(keys.size());
+        String randomKey = keys.get(randomIndex);
+        return voiceLines.get(randomKey);
     }
 
     public void updatePA() {
@@ -52,9 +80,9 @@ public class PASystem {
     }
 
     public void playVoiceLines() {
-        int randomVoiceLine = ran.nextInt(0, 19);
-        currentVoiceLine = voiceLines[randomVoiceLine];
+        currentVoiceLine = getRandomSound();
         if (!currentVoiceLine.isPlaying()) {
+            currentVoiceLine.setVolume(1f);
             currentVoiceLine.play();
         }
     }

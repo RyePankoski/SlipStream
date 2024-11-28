@@ -1,6 +1,7 @@
 package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -8,8 +9,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import org.w3c.dom.Node;
+
 
 import java.awt.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class Monster {
@@ -34,26 +40,40 @@ public class Monster {
     double angerTime = 1;
     int tpAwayTimer = 0;
 
+    boolean followingPath = false;
+
     ShapeRenderer shapeRenderer;
     private Sound escapeSound;
 
+    int[][] theMap;
+
+    List<int[]> thePath;
+
+    int thePathSpot = 0;
+
 //endregion
 
-    public Monster(Pixmap pixmap) {
+    public Monster(Pixmap pixmap) throws IOException {
         initVariables();
         initDrawParams(pixmap);
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
     }
 
     public void updateMonster() {
         if (System.currentTimeMillis() >= angerTime) angry = false;
         monitorHealth();
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            getPath();
+            followingPath = true;
+        }
+
         if (alive) {
-            move();
+            if (!followingPath) {
+                move();
+            } else {
+                followPath();
+            }
+
             drawMyself();
             distanceToPlayer();
             if (health < 100) {
@@ -65,6 +85,26 @@ public class Monster {
             shouldITeleport();
         }
     }
+
+    public void getPath() {
+        thePathSpot = 0;
+        int[] start = {(int) coorX/32, (int) coorY/32};
+        int[] goal = {(int) player.getCoorX()/32, (int) player.getCoorY()/32};
+        thePath = AStar.aStar(start, goal, theMap);
+    }
+
+    public void followPath() {
+        System.out.println("hi");
+        if (thePathSpot < thePath.size()) {
+            int[] point1 = thePath.get(thePathSpot);
+            coorX = point1[0];
+            coorY = point1[1];
+            thePathSpot++;
+        } else {
+            followingPath = false;
+        }
+    }
+
 
     public void distanceToPlayer() {
 
@@ -238,8 +278,9 @@ public class Monster {
         player.main.killMonster(this);
     }
 
-    public void initDrawParams(Pixmap pixmap) {
+    public void initDrawParams(Pixmap pixmap) throws IOException {
         this.pixmap = pixmap;
+        theMap = AStar.imageToGrid("assets/CollisionMap/collisionMap.png");
         monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
@@ -249,8 +290,12 @@ public class Monster {
     public void initVariables() {
         dx = 1;
         coorX = 7800;
-        coorY = 800;
+        coorY = 9000;
         health = 100;
         ran = new Random();
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

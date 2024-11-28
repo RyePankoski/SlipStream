@@ -1,4 +1,5 @@
 package com.Rye.DarknessGame;
+
 import com.Rye.DarknessGame.InteractableLibrary.KeyPad;
 import com.Rye.DarknessGame.KeyLibrary.Key;
 import com.Rye.DarknessGame.PartsLibrary.PartManager;
@@ -6,6 +7,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
@@ -27,6 +32,7 @@ public class Main extends ApplicationAdapter {
     Player playcor;
     Hud hud;
     CollisionMask collisionMask;
+    CollisionMask monsterCollisionMask;
     DarknessLayer darknessLayer;
     Monster monster;
     Pixmap sectorMap;
@@ -43,23 +49,30 @@ public class Main extends ApplicationAdapter {
     PDA testPDA;
     PartManager partManager;
 
+    int[][] theMap;
+    List<int[]> thePath;
+
 
     //endregion
     public void create() {
         //non-dependent objects
 
-
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         collisionMask = new CollisionMask();
+        monsterCollisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
-        //temp stuff
-        lightsOffTimer = System.currentTimeMillis() + 70000;
+        lightsOffTimer = System.currentTimeMillis() + 200000;
         lightsOffWarningTimer = lightsOffTimer - 10000;
 
         //dependent objects
-        monster = new Monster(collisionMask.getPixmap());
+        try {
+            monster = new Monster(monsterCollisionMask.getPixmap());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), monster, this);
 
 
@@ -67,11 +80,12 @@ public class Main extends ApplicationAdapter {
         partManager = new PartManager(playcor);
         key1 = new Key(8530, 180, 3, 30, playcor);
 
-        testPDA = new PDA(playcor);
 
-        taskManager = new TaskManager(playcor);
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
 
+
+        testPDA = new PDA(playcor);
+        taskManager = new TaskManager(playcor);
         keyPad = new KeyPad(playcor, doorManager.getDoor(3, 7));
 
         los = new LOS(playcor, lightMask.getPixmap());
@@ -114,6 +128,10 @@ public class Main extends ApplicationAdapter {
 
                 sceneManager.getScenes().get(sceneNumber).renderScene();
 
+                keyPad.isPlayerNear();
+
+                testPDA.updatePDA();
+
                 key1.updateKey();
 
                 if (playerSector == 24) {
@@ -147,8 +165,7 @@ public class Main extends ApplicationAdapter {
                 paSystem.updatePA();
             }
 
-            keyPad.isPlayerNear();
-            testPDA.updatePDA();
+
             UIManager.getInstance().render(Gdx.graphics.getDeltaTime());
         }
     }

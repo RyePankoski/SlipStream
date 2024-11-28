@@ -3,8 +3,6 @@ package com.Rye.DarknessGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
-
-import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
 
@@ -20,7 +18,7 @@ public class PASystem {
 
     public PASystem() {
         voiceLines = new HashMap<>();
-        timeTillVoiceLines = System.currentTimeMillis() + 10000;
+        timeTillVoiceLines = System.currentTimeMillis() + 60000;
         ran = new Random();
         loadAudioFromDirectory("assets/paVoiceLines");
     }
@@ -40,7 +38,6 @@ public class PASystem {
             System.out.println("Found file: " + file.name());
         }
 
-        // Now filter for specific audio files
         FileHandle[] listOfFiles = dirHandle.list((FileFilter) file ->
             file.getName().toLowerCase().endsWith(".mp3") ||
                 file.getName().toLowerCase().endsWith(".wav"));

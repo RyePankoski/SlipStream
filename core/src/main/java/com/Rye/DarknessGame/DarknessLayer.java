@@ -128,7 +128,7 @@ public class DarknessLayer implements Screen {
     }
 
     private void renderBulletStrike() {
-        shapeRenderer.setColor(1f, 1f, 0f, (float) (bulletStrikeState.getStrikeSize() / 300f));
+        shapeRenderer.setColor(1f, 1f, 0f, (float)(bulletStrikeState.getStrikeSize() / 300f));
         shapeRenderer.circle(
             bulletStrikeState.getPosition().x,
             bulletStrikeState.getPosition().y,

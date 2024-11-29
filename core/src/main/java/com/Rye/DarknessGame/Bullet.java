@@ -1,25 +1,27 @@
 package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.awt.*;
 
 public class Bullet {
-    double startX, startY, facingX, facingY, posX, posY, dx, dy, bulletSpeed;
+    double startX, startY, facingX, facingY, posX, posY, dx, dy, bulletSpeed,angle;
     boolean alive;
     Player player;
     Monster monster;
     Weapon weapon;
     Color white;
-    Texture bulletStrikeTexture;
-    ShapeRenderer shapeRenderer;
-    SpriteBatch spriteBatch;
+    Texture bulletStrikeTexture,bulletTexture;
     Pixmap collisionMap;
+    private boolean struck;
+    ShapeRenderer shapeRenderer;
+
+    Sprite bulletSprite;
 
     public Bullet(Pixmap collisionMap, Player player, double bulletSpeed, Monster monster, Weapon weapon) {
         this.collisionMap = collisionMap;
@@ -27,17 +29,17 @@ public class Bullet {
         this.bulletSpeed = bulletSpeed;
         this.monster = monster;
         this.weapon = weapon;
-
+        struck = false;
         initVariables();
         initDrawParams();
         initSprites();
-        findXYIncrements();
+        findLifeTimeVariables();
     }
 
-    public void findXYIncrements() {
+    public void findLifeTimeVariables() {
         dx = facingX - startX;
         dy = facingY - startY;
-        double angle = Math.atan2(dx, dy);
+        angle = Math.atan2(dx, dy);
         dx = bulletSpeed * Math.sin(angle);
         dy = bulletSpeed * Math.cos(angle);
     }
@@ -46,17 +48,24 @@ public class Bullet {
         posX += dx;
         posY += dy;
 
-        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(255 / 255f, 255 / 255f, 0 / 255f, 1f);
-        shapeRenderer.circle((float) posX, (float) posY, 2);
-        shapeRenderer.end();
-
         checkForWall();
         if (monster.alive) {
             checkForMonster();
         }
         checkOutOfBounds();
+    }
+
+    public void drawMyself(SpriteBatch spriteBatch) {
+        bulletSprite.setPosition((float)(posX - bulletTexture.getWidth()/2),(float)(posY - bulletTexture.getHeight()/2));
+        bulletSprite.setRotation((float) angle);
+        bulletSprite.draw(spriteBatch);
+    }
+
+    public void drawStrike(SpriteBatch spriteBatch) {
+        if (struck) {
+            spriteBatch.draw(bulletStrikeTexture, ((float) (posX - bulletStrikeTexture.getWidth() / 2f)), ((float) (posY - bulletStrikeTexture.getHeight() / 2f)));
+            player.main.darknessLayer.setBulletStrike(true, posX, posY, weapon.getWeaponType().hitSize);
+        }
     }
 
     public void die() {
@@ -66,25 +75,14 @@ public class Bullet {
     public void checkForWall() {
 
         if (getPixelColor((int) posX, (int) posY).equals(white)) {
-            double distance = MathFunctions.distanceFromMe(startX,startY,facingX,facingY);
-            double percent = ((500 - distance) / 500);
-            percent = Math.max(0, Math.min(1, percent));
-
-            SoundEffects.playSoundWithParameters("bulletStrike",(float)percent, 1f);
-
-            spriteBatch.setProjectionMatrix(player.getCamera().combined);
-            spriteBatch.begin();
-            spriteBatch.draw(bulletStrikeTexture, ((float) (posX - bulletStrikeTexture.getWidth() / 2f)), ((float) (posY - bulletStrikeTexture.getHeight() / 2f)));
-            spriteBatch.end();
-
-            player.main.darknessLayer.setBulletStrike(true, posX, posY, weapon.getWeaponType().hitSize);
-
+            struck = true;
+            SoundEffects.playSound("bulletStrike");
             die();
         }
     }
 
     public void checkForMonster() {
-        double distance = MathFunctions.distanceFromMe(posX,posY,monster.getCoorX(),monster.getCoorY());
+        double distance = MathFunctions.distanceFromMe(posX, posY, monster.getCoorX(), monster.getCoorY());
         if (distance < 20) {
             monster.hitByBullet(weapon.getWeaponType());
             SoundEffects.playSound("monsterStrikeSound");
@@ -127,11 +125,13 @@ public class Bullet {
     }
 
     public void initDrawParams() {
-        white = new Color(255, 255, 255);
         shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
+        white = new Color(255, 255, 255);
     }
+
     public void initSprites() {
+        bulletTexture = new Texture(Gdx.files.internal("TexSprites/Untitled.png"));
+        bulletSprite = new Sprite(bulletTexture);
         bulletStrikeTexture = new Texture(Gdx.files.internal("TexSprites/bulletImpactSprite.png"));
     }
 

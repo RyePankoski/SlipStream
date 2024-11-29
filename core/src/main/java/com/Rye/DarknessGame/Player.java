@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
 
@@ -37,15 +36,13 @@ public class Player {
     ArrayList<Bullet> bullets;
     Map<String, Key> keys;
     private Sprite playerSprite, mouseCursorSprite;
-    private SpriteBatch spriteBatch;
-    BitmapFont bitmapFont;
-    ShapeRenderer shapeRenderer;
     Color white;
     Hud hud;
     Monster monster;
 
     public Main main;
     public Pixmap collisionMap;
+    private static Player instance;
     //endregion
 
     public Player(int x, int y, int speed, Hud hud,
@@ -57,6 +54,7 @@ public class Player {
         this.hud = hud;
         this.collisionMap = collisionMap;
         this.monster = monster;
+        instance = this;
 
         initVariables();
         initDrawParams();
@@ -81,13 +79,37 @@ public class Player {
         variableUpdates();
         updateCamera();
         manageHealth();
-        startShapeRender();
-        drawMyself();
-        drawCursor();
-        stopShapeRender();
         melee();
         flashLight();
         ronaldProximity();
+    }
+
+    public void updateCamera() {
+
+        if (coorX + (cameraZoom / 2) > mapWidth) {
+            camX = mapWidth - cameraZoom / 2;
+        } else if (coorX - (cameraZoom / 2) < 0) {
+            camX = cameraZoom / 2;
+        } else {
+            camX = coorX;
+        }
+
+        if (coorY + (cameraZoom / 2) > mapHeight) {
+            camY = mapHeight - cameraZoom / 2;
+        } else if (coorY - (cameraZoom / 2) < 0) {
+            camY = cameraZoom / 2;
+        } else {
+            camY = coorY;
+        }
+
+        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            double[] aimPosition = MathFunctions.pointInFront(coorX, coorY, faceX, faceY, 150);
+            camX = (float) aimPosition[0];
+            camY = (float) aimPosition[1];
+        }
+
+        camera.position.set(camX, camY, 0);
+        camera.update();
     }
 
     public void variableUpdates() {
@@ -95,6 +117,140 @@ public class Player {
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
         facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
         monsterDistance = (float) MathFunctions.distanceFromMe(coorX, coorY, monster.getCoorX(), monster.getCoorY());
+    }
+
+    public void move() {
+        moving = false;
+        boolean movingUp = false;
+        boolean movingDown = false;
+        boolean movingLeft = false;
+        boolean movingRight = false;
+
+        float dy = 0;
+        float dx = 0;
+        float moveSpeed;
+
+        sprint = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
+
+        if (stamina <= 0) {
+            sprint = false;
+        }
+
+        moveSpeed = sprint ? speed * factor : speed;
+        moveSpeed *= (float) ((0.4 + (0.6 * (stamina / 100))));
+
+
+        //region key input management
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            dy = moveSpeed;
+            movingUp = true;
+            moving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            dy = -moveSpeed;
+            movingDown = true;
+            moving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            dx = moveSpeed;
+            movingRight = true;
+            moving = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            dx = -moveSpeed;
+            movingLeft = true;
+            moving = true;
+        }
+        //endregion
+
+        //region stamina management
+        if (stamina <= 0) {
+            if (!staminaPause) {
+                staminaPause = true;
+                waitUntil = System.currentTimeMillis() + 3000;
+            }
+            if (System.currentTimeMillis() >= waitUntil) {
+                staminaPause = false;
+            }
+        }
+
+        if (sprint && stamina > 0 && (Math.abs(dy) + Math.abs(dx)) > 0) {
+            stamina -= 0.1;
+        } else if (stamina < 100 && !staminaPause && staminaRegen) {
+            if (dx == 0 && dy == 0) {
+                stamina += 0.03;
+            } else {
+                stamina += 0.01;
+            }
+        }
+        if (stamina < 0) {
+            stamina = 0;
+        }
+        //endregion
+
+        //region sound management
+        if (sprint) {
+            SoundEffects.stopMusic("walking");
+            SoundEffects.playMusic("running");
+        } else {
+            SoundEffects.stopMusic("running");
+            SoundEffects.playMusic("walking");
+        }
+
+        if (dx == 0 && dy == 0) {
+            SoundEffects.stopMusic("walking");
+            SoundEffects.stopMusic("running");
+        }
+        //endregion
+
+        //region Normalization
+        float inputX = Math.abs(dx);
+        float inputY = Math.abs(dy);
+        double magnitude = MathFunctions.fastSqrt((dx * dx) + (dy * dy));
+        if (magnitude != 0) {
+            dx /= (float) magnitude;
+            dy /= (float) magnitude;
+        }
+
+        dx *= inputX;
+        dy *= inputY;
+        //endregion
+
+        //region edge of level collision
+        if (coorX + dx < 10) {
+            coorX = 10;
+        } else if (coorY + dy < 10) {
+            coorY = 10;
+        } else if (coorX + dx > collisionMap.getWidth() - 10) {
+            coorX = collisionMap.getWidth() - 10;
+        } else if (coorY + dy > collisionMap.getHeight() - 10) {
+            coorY = collisionMap.getHeight() - 10;
+        }
+        //endregion
+
+        //region collision
+        if (movingRight) {
+            if (MathFunctions.getPixelColor((int) coorX + 10, (int) coorY, collisionMap).equals(white)) {
+                dx = 0;
+            }
+        } else if (movingLeft) {
+            if (MathFunctions.getPixelColor((int) coorX - 10, (int) coorY, collisionMap).equals(white)) {
+                dx = 0;
+            }
+        }
+        if (movingUp) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 10, collisionMap).equals(white)) {
+                dy = 0;
+            }
+        } else if (movingDown) {
+            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 10, collisionMap).equals(white)) {
+                dy = 0;
+            }
+        }
+        //endregion
+
+        coorX += dx;
+        coorY += dy;
     }
 
     public void manageHealth() {
@@ -116,6 +272,12 @@ public class Player {
         if (health <= 0) {
             health = 0;
         }
+    }
+
+    public void handleMouse() {
+        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mousePos);
+        setFacing(mousePos.x, mousePos.y);
     }
 
     public void flashLight() {
@@ -254,191 +416,12 @@ public class Player {
         bullets.add(bulletz);
     }
 
-    public void handleMouse() {
-        Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-        camera.unproject(mousePos);
-        setFacing(mousePos.x, mousePos.y);
-    }
-
-    public void move() {
-        moving = false;
-        boolean movingUp = false;
-        boolean movingDown = false;
-        boolean movingLeft = false;
-        boolean movingRight = false;
-
-        float dy = 0;
-        float dx = 0;
-        float moveSpeed;
-
-        sprint = Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT);
-
-        if (stamina <= 0) {
-            sprint = false;
-        }
-
-        moveSpeed = sprint ? speed * factor : speed;
-        moveSpeed *= (float) ((0.4 + (0.6 * (stamina / 100))));
-
-
-        //region key input management
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            dy = moveSpeed;
-            movingUp = true;
-            moving = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            dy = -moveSpeed;
-            movingDown = true;
-            moving = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            dx = moveSpeed;
-            movingRight = true;
-            moving = true;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            dx = -moveSpeed;
-            movingLeft = true;
-            moving = true;
-        }
-        //endregion
-
-        //region stamina management
-        if (stamina <= 0) {
-            if (!staminaPause) {
-                staminaPause = true;
-                waitUntil = System.currentTimeMillis() + 3000;
-            }
-            if (System.currentTimeMillis() >= waitUntil) {
-                staminaPause = false;
-            }
-        }
-
-        if (sprint && stamina > 0 && (Math.abs(dy) + Math.abs(dx)) > 0) {
-            stamina -= 0.1;
-        } else if (stamina < 100 && !staminaPause && staminaRegen) {
-            if (dx == 0 && dy == 0) {
-                stamina += 0.03;
-            } else {
-                stamina += 0.01;
-            }
-        }
-        if (stamina < 0) {
-            stamina = 0;
-        }
-        //endregion
-
-        //region sound management
-        if (sprint) {
-            SoundEffects.stopMusic("walking");
-            SoundEffects.playMusic("running");
-        } else {
-            SoundEffects.stopMusic("running");
-            SoundEffects.playMusic("walking");
-        }
-
-        if (dx == 0 && dy == 0) {
-            SoundEffects.stopMusic("walking");
-            SoundEffects.stopMusic("running");
-        }
-        //endregion
-
-        //region Normalization
-        float inputX = Math.abs(dx);
-        float inputY = Math.abs(dy);
-        double magnitude = MathFunctions.fastSqrt((dx * dx) + (dy * dy));
-        if (magnitude != 0) {
-            dx /= (float) magnitude;
-            dy /= (float) magnitude;
-        }
-
-        dx *= inputX;
-        dy *= inputY;
-        //endregion
-
-        //region edge of level collision
-        if (coorX + dx < 10) {
-            coorX = 10;
-        } else if (coorY + dy < 10) {
-            coorY = 10;
-        } else if (coorX + dx > collisionMap.getWidth() - 10) {
-            coorX = collisionMap.getWidth() - 10;
-        } else if (coorY + dy > collisionMap.getHeight() - 10) {
-            coorY = collisionMap.getHeight() - 10;
-        }
-        //endregion
-
-        //region collision
-        if (movingRight) {
-            if (MathFunctions.getPixelColor((int) coorX + 10, (int) coorY, collisionMap).equals(white)) {
-                dx = 0;
-            }
-        } else if (movingLeft) {
-            if (MathFunctions.getPixelColor((int) coorX - 10, (int) coorY, collisionMap).equals(white)) {
-                dx = 0;
-            }
-        }
-        if (movingUp) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY + 10, collisionMap).equals(white)) {
-                dy = 0;
-            }
-        } else if (movingDown) {
-            if (MathFunctions.getPixelColor((int) coorX, (int) coorY - 10, collisionMap).equals(white)) {
-                dy = 0;
-            }
-        }
-        //endregion
-
-        coorX += dx;
-        coorY += dy;
-    }
-
-    public void updateCamera() {
-
-        if (coorX + (cameraZoom / 2) > mapWidth) {
-            camX = mapWidth - cameraZoom / 2;
-        } else if (coorX - (cameraZoom / 2) < 0) {
-            camX = cameraZoom / 2;
-        } else {
-            camX = coorX;
-        }
-
-        if (coorY + (cameraZoom / 2) > mapHeight) {
-            camY = mapHeight - cameraZoom / 2;
-        } else if (coorY - (cameraZoom / 2) < 0) {
-            camY = cameraZoom / 2;
-        } else {
-            camY = coorY;
-        }
-
-        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-            double[] aimPosition = MathFunctions.pointInFront(coorX, coorY, faceX, faceY, 150);
-            camX = (float) aimPosition[0];
-            camY = (float) aimPosition[1];
-        }
-
-        camera.position.set(camX, camY, 0);
-        camera.update();
-    }
-
-    public void startShapeRender() {
-        spriteBatch.setProjectionMatrix(camera.combined);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        spriteBatch.begin();
-    }
-
-    public void stopShapeRender() {
-        spriteBatch.end();
-        shapeRenderer.end();
-    }
-
-    public void drawCursor() {
+    public void drawCursor(SpriteBatch spriteBatch) {
         mouseCursorSprite.setPosition(faceX - mouseCursorSprite.getWidth() / 2, faceY - mouseCursorSprite.getWidth() / 2);
         mouseCursorSprite.draw(spriteBatch);
     }
 
-    public void drawMyself() {
+    public void drawMyself(SpriteBatch spriteBatch) {
         playerSprite.setPosition(getCoorX() - playerSprite.getWidth() / 2, getCoorY() - playerSprite.getHeight() / 2);
         playerSprite.setRotation(getFacingAngle() + 90);
         playerSprite.draw(spriteBatch);
@@ -471,14 +454,10 @@ public class Player {
     }
 
     public void initDrawParams() {
-
         Texture playerTexture = new Texture(Gdx.files.internal("TexSprites/PlayerChar.png"));
         Texture mouseCursor = new Texture(Gdx.files.internal("TexSprites/crosshair003.png"));
-        shapeRenderer = new ShapeRenderer();
-        bitmapFont = new BitmapFont();
         playerSprite = new Sprite(playerTexture);
         mouseCursorSprite = new Sprite(mouseCursor);
-        spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
     }
 
@@ -510,14 +489,6 @@ public class Player {
         return stamina;
     }
 
-    public void setStamina(double stamina) {
-        this.stamina = stamina;
-    }
-
-    public void setFacing(float x, float y) {
-        faceX = x;
-        faceY = y;
-    }
 
     public float getFaceX() {
         return faceX;
@@ -539,13 +510,17 @@ public class Player {
         return collisionMap;
     }
 
-    public void addToCoors(int x, int y) {
-        coorX += x;
-        coorY += y;
+    public static Player getInstance(){
+        return instance;
     }
 
     public Map<String, Key> getKeys() {
         return keys;
+    }
+
+    public void addToCoors(int x, int y) {
+        coorX += x;
+        coorY += y;
     }
 
     public void addKey(String sectorAndNumber, Key key) {
@@ -554,5 +529,18 @@ public class Player {
 
     public void setInPopUp(boolean inPopUp) {
         this.inPopUp = inPopUp;
+    }
+
+    public void setFacing(float x, float y) {
+        faceX = x;
+        faceY = y;
+    }
+
+    public void setStamina(double stamina) {
+        this.stamina = stamina;
+    }
+
+    public ArrayList<Bullet> getBullets(){
+        return bullets;
     }
 }

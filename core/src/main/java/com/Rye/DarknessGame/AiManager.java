@@ -50,14 +50,14 @@ public class AiManager {
         }
 
         // Adjust hunt chance based on player's state
-        huntChance += player.flashLightIsOn ? -10: 30;
+        huntChance += player.flashLightIsOn ? -10 : 30;
         huntChance += player.searchPatternIsOn ? -10 : 10;
 
-        if(main.lightsOn){
+        if (main.lightsOn) {
             huntChance = 0;
         }
 
-        if(justHunted){
+        if (justHunted) {
             huntChance -= 30;
             return huntChance;
         } else {
@@ -85,17 +85,17 @@ public class AiManager {
             nextHuntAttemptTime = System.currentTimeMillis() + HUNT_CHANCE_INTERVAL;
 
             // Randomized hunt attempt
-            int chanceCheck = random.nextInt(0,MAX_HUNT_CHANCE_RANGE + 1);
+            int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
 
             if (chanceCheck <= currentHuntChance) {
-                System.out.println(STR."Success. Hunt chance was: \{currentHuntChance}");
+                System.out.println("Success. Hunt chance was: " + currentHuntChance);
                 huntFailedAttempts = 0;
                 monster.aiManager(true);
                 isHunting = true;
             } else {
 
                 huntFailedAttempts++;
-                System.out.println(STR."Failure. Hunt chance was: \{currentHuntChance}");
+                System.out.println("Failure. Hunt chance was: " + currentHuntChance);
             }
         }
         updateMenaceLevel();

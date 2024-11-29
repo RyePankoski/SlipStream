@@ -39,12 +39,8 @@ public class Monster {
     boolean angry = false;
     public double moveSpeed = 2;
     double angerTime = 1;
-    int tpAwayTimer = 0;
 
     boolean followingPath = false;
-
-    ShapeRenderer shapeRenderer;
-    private Sound escapeSound;
 
     int[][] theMap;
 
@@ -68,6 +64,8 @@ public class Monster {
 
     double[] intermediateCoordinate;
 
+    private static Monster instance;
+
 
 //endregion
 
@@ -75,6 +73,7 @@ public class Monster {
         intermediatePoints = new ArrayList<>();
         initVariables();
         initDrawParams(pixmap);
+        instance = this;
     }
 
     public void aiManager(boolean huntStatus) {
@@ -103,15 +102,11 @@ public class Monster {
     }
 
     public void updateMonster() {
-
-        System.out.println(player.monsterDistance);
-
         if (alive) {
             if (System.currentTimeMillis() >= angerTime) angry = false;
             if (System.currentTimeMillis() >= timeTillNextHuntSearch) canHuntSearch = true;
             monitorHealth();
             movementBehavior();
-            drawMyself();
             distanceToPlayer();
         }
     }
@@ -140,7 +135,7 @@ public class Monster {
             currentPoint = thePath.get(thePathSpot);
             nextPoint = thePath.get(thePathSpot + 1);
 
-            double distance = MathFunctions.distanceFromMe(nextPoint[0], currentPoint[1], nextPoint[0], nextPoint[1]);
+            double distance = MathFunctions.distanceFromMe(currentPoint[0], currentPoint[1], nextPoint[0], nextPoint[1]);
             intermediatePoints = interpolatePoints(currentPoint[0], currentPoint[1], nextPoint[0], nextPoint[1], (int) distance / 2);
 
             intermediatePointIndex = 0;
@@ -212,7 +207,7 @@ public class Monster {
         if (health <= 0) {
             health = 0;
             alive = false;
-            eerieMusic.stop();
+            SoundEffects.stopMusic("eerieMusic");
             die();
         }
     }
@@ -309,27 +304,11 @@ public class Monster {
         }
     }
 
-    public void drawMyself() {
-        spriteBatch.setProjectionMatrix(player.getCamera().combined);
-        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-
-        spriteBatch.begin();
+    public void drawMyself(SpriteBatch spriteBatch) {
         spriteBatch.draw(monsterTexture, (float) coorX - monsterTexture.getWidth() / 2f, (float) coorY - monsterTexture.getHeight() / 2f);
-        spriteBatch.end();
-
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(255, 0, 0, (float) (1 - (health / 100)));
-        shapeRenderer.circle((float) coorX, (float) coorY, 10);
-        shapeRenderer.end();
     }
 
     public void die() {
-        eerieMusic.dispose();
-        spriteBatch.dispose();
-        shapeRenderer.dispose();
         monsterTexture.dispose();
         player.main.killMonster(this);
     }
@@ -338,8 +317,6 @@ public class Monster {
         this.pixmap = pixmap;
         theMap = AStar.imageToGrid("assets/CollisionMap/collisionMap.png");
         monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
-        shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
         white = new Color(255, 255, 255);
     }
 
@@ -354,5 +331,9 @@ public class Monster {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public static Monster getInstance(){
+        return instance;
     }
 }

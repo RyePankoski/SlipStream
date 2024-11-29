@@ -59,6 +59,8 @@ public class Main extends ApplicationAdapter {
 
     FrameBuffer frameBuffer;
 
+    Draw artist;
+
     //endregion
     public void create() {
 
@@ -80,6 +82,8 @@ public class Main extends ApplicationAdapter {
 
 
         //non-dependent objects
+
+
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         collisionMask = new CollisionMask();
@@ -109,6 +113,7 @@ public class Main extends ApplicationAdapter {
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor, ronald);
 
 
+        artist = new Draw(playcor.getCamera());
         testPDA = new PDA(playcor);
         taskManager = new TaskManager(playcor);
         keyPad = new KeyPad(playcor, doorManager.getDoor(3, 7));
@@ -151,17 +156,16 @@ public class Main extends ApplicationAdapter {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
-                sceneManager.getScenes().get(sceneNumber).renderScene();
-
                 keyPad.isPlayerNear();
-
                 testPDA.updatePDA();
-
                 key1.updateKey();
 
                 if (playerSector == 24) {
                     tram.updateTram();
                 }
+
+                artist.updateAll();
+
                 playcor.updatePlayer();
                 playcor.checkBullets();
 

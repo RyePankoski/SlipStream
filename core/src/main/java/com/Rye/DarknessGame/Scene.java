@@ -12,27 +12,23 @@ public class Scene {
     String stageName;
     Player player;
     Texture image;
-    private final ShapeRenderer shapeRenderer;
     private final SpriteBatch batch;
     Matrix4 projection;
+
+    private static Scene instance;
 
     public Scene(String stageName, Player player, Texture image) {
         this.stageName = stageName;
         this.image = image;
         this.player = player;
         batch = new SpriteBatch();
-        shapeRenderer = new ShapeRenderer();
-
         projection = player.getCamera().combined;
-        shapeRenderer.setProjectionMatrix(projection);
+        instance = this;
     }
 
-    public void renderScene() {
+    public void renderScene(SpriteBatch batch) {
 
         SoundEffects.playMusic("ambience");
-
-        batch.begin();
-        batch.setProjectionMatrix(projection);
 
         float margin = player.cameraZoom * 0.25f;
         float drawWidth = player.cameraZoom + margin * 2.5f;  // Add margin
@@ -51,6 +47,8 @@ public class Scene {
             (int)drawWidth,                            // Width of texture region
             (int)drawHeight,                           // Height of texture region
             false, false);
-        batch.end();
+    }
+    public static Scene getInstance(){
+        return instance;
     }
 }

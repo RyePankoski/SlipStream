@@ -27,22 +27,22 @@ public class PASystem {
         FileHandle dirHandle = Gdx.files.internal(directoryPath);
 
         // Debug: Print the absolute path to verify the directory
-        System.out.println("Searching in directory: " + dirHandle.path());
+//        System.out.println("Searching in directory: " + dirHandle.path());
 
         // List ALL files to see what's actually there
         FileHandle[] allFiles = dirHandle.list();
-        System.out.println("Total files found: " + allFiles.length);
+//        System.out.println("Total files found: " + allFiles.length);
 
         for (FileHandle file : allFiles) {
             // Print each file to debug
-            System.out.println("Found file: " + file.name());
+//            System.out.println("Found file: " + file.name());
         }
 
         FileHandle[] listOfFiles = dirHandle.list((FileFilter) file ->
             file.getName().toLowerCase().endsWith(".mp3") ||
                 file.getName().toLowerCase().endsWith(".wav"));
 
-        System.out.println("Audio files found: " + listOfFiles.length);
+//        System.out.println("Audio files found: " + listOfFiles.length);
 
         for (FileHandle file : listOfFiles) {
             String fileName = file.name();

@@ -21,6 +21,7 @@ public class KeyPad extends Interactable {
         double playerDistance = MathFunctions.distanceFromMe(x, y, player.getCoorX(), player.getCoorY());
         if (playerDistance < 50) {
             PopUpManager.displayPopUp(8340, 250, "E", player);
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 player.setInPopUp(true);
                 Gdx.input.setCursorCatched(false);
@@ -36,9 +37,11 @@ public class KeyPad extends Interactable {
                 player.setInPopUp(false);
                 door.setLocked(false);
                 SoundEffects.playSound("accessGranted");
+                Gdx.input.setCursorCatched(true);
             } else {
                 player.setInPopUp(false);
                 SoundEffects.playSound("accessDenied");
+                Gdx.input.setCursorCatched(true);
             }
         });
     }

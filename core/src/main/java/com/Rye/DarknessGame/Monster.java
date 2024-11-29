@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -36,7 +37,7 @@ public class Monster {
     boolean alive = true;
     double health;
     boolean angry = false;
-    public double moveSpeed = 5;
+    public double moveSpeed = 2;
     double angerTime = 1;
     int tpAwayTimer = 0;
 
@@ -51,60 +52,129 @@ public class Monster {
 
     int thePathSpot = 0;
 
+    boolean hunting;
+
+    double timeTillNextHuntSearch;
+
+    boolean canFindNextPoint = true, canHuntSearch = true;
+
+    int intermediatePointIndex;
+
+    List<double[]> intermediatePoints;
+
+    int[] currentPoint;
+
+    int[] nextPoint;
+
+    double[] intermediateCoordinate;
+
+
 //endregion
 
     public Monster(Pixmap pixmap) throws IOException {
+        intermediatePoints = new ArrayList<>();
         initVariables();
         initDrawParams(pixmap);
     }
 
-    public void updateMonster() {
-        if (System.currentTimeMillis() >= angerTime) angry = false;
-        monitorHealth();
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            getPath();
+    public void aiManager(boolean huntStatus) {
+        hunting = huntStatus;
+        if (!hunting) {
+            SoundEffects.playSound("escapeSound");
+            getPathAwayFromPlayer();
             followingPath = true;
-        }
-
-        if (alive) {
-            if (!followingPath) {
-                move();
-            } else {
-                followPath();
-            }
-
-            drawMyself();
-            distanceToPlayer();
-            if (health < 100) {
-                health += 0.02;
-            }
-        }
-
-        if (tpAwayTimer > 0) {
-            shouldITeleport();
         }
     }
 
-    public void getPath() {
+    public void movementBehavior() {
+
+        if (canHuntSearch && hunting) {
+            followingPath = true;
+            canHuntSearch = false;
+            timeTillNextHuntSearch = System.currentTimeMillis() + 30000;
+            getPathToPlayer();
+        }
+
+        if (!followingPath && player.monsterDistance < 1500) {
+            move();
+        } else if (followingPath){
+            followPath();
+        }
+    }
+
+    public void updateMonster() {
+
+        System.out.println(player.monsterDistance);
+
+        if (alive) {
+            if (System.currentTimeMillis() >= angerTime) angry = false;
+            if (System.currentTimeMillis() >= timeTillNextHuntSearch) canHuntSearch = true;
+            monitorHealth();
+            movementBehavior();
+            drawMyself();
+            distanceToPlayer();
+        }
+    }
+
+    public void getPathToPlayer() {
+        System.out.println("finding path to player");
         thePathSpot = 0;
-        int[] start = {(int) coorX/32, (int) coorY/32};
-        int[] goal = {(int) player.getCoorX()/32, (int) player.getCoorY()/32};
+        int[] start = {(int) coorX / 32, (int) coorY / 32};
+        int[] goal = {(int) player.getCoorX() / 32, (int) player.getCoorY() / 32};
+        thePath = AStar.aStar(start, goal, theMap);
+    }
+
+    public void getPathAwayFromPlayer() {
+        System.out.println("finding path away from player");
+        thePathSpot = 0;
+        int[] start = {(int) coorX / 32, (int) coorY / 32};
+        int[] goal = {800 / 32, 9000 / 32};
         thePath = AStar.aStar(start, goal, theMap);
     }
 
     public void followPath() {
-        System.out.println("hi");
-        if (thePathSpot < thePath.size()) {
-            int[] point1 = thePath.get(thePathSpot);
-            coorX = point1[0];
-            coorY = point1[1];
+//        System.out.println(player.monsterDistance);
+
+        if (canFindNextPoint && thePathSpot + 1 < thePath.size()) {
+            canFindNextPoint = false;
+            currentPoint = thePath.get(thePathSpot);
+            nextPoint = thePath.get(thePathSpot + 1);
+
+            double distance = MathFunctions.distanceFromMe(nextPoint[0], currentPoint[1], nextPoint[0], nextPoint[1]);
+            intermediatePoints = interpolatePoints(currentPoint[0], currentPoint[1], nextPoint[0], nextPoint[1], (int) distance / 2);
+
+            intermediatePointIndex = 0;
+            setPosition(currentPoint[0], currentPoint[1]);
+        }
+
+        if (intermediatePointIndex < intermediatePoints.size()) {
+            intermediateCoordinate = intermediatePoints.get(intermediatePointIndex);
+            setPosition(intermediateCoordinate[0], intermediateCoordinate[1]);
+            intermediatePointIndex++;
+        }
+
+        if (intermediatePointIndex >= intermediatePoints.size()) {
+            setPosition(nextPoint[0], nextPoint[1]);
             thePathSpot++;
-        } else {
+
+            canFindNextPoint = true;
+        }
+
+        if (thePathSpot == thePath.size()) {
             followingPath = false;
         }
     }
 
+    public static List<double[]> interpolatePoints(double x1, double y1, double x2, double y2, int numPoints) {
+        List<double[]> points = new ArrayList<>();
+        for (int i = 1; i <= numPoints; i++) {
+            double t = (double) i / (numPoints + 1); // Divide interval into (numPoints + 1) segments
+            double x = x1 + t * (x2 - x1);
+            double y = y1 + t * (y2 - y1);
+            points.add(new double[]{x, y});
+        }
+        return points;
+    }
 
     public void distanceToPlayer() {
 
@@ -119,6 +189,11 @@ public class Monster {
         }
     }
 
+    public void setPosition(double x, double y) {
+        coorX = x;
+        coorY = y;
+    }
+
     private Color getPixelColor(int x, int y) {
         int pixel = pixmap.getPixel(x, pixmap.getHeight() - y);
 
@@ -131,6 +206,9 @@ public class Monster {
     }
 
     public void monitorHealth() {
+        if (health < 100) {
+            health += 0.02;
+        }
         if (health <= 0) {
             health = 0;
             alive = false;
@@ -149,32 +227,10 @@ public class Monster {
         angry = true;
         angerTime = System.currentTimeMillis() + 7000;
         health -= weapon.getDamage();
-        tpAwayTimer = 1000;
     }
 
     public double getCoorX() {
         return coorX;
-    }
-
-    public void teleportAway() {
-        health = 100;
-        if (eerieMusic.isPlaying()) {
-            eerieMusic.stop();
-        }
-        escapeSound.play();
-        coorX = ran.nextInt(100, pixmap.getWidth() - 100);
-        coorY = ran.nextInt(100, pixmap.getHeight() - 100);
-    }
-
-    public void shouldITeleport() {
-
-        if (tpAwayTimer > 0) {
-            tpAwayTimer--;
-        }
-        if (tpAwayTimer == 0) {
-            teleportAway();
-        }
-
     }
 
     public double getCoorY() {
@@ -185,7 +241,7 @@ public class Monster {
 
         int textureSize = monsterTexture.getWidth() / 2;
 
-        moveSpeed = 2;
+        moveSpeed = 1;
         moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
 
         //region out of bounds detection
@@ -289,8 +345,9 @@ public class Monster {
 
     public void initVariables() {
         dx = 1;
-        coorX = 7800;
+        coorX = 800;
         coorY = 9000;
+
         health = 100;
         ran = new Random();
     }

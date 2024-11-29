@@ -23,11 +23,14 @@ public class DoorManager {
     Map<String, ArrayList<Door>> sectorsHashMap;
     ArrayList<Door> sectorDoorsArray;
 
-    public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player) {
+    Monster monster;
+
+    public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player, Monster monster) {
         this.sectorMap = sectorMap;
         this.lightMap = lightMap;
         this.collisionMap = collisionMap;
         this.player = player;
+        this.monster = monster;
 
         sectorsHashMap = new HashMap<>();
         loadMapAndInstantiateDoors("CollisionMap/objectMap.tmx");
@@ -115,7 +118,7 @@ public class DoorManager {
 
                 ArrayList<Door> temp = sectorsHashMap.get(String.valueOf(sector));
 
-                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector], isLocked, player, collisionMap, lightMap);
+                door = new Door((int) x, (int) y, (int) width, (int) height, sector, numberDoorsInSector[sector], isLocked, player, monster, collisionMap, lightMap);
                 numberDoorsInSector[sector]++;
                 temp.add(door);
 

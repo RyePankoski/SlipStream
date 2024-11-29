@@ -7,10 +7,12 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
@@ -34,7 +36,7 @@ public class Main extends ApplicationAdapter {
     CollisionMask collisionMask;
     CollisionMask monsterCollisionMask;
     DarknessLayer darknessLayer;
-    Monster monster;
+    Monster ronald;
     Pixmap sectorMap;
     Tram tram;
     LOS los;
@@ -48,32 +50,55 @@ public class Main extends ApplicationAdapter {
     KeyPad keyPad;
     PDA testPDA;
     PartManager partManager;
+    AiManager aiManager;
 
-    int[][] theMap;
-    List<int[]> thePath;
+    ShaderProgram shader;
 
+
+    SpriteBatch batch;
+
+    FrameBuffer frameBuffer;
 
     //endregion
     public void create() {
-        //non-dependent objects
 
+//        batch = new SpriteBatch();
+//
+//        String vertexShaderCode = Gdx.files.internal("Shaders/vertex.glsl").readString();
+//
+//        String fragmentShaderCode = Gdx.files.internal("Shaders/fragment.glsl").readString();
+//
+//        shader  = new ShaderProgram(vertexShaderCode, fragmentShaderCode);
+//
+//        if (!shader.isCompiled()) {
+//            throw new GdxRuntimeException("Shader compilation failed: " + shader.getLog());
+//        }
+//
+//        // Use a FrameBuffer for post-processing
+//        frameBuffer= new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+
+
+
+        //non-dependent objects
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
         collisionMask = new CollisionMask();
         monsterCollisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
-        lightsOffTimer = System.currentTimeMillis() + 200000;
+        lightsOffTimer = System.currentTimeMillis() + 30000;
         lightsOffWarningTimer = lightsOffTimer - 10000;
 
         //dependent objects
         try {
-            monster = new Monster(monsterCollisionMask.getPixmap());
+            ronald = new Monster(monsterCollisionMask.getPixmap());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), monster, this);
+        playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), ronald, this);
+
+        aiManager = new AiManager(playcor, ronald,this);
 
 
         //test classes to be later removed or implemented;
@@ -81,7 +106,7 @@ public class Main extends ApplicationAdapter {
         key1 = new Key(8530, 180, 3, 30, playcor);
 
 
-        doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor);
+        doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor, ronald);
 
 
         testPDA = new PDA(playcor);
@@ -96,7 +121,7 @@ public class Main extends ApplicationAdapter {
 
         //setters
         hud.setPlayer(playcor);
-        monster.setPlayer(playcor);
+        ronald.setPlayer(playcor);
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
         Gdx.input.setCursorCatched(true);
 
@@ -141,7 +166,7 @@ public class Main extends ApplicationAdapter {
                 playcor.checkBullets();
 
                 if (monsterAlive) {
-                    monster.updateMonster();
+                    ronald.updateMonster();
                 }
                 if (System.currentTimeMillis() >= lightsOffWarningTimer && System.currentTimeMillis() < lightsOffWarningTimer + 10) {
                     SoundEffects.playMusic("shutdownAlert");
@@ -163,10 +188,22 @@ public class Main extends ApplicationAdapter {
                 RenderSlowTimer = System.currentTimeMillis() + 250;
                 playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
                 paSystem.updatePA();
+                aiManager.update();
             }
 
-
             UIManager.getInstance().render(Gdx.graphics.getDeltaTime());
+//            frameBuffer.begin();
+//            frameBuffer.end();
+//
+//            batch.setShader(shader);
+//            shader.bind();
+//            shader.setUniformf("u_time", System.currentTimeMillis() / 1000f);
+//            shader.setUniformf("u_intensity",50); // Set based on player health
+//
+//            batch.begin();
+//            batch.draw(frameBuffer.getColorBufferTexture(), 0, 0, 1800, 1350);
+//            batch.end();
+//            batch.setShader(null);
         }
     }
 }

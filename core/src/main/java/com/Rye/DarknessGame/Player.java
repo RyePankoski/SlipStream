@@ -21,7 +21,7 @@ import java.util.Map;
 public class Player {
     //region Variables
 
-    boolean sprint, staminaPause, staminaRegen, canChangeGun, flashLightIsOn, canMelee, canFlashLight;
+    boolean sprint, staminaPause, staminaRegen, canChangeGun, canMelee, canFlashLight;
     float camX, camY;
     private float coorX, coorY, faceX, faceY, facingAngle, factor;
     public float speed, cameraZoom;
@@ -29,7 +29,7 @@ public class Player {
     int mapWidth, mapHeight;
     double monsterDistance, flashlightBattery, health, beepTimer;
     private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash, timeTillCanToggleSearch;
-    public boolean playerHurt, searchPatternIsOn, canToggleSearch, moving, inPopUp;
+    public boolean playerHurt, searchPatternIsOn, canToggleSearch, moving, inPopUp, flashLightIsOn;
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;

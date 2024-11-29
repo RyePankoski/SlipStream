@@ -10,9 +10,11 @@ public class Door {
     Player player;
     Pixmap collisionMap, lightMap;
 
+    Monster monster;
+
 
     public Door(int posX, int posY, int width, int height, int sector, int instantiationNumber,
-                boolean locked, Player player, Pixmap collisionMap, Pixmap lightMap) {
+                boolean locked, Player player, Monster monster, Pixmap collisionMap, Pixmap lightMap) {
         this.posX = posX;
         this.posY = posY;
         this.width = width;
@@ -21,6 +23,7 @@ public class Door {
         this.instantiationNumber = instantiationNumber;
         this.locked = locked;
         this.player = player;
+        this.monster = monster;
         this.collisionMap = collisionMap;
         this.lightMap = lightMap;
 
@@ -78,7 +81,16 @@ public class Door {
 
     public void isPlayerNear() {
 
+        double monsterDistance = MathFunctions.distanceFromMe(posX + (double) width / 2, posY + (double) height / 2,monster.getCoorX(),monster.getCoorY());
+
         double playerDistance = MathFunctions.distanceFromMe(posX + (double) width / 2, posY + (double) height / 2, player.getCoorX(), player.getCoorY());
+
+
+//        if(monsterDistance < 150){
+//            open();
+//        } else {
+//            close();
+//        }
 
 //        if(playerDistance < 75){
 //            System.out.println(String.valueOf(sector) + instantiationNumber);

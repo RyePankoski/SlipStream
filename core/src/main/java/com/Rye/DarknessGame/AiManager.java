@@ -68,6 +68,10 @@ public class AiManager {
     public void update() {
         if (System.currentTimeMillis() >= nextHuntAttemptTime) canAttemptHunt = true;
         if (System.currentTimeMillis() >= justHuntedTimer) justHunted = false;
+
+        DebugUtility.updateVariable("Chance of Hunt: ", String.valueOf(calculateHuntChance()));
+        DebugUtility.updateVariable("Menace Level: ", String.valueOf(menaceLevel));
+        DebugUtility.updateVariable("Hunting? : ", String.valueOf(isHunting));
 //        System.out.println(menaceLevel);
 
         if (menaceLevel >= MAX_MENACE_LEVEL && isHunting) {

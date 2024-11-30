@@ -7,10 +7,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.utils.GdxRuntimeException;
+
 
 import java.io.IOException;
 
@@ -52,14 +49,9 @@ public class Main extends ApplicationAdapter {
     PartManager partManager;
     AiManager aiManager;
 
-    ShaderProgram shader;
-
-
-    SpriteBatch batch;
-
-    FrameBuffer frameBuffer;
-
     Draw artist;
+
+
 
     //endregion
     public void create() {
@@ -82,7 +74,7 @@ public class Main extends ApplicationAdapter {
 
 
         //non-dependent objects
-
+        DebugUtility.initialize();
 
         paSystem = new PASystem();
         sectorMap = new Pixmap(Gdx.files.internal("CollisionMap/sectorMap.png"));
@@ -151,20 +143,24 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= renderFastTimer) canRenderFast = true;
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
 
+
+
             //only for drawn elements!
             if (canRenderVeryFast) {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
-                keyPad.isPlayerNear();
-                testPDA.updatePDA();
-                key1.updateKey();
+
 
                 if (playerSector == 24) {
                     tram.updateTram();
                 }
 
                 artist.updateAll();
+
+                keyPad.isPlayerNear();
+                testPDA.updatePDA();
+                key1.updateKey();
 
                 playcor.updatePlayer();
                 playcor.checkBullets();

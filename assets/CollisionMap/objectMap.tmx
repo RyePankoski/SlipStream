@@ -2102,7 +2102,7 @@
   </object>
   <object id="78" type="Door" x="7584" y="9504" width="32" height="96">
    <properties>
-    <property name="locked" type="bool" value="true"/>
+    <property name="locked" type="bool" value="false"/>
    </properties>
   </object>
   <object id="79" type="Door" x="8768" y="9792" width="128" height="32">

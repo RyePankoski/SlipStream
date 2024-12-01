@@ -72,6 +72,7 @@ public class AiManager {
         DebugUtility.updateVariable("Chance of Hunt: ", String.valueOf(calculateHuntChance()));
         DebugUtility.updateVariable("Menace Level: ", String.valueOf(menaceLevel));
         DebugUtility.updateVariable("Hunting? : ", String.valueOf(isHunting));
+        DebugUtility.updateVariable("Distance to Monster", String.valueOf(player.monsterDistance));
 //        System.out.println(menaceLevel);
 
         if (menaceLevel >= MAX_MENACE_LEVEL && isHunting) {

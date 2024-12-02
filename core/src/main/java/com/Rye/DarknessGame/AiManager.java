@@ -93,21 +93,18 @@ public class AiManager {
             int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
 
             if (chanceCheck <= currentHuntChance) {
-                System.out.println("Success. Hunt chance was: " + currentHuntChance);
                 huntFailedAttempts = 0;
                 monster.aiManager(true);
                 isHunting = true;
             } else {
 
                 huntFailedAttempts++;
-                System.out.println("Failure. Hunt chance was: " + currentHuntChance);
             }
         }
         updateMenaceLevel();
     }
 
     private void updateMenaceLevel() {
-
         if (player.monsterDistance > DISTANCE_THRESHOLD && menaceLevel > 0) {
             menaceLevel = Math.max(0, menaceLevel - 1);
         } else if (player.monsterDistance < DISTANCE_THRESHOLD && menaceLevel < MAX_MENACE_LEVEL) {

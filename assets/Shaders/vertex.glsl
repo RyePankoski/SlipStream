@@ -6,6 +6,7 @@ uniform mat4 u_projTrans;
 varying vec2 v_texCoord;
 
 void main() {
-    v_texCoord = vec2(a_texCoord0.x, 1.0 - a_texCoord0.y);
+    // Remove the Y-coordinate flipping
+    v_texCoord = a_texCoord0;
     gl_Position = u_projTrans * a_position;
 }

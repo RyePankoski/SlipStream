@@ -69,6 +69,12 @@ public class Player {
         if (System.currentTimeMillis() >= timeTillMelee) canMelee = true;
         if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
+        if(Gdx.input.isKeyPressed(Input.Keys.P)){
+            health++;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.O)){
+            health--;
+        }
+
 
         if (!inPopUp) {
             handleMouse();
@@ -113,6 +119,9 @@ public class Player {
     }
 
     public void variableUpdates() {
+
+
+
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
         facingAngle = (float) MathFunctions.facingAngle(coorX, coorY, faceX, faceY);
@@ -443,7 +452,7 @@ public class Player {
         bullets = new ArrayList<>();
         keys = new HashMap<>();
 
-        health = 100;
+        health = 10;
         stamina = 100;
         equippedWeaponName = "SMG";
         cameraZoom = 500;
@@ -516,6 +525,10 @@ public class Player {
 
     public Map<String, Key> getKeys() {
         return keys;
+    }
+
+    public double getHealth() {
+        return health;
     }
 
     public void addToCoors(int x, int y) {

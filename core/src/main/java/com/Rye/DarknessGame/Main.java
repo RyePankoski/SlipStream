@@ -3,31 +3,21 @@ package com.Rye.DarknessGame;
 import com.Rye.DarknessGame.InteractableLibrary.KeyPad;
 import com.Rye.DarknessGame.KeyLibrary.Key;
 import com.Rye.DarknessGame.PartsLibrary.PartManager;
+import com.Rye.DarknessGame.TaskLibrary.TaskManager;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
-
-
 import java.io.IOException;
 
 @SuppressWarnings({"ParameterCanBeLocal", "UnusedAssignment"})
 public class Main extends ApplicationAdapter {
-
-    //region Variables
-// boolean variables
     public boolean monsterAlive = true, canRenderSlow = true, renderGame = true, canRenderVeryFast = true, canRenderFast, lightsOn = true;
-
-    // int variables
     int sceneNumber = 0, playerSector;
-
-    // long variables
     private long renderVeryFastTimer, renderFastTimer;
-
-    // double variables
     double RenderSlowTimer, lightsOffTimer, lightsOffWarningTimer;
 
-    // Object variables
+    //region Objects
     Player playcor;
     Hud hud;
     CollisionMask collisionMask;
@@ -48,31 +38,12 @@ public class Main extends ApplicationAdapter {
     PDA testPDA;
     PartManager partManager;
     AiManager aiManager;
-
     Draw artist;
-
-
+    Inventory inventory;
 
     //endregion
+
     public void create() {
-
-//        batch = new SpriteBatch();
-//
-//        String vertexShaderCode = Gdx.files.internal("Shaders/vertex.glsl").readString();
-//
-//        String fragmentShaderCode = Gdx.files.internal("Shaders/fragment.glsl").readString();
-//
-//        shader  = new ShaderProgram(vertexShaderCode, fragmentShaderCode);
-//
-//        if (!shader.isCompiled()) {
-//            throw new GdxRuntimeException("Shader compilation failed: " + shader.getLog());
-//        }
-//
-//        // Use a FrameBuffer for post-processing
-//        frameBuffer= new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-
-
-
         //non-dependent objects
         DebugUtility.initialize();
 
@@ -95,15 +66,13 @@ public class Main extends ApplicationAdapter {
         playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), ronald, this);
 
         aiManager = new AiManager(playcor, ronald,this);
-
+        inventory = new Inventory(playcor);
 
         //test classes to be later removed or implemented;
         partManager = new PartManager(playcor);
         key1 = new Key(8530, 180, 3, 30, playcor);
 
-
         doorManager = new DoorManager(sectorMap, collisionMask.getPixmap(), lightMask.getPixmap(), playcor, ronald);
-
 
         artist = new Draw(playcor.getCamera());
         testPDA = new PDA(playcor);
@@ -143,20 +112,16 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= renderFastTimer) canRenderFast = true;
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
 
-
-
-            //only for drawn elements!
             if (canRenderVeryFast) {
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
 
+                artist.updateAll();
 
                 if (playerSector == 24) {
                     tram.updateTram();
                 }
-
-                artist.updateAll();
 
                 keyPad.isPlayerNear();
                 testPDA.updatePDA();
@@ -176,12 +141,14 @@ public class Main extends ApplicationAdapter {
                 }
                 los.render(0f);
                 hud.renderHud();
+                inventory.update();
             }
 
             if (canRenderFast) {
                 canRenderFast = false;
                 renderFastTimer = System.currentTimeMillis() + 20;
                 doorManager.updateDoors(playerSector);
+
             }
             if (canRenderSlow) {
                 canRenderSlow = false;
@@ -189,21 +156,10 @@ public class Main extends ApplicationAdapter {
                 playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
                 paSystem.updatePA();
                 aiManager.update();
+
             }
 
             UIManager.getInstance().render(Gdx.graphics.getDeltaTime());
-//            frameBuffer.begin();
-//            frameBuffer.end();
-//
-//            batch.setShader(shader);
-//            shader.bind();
-//            shader.setUniformf("u_time", System.currentTimeMillis() / 1000f);
-//            shader.setUniformf("u_intensity",50); // Set based on player health
-//
-//            batch.begin();
-//            batch.draw(frameBuffer.getColorBufferTexture(), 0, 0, 1800, 1350);
-//            batch.end();
-//            batch.setShader(null);
         }
     }
 }

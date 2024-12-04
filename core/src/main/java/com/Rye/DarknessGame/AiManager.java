@@ -96,7 +96,6 @@ public class AiManager {
                 monster.aiManager(true);
                 isHunting = true;
             } else {
-
                 huntFailedAttempts++;
             }
         }

@@ -1,4 +1,5 @@
-package com.Rye.DarknessGame;
+package com.Rye.DarknessGame.TaskLibrary;
+import com.Rye.DarknessGame.Player;
 import com.Rye.DarknessGame.TaskLibrary.*;
 
 public class TaskManager {
@@ -13,6 +14,6 @@ public class TaskManager {
 
     }
     public void initTasks(){
-        repairReceiving firstTask = new repairReceiving("IntroTask",player);
+        repairReceiving firstTask = new repairReceiving("IntroTask", player);
     }
 }

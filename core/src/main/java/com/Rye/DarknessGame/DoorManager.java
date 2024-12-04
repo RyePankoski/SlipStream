@@ -22,7 +22,6 @@ public class DoorManager {
     Pixmap lightMap;
     Map<String, ArrayList<Door>> sectorsHashMap;
     ArrayList<Door> sectorDoorsArray;
-
     Monster monster;
 
     public DoorManager(Pixmap sectorMap, Pixmap collisionMap, Pixmap lightMap, Player player, Monster monster) {
@@ -78,6 +77,12 @@ public class DoorManager {
     public void updateDoors(int playerSector) {
 
         ArrayList<Door> updateDoors = sectorsHashMap.get(String.valueOf(playerSector));
+
+        if(updateDoors != null) {
+            DebugUtility.updateVariable("Doors loaded", String.valueOf(updateDoors.size()));
+        } else {
+            DebugUtility.updateVariable("Doors loaded", "0");
+        }
 
         if (updateDoors != null) {
             for (Door door : updateDoors) {

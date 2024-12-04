@@ -10,29 +10,21 @@ import com.badlogic.gdx.math.Rectangle;
 
 
 public class Tram {
-
     Player player;
-    ShapeRenderer shapeRenderer;
-
-    SpriteBatch spriteBatch;
-
     Texture tramTexture;
-    int coorX = 9000;
-
-    int coorY = 4930;
-
+    int coorX = 9000, coorY = 4930;
     boolean moving;
-
-    Music tramMovingSound;
 
     int[] tramStops;
 
     int whichStop;
 
+    private static Tram instance;
+
     public Tram(Player player) {
         this.player = player;
+        instance = this;
 
-        initDrawParams();
         initTexture();
         initVariables();
     }
@@ -40,7 +32,6 @@ public class Tram {
     public void updateTram() {
         handleInputs();
         move();
-        drawMyself();
     }
 
     public void handleInputs() {
@@ -93,24 +84,19 @@ public class Tram {
         tramStops[3] = 12900;
     }
 
-    public void drawMyself() {
-        shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-        spriteBatch.setProjectionMatrix(player.getCamera().combined);
-        spriteBatch.begin();
+    public void drawMyself(SpriteBatch spriteBatch) {
         spriteBatch.draw(tramTexture, coorX, coorY);
-        spriteBatch.end();
-        shapeRenderer.end();
-    }
-
-    public void initDrawParams() {
-        shapeRenderer = new ShapeRenderer();
-        spriteBatch = new SpriteBatch();
-
     }
 
     public void initTexture() {
         tramTexture = new Texture("TexSprites/tram.png");
     }
+
+    public static Tram getInstance() {
+        return instance;
+    }
 }
+
+
 
 

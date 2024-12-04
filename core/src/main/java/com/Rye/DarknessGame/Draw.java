@@ -18,13 +18,17 @@ public class Draw {
     ArrayList<Bullet> bullets;
     Scene scene;
 
-    private ShaderProgram shader;
+    Tram tram;
+
+    Inventory inventory;
+    private final ShaderProgram shader;
     private float timeElapsed;
     private float intensity;
     private float targetIntensity;
-
     private static final float MAX_HEALTH = 100f; // Adjust this to match your game's max health
     private static final float INTENSITY_SMOOTHING = 0.1f; // How quickly intensity changes
+
+
 
     public Draw(OrthographicCamera camera) {
         batch = new SpriteBatch();
@@ -54,6 +58,8 @@ public class Draw {
         player = Player.getInstance();
         monster = Monster.getInstance();
         bullets = player.getBullets();
+        tram = Tram.getInstance();
+        inventory = Inventory.getInstance();
 
         float healthPercent = (float) player.getHealth() / MAX_HEALTH;
         targetIntensity = MathUtils.clamp(0.0025f * (1.0f - healthPercent), 0f, 0.0025f);
@@ -66,6 +72,7 @@ public class Draw {
 
         startBatch();
         scene.renderScene(batch);
+        tram.drawMyself(batch);
         player.drawMyself(batch);
         player.drawCursor(batch);
         monster.drawMyself(batch);
@@ -74,6 +81,8 @@ public class Draw {
             bullet.drawMyself(batch);
             bullet.drawStrike(batch);
         }
+
+        inventory.render(batch);
 
         endBatch();
     }

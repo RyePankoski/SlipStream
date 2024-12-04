@@ -14,6 +14,10 @@ public class AStar {
         {-1, -1}, {-1, 1}, {1, -1}, {1, 1}  // Diagonal movements
     };
 
+
+    //the collision map is not instantiated here in case there are different types of maps that need pathfinding in the
+    //future.
+
     public static int[][] imageToGrid(String imagePath) throws IOException {
         File file = new File(imagePath);
         BufferedImage image = ImageIO.read(file);

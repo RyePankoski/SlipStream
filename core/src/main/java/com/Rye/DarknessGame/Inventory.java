@@ -6,85 +6,245 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Inventory {
     private final Player player;
-    private final Array<InventoryItem> items;
+    private Array<InventoryItem> visualItems;
+
     private boolean isOpen;
     private InventoryItem selectedItem;
-
+    private boolean isMoving = false; // Track if item is being moved
+    private float originalX, originalY; // Store original position for cancellation
     ShapeRenderer shapeRenderer;
     private static Inventory instance;
-
-    private static final float WINDOW_WIDTH = 400;
-    private static final float WINDOW_HEIGHT = 200;
+    private static final float WINDOW_WIDTH = 200;
+    private static final float WINDOW_HEIGHT = 120;
     private static final float CELL_SIZE = 40; // Size of each grid cell
+    private static final float OVERLAP_SCALE = 0.7f; // Scale factor when overlapping
+    private static final float SELECTED_SCALE = 0.9f; // Scale factor for selected items
+    private static final float SELECTED_ALPHA = 0.8f; // Transparency for selected items
+    private static final float MOVING_ALPHA = 0.5f;
 
     public Inventory(Player player) {
         this.player = player;
-        this.items = new Array<InventoryItem>();
+        this.visualItems = new Array<>();
         this.isOpen = false;
         shapeRenderer = new ShapeRenderer();
         instance = this;
+    }
 
-        // Add some test items
-        addItem(ItemType.WEAPON, 2, 1); // 2x1 weapon
-        addItem(ItemType.POTION, 1, 1); // 1x1 potion
+    private void refreshFromPlayer() {
+        visualItems.clear();
+
+        for(Item playerItem : player.getItems()) {
+            InventoryItem visualItem = new InventoryItem(
+                playerItem.getType(),
+                playerItem.getWidth(),
+                playerItem.getHeight()
+            );
+
+            float x = 0;
+            float y = 0;
+
+            while (wouldCollideWithOtherItems(x, y, visualItem)) {
+                x += CELL_SIZE;
+                if (x + visualItem.getWidth() * CELL_SIZE > WINDOW_WIDTH) {
+                    x = 0;
+                    y += CELL_SIZE;
+                    if (y + visualItem.getHeight() * CELL_SIZE > WINDOW_HEIGHT) {
+                        return;
+                    }
+                }
+            }
+            visualItem.setX(x);
+            visualItem.setY(y);
+            visualItems.add(visualItem);
+        }
     }
 
     public void update() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             isOpen = !isOpen;
+            if (isOpen) {
+                refreshFromPlayer();
+                selectedItem = null;
+                isMoving = false;
+            }
+            if (!isOpen) {
+                cancelMovement();
+            }
         }
         if (isOpen) {
             handleItemMovement();
         }
-        DebugUtility.updateVariable("Inv-Status", String.valueOf(isOpen));
     }
 
     private void handleItemMovement() {
-        // Select next/previous item
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
-            selectNextItem();
+        if (!isMoving) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+                selectNextItem();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+                selectPreviousItem();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ALT_LEFT) && selectedItem != null) {
+                dropSelectedItem();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                if (selectedItem == null && visualItems.size > 0) {
+                    selectedItem = visualItems.first();
+                } else if (selectedItem != null) {
+                    startMovement();
+                }
+            }
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
-            selectPreviousItem();
-        }
+        if (selectedItem != null && isMoving) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isMoving) {
+                startMovement();
+            }
 
-        // Move selected item
+            if (isMoving) {
+
+                float newX = selectedItem.getX();
+                float newY = selectedItem.getY();
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+                    newX -= CELL_SIZE;
+                }
+                if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                    newX += CELL_SIZE;
+                }
+                if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+                    newY += CELL_SIZE;
+                }
+                if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+                    newY -= CELL_SIZE;
+                }
+
+                if (isPositionWithinBounds(newX, newY, selectedItem)) {
+                    selectedItem.setX(newX);
+                    selectedItem.setY(newY);
+                }
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+                    int newWidth = selectedItem.getHeight();
+                    int newHeight = selectedItem.getWidth();
+                    if (isPositionWithinBounds(selectedItem.getX(), selectedItem.getY(), newWidth, newHeight)) {
+                        selectedItem.rotate();
+                    }
+                }
+
+                if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                    finalizeMovement();
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
+                    cancelMovement();
+                }
+            }
+        }
+    }
+
+    private void dropSelectedItem() {
         if (selectedItem != null) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-                selectedItem.setX(selectedItem.getX() - CELL_SIZE);
+            int index = visualItems.indexOf(selectedItem, true);
+            if (index >= 0 && index < player.getItems().size) {
+                player.getItems().removeIndex(index);
             }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-                selectedItem.setX(selectedItem.getX() + CELL_SIZE);
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-                selectedItem.setY(selectedItem.getY() + CELL_SIZE);
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-                selectedItem.setY(selectedItem.getY() - CELL_SIZE);
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-                selectedItem.rotate();
-            }
+
+            visualItems.removeValue(selectedItem, true);
+
+            selectedItem = null;
+            isMoving = false;
         }
     }
 
-    private void selectNextItem() {
-        int currentIndex = selectedItem != null ? items.indexOf(selectedItem, true) : -1;
-        if (items.size > 0) {
-            currentIndex = (currentIndex + 1) % items.size;
-            selectedItem = items.get(currentIndex);
+    private void startMovement() {
+        isMoving = true;
+        originalX = selectedItem.getX();
+        originalY = selectedItem.getY();
+    }
+
+    private void finalizeMovement() {
+        if (!wouldCollideWithOtherItems(selectedItem.getX(), selectedItem.getY(), selectedItem)) {
+            isMoving = false;
+            selectedItem = null;
+        } else {
+            cancelMovement();
         }
     }
 
-    private void selectPreviousItem() {
-        int currentIndex = selectedItem != null ? items.indexOf(selectedItem, true) : 0;
-        if (items.size > 0) {
-            currentIndex = (currentIndex - 1 + items.size) % items.size;
-            selectedItem = items.get(currentIndex);
+    private void cancelMovement() {
+        if (selectedItem != null && isMoving) {
+            selectedItem.setX(originalX);
+            selectedItem.setY(originalY);
         }
+        isMoving = false;
+        selectedItem = null;
+    }
+
+    private boolean isPositionWithinBounds(float x, float y, InventoryItem item) {
+        return isPositionWithinBounds(x, y, item.getWidth(), item.getHeight());
+    }
+
+    private boolean isPositionWithinBounds(float x, float y, int width, int height) {
+        return x >= 0 &&
+            y >= 0 &&
+            x + width * CELL_SIZE <= WINDOW_WIDTH &&
+            y + height * CELL_SIZE <= WINDOW_HEIGHT;
+    }
+
+    private boolean wouldCollideWithOtherItems(float newX, float newY, InventoryItem item) {
+        Rectangle itemBounds = new Rectangle(
+            newX,
+            newY,
+            item.getWidth() * CELL_SIZE,
+            item.getHeight() * CELL_SIZE
+        );
+
+        // Use index-based iteration instead of iterator
+        for (int i = 0; i < visualItems.size; i++) {
+            InventoryItem otherItem = visualItems.get(i);
+            if (otherItem == item) continue;
+
+            Rectangle otherBounds = new Rectangle(
+                otherItem.getX(),
+                otherItem.getY(),
+                otherItem.getWidth() * CELL_SIZE,
+                otherItem.getHeight() * CELL_SIZE
+            );
+
+            if (itemBounds.overlaps(otherBounds)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isOverlappingAnyItem(InventoryItem item) {
+        // Create temporary arrays for item bounds
+        Rectangle itemBounds = new Rectangle(
+            item.getX(),
+            item.getY(),
+            item.getWidth() * CELL_SIZE,
+            item.getHeight() * CELL_SIZE
+        );
+
+        for (int i = 0; i < visualItems.size; i++) {
+            InventoryItem otherItem = visualItems.get(i);
+            if (otherItem == item) continue;
+
+            Rectangle otherBounds = new Rectangle(
+                otherItem.getX(),
+                otherItem.getY(),
+                otherItem.getWidth() * CELL_SIZE,
+                otherItem.getHeight() * CELL_SIZE
+            );
+
+            if (itemBounds.overlaps(otherBounds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void render(SpriteBatch batch) {
@@ -92,8 +252,8 @@ public class Inventory {
 
         batch.end();
 
-        float windowX = player.getCoorX() - WINDOW_WIDTH/2;
-        float windowY = player.getCoorY() - WINDOW_HEIGHT/2;
+        float windowX = player.getCoorX() - WINDOW_WIDTH / 2;
+        float windowY = player.getCoorY() - WINDOW_HEIGHT / 2;
 
         shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -102,34 +262,57 @@ public class Inventory {
         shapeRenderer.setColor(new Color(0, 0, 0, 1f));
         shapeRenderer.rect(windowX, windowY, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        // Draw items
-        for (InventoryItem item : items) {
-            // Highlight selected item with a different color
-            if (item == selectedItem) {
-                shapeRenderer.setColor(item.getColor().cpy().add(0.2f, 0.2f, 0.2f, 0));
-            } else {
+        for (int i = 0; i < visualItems.size; i++) {
+            InventoryItem item = visualItems.get(i);
+            if (item != selectedItem) {  // Skip the selected item
                 shapeRenderer.setColor(item.getColor());
+                shapeRenderer.rect(
+                    windowX + item.getX(),
+                    windowY + item.getY(),
+                    item.getWidth() * CELL_SIZE,
+                    item.getHeight() * CELL_SIZE
+                );
             }
-            shapeRenderer.rect(windowX + item.getX(),
-                windowY + item.getY(),
-                item.getWidth() * CELL_SIZE,
-                item.getHeight() * CELL_SIZE);
+        }
+
+        if (selectedItem != null) {
+            float scale = SELECTED_SCALE;
+
+            if (isMoving && isOverlappingAnyItem(selectedItem)) {
+                scale = OVERLAP_SCALE;
+            }
+
+            Color itemColor = selectedItem.getColor().cpy().add(0.2f, 0.2f, 0.2f, 0);
+            itemColor.a = isMoving ? MOVING_ALPHA : SELECTED_ALPHA;
+
+            shapeRenderer.setColor(itemColor);
+
+            float width = selectedItem.getWidth() * CELL_SIZE * scale;
+            float height = selectedItem.getHeight() * CELL_SIZE * scale;
+
+            float x = windowX + selectedItem.getX() + (selectedItem.getWidth() * CELL_SIZE * (1 - scale)) / 2;
+            float y = windowY + selectedItem.getY() + (selectedItem.getHeight() * CELL_SIZE * (1 - scale)) / 2;
+
+            shapeRenderer.rect(x, y, width, height);
         }
 
         shapeRenderer.end();
         batch.begin();
     }
 
-    public void addItem(ItemType type, int width, int height) {
-        InventoryItem newItem = new InventoryItem(type, width, height);
-        // Set initial position
-        newItem.setX(items.size * CELL_SIZE);
-        newItem.setY(0);
-        items.add(newItem);
+    private void selectNextItem() {
+        int currentIndex = selectedItem != null ? visualItems.indexOf(selectedItem, true) : -1;
+        if (visualItems.size > 0) {
+            currentIndex = (currentIndex + 1) % visualItems.size;
+            selectedItem = visualItems.get(currentIndex);
+        }
+    }
 
-        // Select first item added
-        if (selectedItem == null) {
-            selectedItem = newItem;
+    private void selectPreviousItem() {
+        int currentIndex = selectedItem != null ? visualItems.indexOf(selectedItem, true) : 0;
+        if (visualItems.size > 0) {
+            currentIndex = (currentIndex - 1 + visualItems.size) % visualItems.size;
+            selectedItem = visualItems.get(currentIndex);
         }
     }
 

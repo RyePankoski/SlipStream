@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.utils.Array;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import java.util.Map;
 
 public class Player {
     //region Variables
-
     boolean sprint, staminaPause, staminaRegen, canChangeGun, canMelee, canFlashLight;
     float camX, camY;
     private float coorX, coorY, faceX, faceY, facingAngle, factor;
@@ -43,6 +43,7 @@ public class Player {
     public Main main;
     public Pixmap collisionMap;
     private static Player instance;
+    Array<Item> items;
     //endregion
 
     public Player(int x, int y, int speed, Hud hud,
@@ -60,6 +61,7 @@ public class Player {
         initDrawParams();
         initCamera();
         initWeapons();
+        initItems();
     }
 
     public void updatePlayer() {
@@ -86,7 +88,11 @@ public class Player {
         updateCamera();
         manageHealth();
         melee();
-        flashLight();
+
+        if(hasItem("FLASHLIGHT")) {
+            flashLight();
+        }
+
         ronaldProximity();
     }
 
@@ -119,8 +125,6 @@ public class Player {
     }
 
     public void variableUpdates() {
-
-
 
         hud.updatePlayerStats(stamina, equippedWeaponName, flashlightBattery, health);
         hud.updateWeaponStats(equippedWeapon.getAmmo(), equippedWeapon.getMagazines(), equippedWeapon.getMagazineSize(), equippedWeapon.maxMagazines);
@@ -319,10 +323,10 @@ public class Player {
         }
     }
 
-    public void weapon() {
-
+    public void switchWeapons(){
         if (canChangeGun) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) && hasItem("SMG")) {
                 SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
@@ -331,7 +335,7 @@ public class Player {
                 equippedWeaponName = "SMG";
                 equippedWeapon = smg;
             }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) && hasItem("RIFLE")) {
                 SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
@@ -341,6 +345,10 @@ public class Player {
                 equippedWeapon = rifle;
             }
         }
+    }
+
+    public void weapon() {
+        switchWeapons();
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && canChangeGun) {
             equippedWeapon.fireWeapon();
@@ -421,6 +429,15 @@ public class Player {
         }
     }
 
+    public boolean hasItem(String itemName) {
+        for(Item item : items) {
+            if(item.getName().equals(itemName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void updateBullets(Bullet bulletz) {
         bullets.add(bulletz);
     }
@@ -448,9 +465,16 @@ public class Player {
         camera.setToOrtho(false, cameraZoom, cameraZoom);
     }
 
+    public void initItems(){
+        items.add(new Item("SMG", ItemType.WEAPON, 1, 3));
+        items.add(new Item("RIFLE", ItemType.WEAPON, 1, 3));
+        items.add(new Item("FLASHLIGHT", ItemType.FLASHLIGHT, 1,1));
+    }
+
     public void initVariables() {
         bullets = new ArrayList<>();
         keys = new HashMap<>();
+        items = new Array<>();
 
         health = 10;
         stamina = 100;
@@ -555,5 +579,13 @@ public class Player {
 
     public ArrayList<Bullet> getBullets(){
         return bullets;
+    }
+
+    public Array<Item> getItems(){
+        return  items;
+    }
+
+    public void dropItem(String item){
+
     }
 }

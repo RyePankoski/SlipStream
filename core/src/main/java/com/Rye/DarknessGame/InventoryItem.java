@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 
 import java.awt.*;
 
+
 public class InventoryItem {
     private ItemType type;
     private float x, y;

@@ -35,7 +35,7 @@ public class Inventory {
     }
 
     private void refreshFromPlayer() {
-        visualItems.clear();
+        visualItems.clear();  // Clear existing InventoryItems
 
         for(Item playerItem : player.getItems()) {
             InventoryItem visualItem = new InventoryItem(
@@ -44,6 +44,7 @@ public class Inventory {
                 playerItem.getHeight()
             );
 
+            // Find first non-colliding position
             float x = 0;
             float y = 0;
 
@@ -53,6 +54,7 @@ public class Inventory {
                     x = 0;
                     y += CELL_SIZE;
                     if (y + visualItem.getHeight() * CELL_SIZE > WINDOW_HEIGHT) {
+                        // No space found
                         return;
                     }
                 }
@@ -67,9 +69,7 @@ public class Inventory {
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             isOpen = !isOpen;
             if (isOpen) {
-                refreshFromPlayer();
-                selectedItem = null;
-                isMoving = false;
+                refreshFromPlayer();  // Only refresh when opening
             }
             if (!isOpen) {
                 cancelMovement();
@@ -81,7 +81,8 @@ public class Inventory {
     }
 
     private void handleItemMovement() {
-        if (!isMoving) {
+        // Select next/previous item
+        if (!isMoving) {  // Only allow selection/dropping when not moving an item
             if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
                 selectNextItem();
             }
@@ -92,22 +93,29 @@ public class Inventory {
                 dropSelectedItem();
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                if (selectedItem == null && visualItems.size > 0) {
-                    selectedItem = visualItems.first();
-                } else if (selectedItem != null) {
+                if (selectedItem == null) {
+                    if (visualItems.size > 0) {
+                        selectedItem = visualItems.first();
+                    }
+                } else {
                     startMovement();
                 }
             }
         }
-        if (selectedItem != null && isMoving) {
+        // Move selected item
+        if (selectedItem != null) {
+            // Start movement
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isMoving) {
                 startMovement();
             }
 
             if (isMoving) {
 
+
                 float newX = selectedItem.getX();
                 float newY = selectedItem.getY();
+
+
 
                 if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
                     newX -= CELL_SIZE;
@@ -122,11 +130,13 @@ public class Inventory {
                     newY -= CELL_SIZE;
                 }
 
+                // Check if new position is within bounds
                 if (isPositionWithinBounds(newX, newY, selectedItem)) {
                     selectedItem.setX(newX);
                     selectedItem.setY(newY);
                 }
 
+                // Handle rotation during movement
                 if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
                     int newWidth = selectedItem.getHeight();
                     int newHeight = selectedItem.getWidth();
@@ -135,6 +145,7 @@ public class Inventory {
                     }
                 }
 
+                // Finalize or cancel movement
                 if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
                     finalizeMovement();
                 } else if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE)) {
@@ -146,13 +157,16 @@ public class Inventory {
 
     private void dropSelectedItem() {
         if (selectedItem != null) {
+            // Remove the item from player's inventory
             int index = visualItems.indexOf(selectedItem, true);
             if (index >= 0 && index < player.getItems().size) {
                 player.getItems().removeIndex(index);
             }
 
+            // Remove from visual inventory
             visualItems.removeValue(selectedItem, true);
 
+            // Clear selection
             selectedItem = null;
             isMoving = false;
         }
@@ -167,8 +181,9 @@ public class Inventory {
     private void finalizeMovement() {
         if (!wouldCollideWithOtherItems(selectedItem.getX(), selectedItem.getY(), selectedItem)) {
             isMoving = false;
-            selectedItem = null;
+            selectedItem = null;  // Deselect the item after finalizing movement
         } else {
+            // If position is invalid, return to original position
             cancelMovement();
         }
     }
@@ -179,7 +194,7 @@ public class Inventory {
             selectedItem.setY(originalY);
         }
         isMoving = false;
-        selectedItem = null;
+        selectedItem = null;  // Also deselect when canceling movement
     }
 
     private boolean isPositionWithinBounds(float x, float y, InventoryItem item) {
@@ -262,6 +277,7 @@ public class Inventory {
         shapeRenderer.setColor(new Color(0, 0, 0, 1f));
         shapeRenderer.rect(windowX, windowY, WINDOW_WIDTH, WINDOW_HEIGHT);
 
+        // First draw non-selected items
         for (int i = 0; i < visualItems.size; i++) {
             InventoryItem item = visualItems.get(i);
             if (item != selectedItem) {  // Skip the selected item
@@ -275,21 +291,24 @@ public class Inventory {
             }
         }
 
+        // Then draw selected item last, so it's always on top
         if (selectedItem != null) {
-            float scale = SELECTED_SCALE;
+            float scale = SELECTED_SCALE; // Default scale for selected items
 
+            // If moving and overlapping, use the smaller overlap scale
             if (isMoving && isOverlappingAnyItem(selectedItem)) {
                 scale = OVERLAP_SCALE;
             }
 
             Color itemColor = selectedItem.getColor().cpy().add(0.2f, 0.2f, 0.2f, 0);
-            itemColor.a = isMoving ? MOVING_ALPHA : SELECTED_ALPHA;
+            itemColor.a = isMoving ? MOVING_ALPHA : SELECTED_ALPHA; // Apply appropriate transparency
 
             shapeRenderer.setColor(itemColor);
 
+            // Calculate scaled dimensions and position
             float width = selectedItem.getWidth() * CELL_SIZE * scale;
             float height = selectedItem.getHeight() * CELL_SIZE * scale;
-
+            // Center the scaled item in its cell
             float x = windowX + selectedItem.getX() + (selectedItem.getWidth() * CELL_SIZE * (1 - scale)) / 2;
             float y = windowY + selectedItem.getY() + (selectedItem.getHeight() * CELL_SIZE * (1 - scale)) / 2;
 

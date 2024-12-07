@@ -20,7 +20,7 @@ public class Draw {
 
     Tram tram;
 
-    Inventory inventory;
+
     private final ShaderProgram shader;
     private float timeElapsed;
     private float intensity;
@@ -59,7 +59,6 @@ public class Draw {
         monster = Monster.getInstance();
         bullets = player.getBullets();
         tram = Tram.getInstance();
-        inventory = Inventory.getInstance();
 
         float healthPercent = (float) player.getHealth() / MAX_HEALTH;
         targetIntensity = MathUtils.clamp(0.0025f * (1.0f - healthPercent), 0f, 0.0025f);
@@ -81,9 +80,6 @@ public class Draw {
             bullet.drawMyself(batch);
             bullet.drawStrike(batch);
         }
-
-        inventory.render(batch);
-
         endBatch();
     }
 

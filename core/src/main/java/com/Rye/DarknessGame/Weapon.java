@@ -12,7 +12,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
 
 
-public class Weapon {
+
+public class Weapon extends InventoryObject {
     float fireRate;
     int magazines;
     int magazineSize;
@@ -48,6 +49,8 @@ public class Weapon {
 
     public Weapon(float fireRate, int magazines, int magazineSize, int damage, ArrayList<Sound> sounds,
                   OrthographicCamera camera, Player player, Hud hud, double bulletSpeed, Monster monster, int hitSize, int maxMagazines) {
+
+
         this.maxMagazines = maxMagazines;
         this.fireRate = fireRate;
         this.magazines = magazines;
@@ -73,13 +76,13 @@ public class Weapon {
         hud.updateWeaponStats(ammo, magazines, magazineSize, maxMagazines);
     }
 
-    public void drawFlash(){
+    public void drawFlash() {
         spriteBatch.setProjectionMatrix(player.getCamera().combined);
         spriteBatch.begin();
-        double[] pointOutFront = (MathFunctions.pointInFront(player.getCoorX(),player.getCoorY(),player.getFaceX(),player.getFaceY(),15));
+        double[] pointOutFront = (MathFunctions.pointInFront(player.getCoorX(), player.getCoorY(), player.getFaceX(), player.getFaceY(), 15));
         gunFlashSprite.setPosition(
-            (float)(pointOutFront[0] - gunFlashSprite.getOriginX()),
-            (float)(pointOutFront[1] - gunFlashSprite.getOriginY())
+            (float) (pointOutFront[0] - gunFlashSprite.getOriginX()),
+            (float) (pointOutFront[1] - gunFlashSprite.getOriginY())
         );
         gunFlashSprite.setRotation(player.getFacingAngle() + 90);
         gunFlashSprite.draw(spriteBatch);
@@ -174,7 +177,7 @@ public class Weapon {
         emptyGunSound = sounds.get(2);
     }
 
-    public static Weapon getInstance(){
+    public static Weapon getInstance() {
         return instance;
     }
 

@@ -39,6 +39,7 @@ public class Main extends ApplicationAdapter {
     PartManager partManager;
     AiManager aiManager;
     Draw artist;
+
     Inventory inventory;
 
     //endregion
@@ -65,8 +66,9 @@ public class Main extends ApplicationAdapter {
 
         playcor = new Player(7800, 200, 2, hud, collisionMask.getPixmap(), ronald, this);
 
-        aiManager = new AiManager(playcor, ronald,this);
         inventory = new Inventory(playcor);
+
+        aiManager = new AiManager(playcor, ronald,this);
 
         //test classes to be later removed or implemented;
         partManager = new PartManager(playcor);
@@ -112,12 +114,16 @@ public class Main extends ApplicationAdapter {
             if (System.currentTimeMillis() >= renderFastTimer) canRenderFast = true;
             if (System.currentTimeMillis() >= lightsOffTimer) lightsOn = false;
 
+
+
             if (canRenderVeryFast) {
+
                 canRenderVeryFast = false;
                 renderVeryFastTimer = System.currentTimeMillis() + 8;
 
-
                 artist.updateAll();
+
+                inventory.update();
 
                 if (playerSector == 24) {
                     tram.updateTram();
@@ -141,7 +147,6 @@ public class Main extends ApplicationAdapter {
                 }
                 los.render(0f);
                 hud.renderHud();
-                inventory.update();
             }
 
             if (canRenderFast) {
@@ -156,9 +161,7 @@ public class Main extends ApplicationAdapter {
                 playerSector = MathFunctions.findSector((int) playcor.getCoorX(), (int) playcor.getCoorY(), sectorMap);
                 paSystem.updatePA();
                 aiManager.update();
-
             }
-
             UIManager.getInstance().render(Gdx.graphics.getDeltaTime());
         }
     }

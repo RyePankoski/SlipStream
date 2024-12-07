@@ -11,6 +11,10 @@ public class Rifle extends Weapon {
                  OrthographicCamera camera, Player player, Hud hud, double bulletSpeed, Monster monster,int hitSize,int maxMagazines) {
         super(fireRate, magazines, magazineSize, damage, sounds, camera, player, hud, bulletSpeed, monster, hitSize,maxMagazines );
         hud.updateWeaponStats(ammo, magazines, magazineSize,maxMagazines);
+
+
+        width = 40;
+        height = 120;
     }
 
     @Override

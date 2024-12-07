@@ -28,7 +28,7 @@ public class Player {
     int mapWidth, mapHeight;
     double monsterDistance, flashlightBattery, health, beepTimer;
     private double stamina, waitUntil, haltUntil, timeTillChange, timeTillMelee, timeTillCanFlash, timeTillCanToggleSearch;
-    public boolean playerHurt, searchPatternIsOn, canToggleSearch, moving, inPopUp, flashLightIsOn;
+    public boolean playerHurt, searchPatternIsOn, canToggleSearch, moving, inPopUp, flashLightIsOn, weaponEquipped;
     String equippedWeaponName;
     Weapon equippedWeapon;
     SubMachineGun smg;
@@ -43,11 +43,14 @@ public class Player {
     public Main main;
     public Pixmap collisionMap;
     private static Player instance;
-    Array<Item> items;
+
+    Array<InventoryObject> inventory;
+
     //endregion
 
     public Player(int x, int y, int speed, Hud hud,
                   Pixmap collisionMap, Monster monster, Main main) {
+
         this.main = main;
         this.coorX = x;
         this.coorY = y;
@@ -61,7 +64,7 @@ public class Player {
         initDrawParams();
         initCamera();
         initWeapons();
-        initItems();
+        initInventoryObjects();
     }
 
     public void updatePlayer() {
@@ -71,9 +74,9 @@ public class Player {
         if (System.currentTimeMillis() >= timeTillMelee) canMelee = true;
         if (System.currentTimeMillis() >= timeTillCanToggleSearch) canToggleSearch = true;
 
-        if(Gdx.input.isKeyPressed(Input.Keys.P)){
+        if (Gdx.input.isKeyPressed(Input.Keys.P)) {
             health++;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.O)){
+        } else if (Gdx.input.isKeyPressed(Input.Keys.O)) {
             health--;
         }
 
@@ -89,9 +92,8 @@ public class Player {
         manageHealth();
         melee();
 
-        if(hasItem("FLASHLIGHT")) {
-            flashLight();
-        }
+        flashLight();
+
 
         ronaldProximity();
     }
@@ -323,10 +325,10 @@ public class Player {
         }
     }
 
-    public void switchWeapons(){
+    public void switchWeapons() {
         if (canChangeGun) {
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1) && hasItem("SMG")) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
                 SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
@@ -335,7 +337,7 @@ public class Player {
                 equippedWeaponName = "SMG";
                 equippedWeapon = smg;
             }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2) && hasItem("RIFLE")) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
                 SoundEffects.playSound("changeGun");
 
                 canChangeGun = false;
@@ -429,15 +431,6 @@ public class Player {
         }
     }
 
-    public boolean hasItem(String itemName) {
-        for(Item item : items) {
-            if(item.getName().equals(itemName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void updateBullets(Bullet bulletz) {
         bullets.add(bulletz);
     }
@@ -460,21 +453,20 @@ public class Player {
         equippedWeapon = smg;
     }
 
+    public void initInventoryObjects() {
+        inventory.add(smg);
+        inventory.add(rifle);
+    }
+
     public void initCamera() {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, cameraZoom, cameraZoom);
     }
 
-    public void initItems(){
-        items.add(new Item("SMG", ItemType.WEAPON, 1, 3));
-        items.add(new Item("RIFLE", ItemType.WEAPON, 1, 3));
-        items.add(new Item("FLASHLIGHT", ItemType.FLASHLIGHT, 1,1));
-    }
-
     public void initVariables() {
         bullets = new ArrayList<>();
         keys = new HashMap<>();
-        items = new Array<>();
+        inventory = new Array<>();
 
         health = 10;
         stamina = 100;
@@ -510,6 +502,10 @@ public class Player {
         return facingAngle;
     }
 
+    public Array<InventoryObject> getItems(){
+        return inventory;
+    }
+
     public float getCoorX() {
         return coorX;
     }
@@ -521,7 +517,6 @@ public class Player {
     public double getStamina() {
         return stamina;
     }
-
 
     public float getFaceX() {
         return faceX;
@@ -543,7 +538,7 @@ public class Player {
         return collisionMap;
     }
 
-    public static Player getInstance(){
+    public static Player getInstance() {
         return instance;
     }
 
@@ -577,15 +572,8 @@ public class Player {
         this.stamina = stamina;
     }
 
-    public ArrayList<Bullet> getBullets(){
+    public ArrayList<Bullet> getBullets() {
         return bullets;
     }
 
-    public Array<Item> getItems(){
-        return  items;
-    }
-
-    public void dropItem(String item){
-
-    }
 }

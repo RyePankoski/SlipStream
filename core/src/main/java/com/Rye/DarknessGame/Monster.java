@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
 import java.awt.*;
@@ -29,10 +30,10 @@ public class Monster {
     boolean angry = false;
     boolean hunting, iSeeThePlayer;
     boolean followingPath = false;
-    boolean canFindNextPoint = true, canHuntSearch = true;
+    boolean canFindNextPoint = true, canHuntSearch = true, attacking;
 
     // Timers and status
-    double health;
+    double health, detectMeter;
     double angerTime = 1;
     double timeTillNextHuntSearch;
 
@@ -55,7 +56,7 @@ public class Monster {
     // Utilities
     Random ran;
     Player player;
-
+    ShapeRenderer shapeRenderer;
 
 //endregion
 
@@ -98,10 +99,45 @@ public class Monster {
             monitorHealth();
             movementBehavior();
             canISeeThePlayer();
+            attackState();
             distanceToPlayer();
 
             DebugUtility.updateVariable("CanISeeYou?", String.valueOf(iSeeThePlayer));
+
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setProjectionMatrix(player.getCamera().combined);
+            shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.RED);
+            shapeRenderer.line((float)coorX, (float)coorY, player.getCoorX(), player.getCoorY());
+            shapeRenderer.end();
         }
+    }
+
+
+    public void attackState() {
+
+        DebugUtility.updateVariable("Detect-Meter", String.valueOf(detectMeter));
+        DebugUtility.updateVariable("Attacking?", String.valueOf(attacking));
+
+        if (iSeeThePlayer && detectMeter < 1) {
+            detectMeter += 0.01;
+        } else if (detectMeter > 0){
+            detectMeter -= .005;
+        }
+
+        if (detectMeter > 1) {
+            attacking = true;
+        }
+
+        if (detectMeter <= 0) {
+            attacking = false;
+            detectMeter = 0;
+        }
+    }
+
+    public void attackPlayer() {
+
+
     }
 
     public void canISeeThePlayer() {
@@ -121,14 +157,19 @@ public class Monster {
 
             iSeeThePlayer = false;
 
+            if (getPixelColor((int) sightPointX, (int) sightPointY).equals(white)) {
+                break;
+            }
+
             if (MathFunctions.distanceFromMe(sightPointX, sightPointY, player.getCoorX(), player.getCoorY()) < 10) {
                 iSeeThePlayer = true;
                 break;
             }
 
-            if (getPixelColor((int) sightPointX, (int) sightPointY) == white) {
-                break;
-            }
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.circle((float)sightPointX, (float)sightPointY, 5);
+            shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.GREEN);
+            shapeRenderer.end();
 
             sightPointX += dx;
             sightPointY += dy;
@@ -149,8 +190,8 @@ public class Monster {
 
         while (noValidSpot) {
 
-            goalX = ((int) player.getCoorX() + ran.nextInt(-288, 288))/32;
-            goalY = ((int) player.getCoorY() + ran.nextInt(-288, 288))/32;
+            goalX = ((int) player.getCoorX() + ran.nextInt(-288, 288)) / 32;
+            goalY = ((int) player.getCoorY() + ran.nextInt(-288, 288)) / 32;
 
             if (getPixelColor(goalX, goalY) != white) {
                 noValidSpot = false;
@@ -356,6 +397,7 @@ public class Monster {
 
     public void initDrawParams(Pixmap pixmap) throws IOException {
         this.pixmap = pixmap;
+        shapeRenderer = new ShapeRenderer();
         theMap = AStar.imageToGrid("assets/CollisionMap/collisionMap.png");
         monsterTexture = new Texture(Gdx.files.internal("MonsterTex/monster.png"));
         white = new Color(255, 255, 255);
@@ -363,8 +405,8 @@ public class Monster {
 
     public void initVariables() {
         dx = 1;
-        coorX = 800;
-        coorY = 9000;
+        coorX = 7800;
+        coorY = 400;
 
         health = 100;
         ran = new Random();

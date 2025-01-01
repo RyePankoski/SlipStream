@@ -91,6 +91,8 @@ public class AiManager {
             // Randomized hunt attempt
             int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
 
+            chanceCheck = 1;
+
             if (chanceCheck <= currentHuntChance) {
                 huntFailedAttempts = 0;
                 monster.aiManager(true);

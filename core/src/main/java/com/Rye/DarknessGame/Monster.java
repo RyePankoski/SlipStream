@@ -1,21 +1,15 @@
 package com.Rye.DarknessGame;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import org.w3c.dom.Node;
 
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -23,48 +17,44 @@ public class Monster {
 
     //region Variables
 
-    Texture monsterTexture;
-    SpriteBatch spriteBatch;
-    Player player;
-    public Pixmap pixmap;
-    double coorX;
-    double coorY;
-    double dx;
-    double dy;
-    Color white;
-    Random ran;
-    Music eerieMusic;
-    boolean alive = true;
-    double health;
-    boolean angry = false;
+    // Instance control
+    private static Monster instance;
+
+    // Core coordinates and movement
+    double coorX, coorY, dx, dy;
     public double moveSpeed = 2;
-    double angerTime = 1;
 
+    // State variables
+    boolean alive = true;
+    boolean angry = false;
+    boolean hunting, iSeeThePlayer;
     boolean followingPath = false;
-
-    int[][] theMap;
-
-    List<int[]> thePath;
-
-    int thePathSpot = 0;
-
-    boolean hunting;
-
-    double timeTillNextHuntSearch;
-
     boolean canFindNextPoint = true, canHuntSearch = true;
 
+    // Timers and status
+    double health;
+    double angerTime = 1;
+    double timeTillNextHuntSearch;
+
+    // Graphics and resources
+    Texture monsterTexture;
+    SpriteBatch spriteBatch;
+    public Pixmap pixmap;
+    Color white;
+    Music eerieMusic;
+
+    // Path finding and navigation
+    int[][] theMap;
+    List<int[]> thePath;
+    int thePathSpot = 0;
     int intermediatePointIndex;
-
     List<double[]> intermediatePoints;
-
-    int[] currentPoint;
-
-    int[] nextPoint;
-
+    int[] currentPoint, nextPoint;
     double[] intermediateCoordinate;
 
-    private static Monster instance;
+    // Utilities
+    Random ran;
+    Player player;
 
 
 //endregion
@@ -88,15 +78,15 @@ public class Monster {
     public void movementBehavior() {
 
         if (canHuntSearch && hunting) {
+            getPathToPlayer();
             followingPath = true;
             canHuntSearch = false;
             timeTillNextHuntSearch = System.currentTimeMillis() + 30000;
-            getPathToPlayer();
         }
 
         if (!followingPath && player.monsterDistance < 1500) {
             move();
-        } else if (followingPath){
+        } else if (followingPath) {
             followPath();
         }
     }
@@ -107,15 +97,67 @@ public class Monster {
             if (System.currentTimeMillis() >= timeTillNextHuntSearch) canHuntSearch = true;
             monitorHealth();
             movementBehavior();
+            canISeeThePlayer();
             distanceToPlayer();
+
+            DebugUtility.updateVariable("CanISeeYou?", String.valueOf(iSeeThePlayer));
         }
     }
+
+    public void canISeeThePlayer() {
+
+        int sightRange = 100;
+        double fineness = 5;
+        double sightPointX = coorX;
+        double sightPointY = coorY;
+        double dx = player.getCoorX() - coorX;
+        double dy = player.getCoorY() - coorY;
+        double angle = Math.atan2(dx, dy);
+
+        dx = fineness * Math.sin(angle);
+        dy = fineness * Math.cos(angle);
+
+        for (int i = 0; i < sightRange; i++) {
+
+            iSeeThePlayer = false;
+
+            if (MathFunctions.distanceFromMe(sightPointX, sightPointY, player.getCoorX(), player.getCoorY()) < 10) {
+                iSeeThePlayer = true;
+                break;
+            }
+
+            if (getPixelColor((int) sightPointX, (int) sightPointY) == white) {
+                break;
+            }
+
+            sightPointX += dx;
+            sightPointY += dy;
+        }
+    }
+
 
     public void getPathToPlayer() {
         System.out.println("finding path to player");
         thePathSpot = 0;
+
         int[] start = {(int) coorX / 32, (int) coorY / 32};
-        int[] goal = {(int) player.getCoorX() / 32, (int) player.getCoorY() / 32};
+
+        boolean noValidSpot = true;
+
+        int goalX = 0;
+        int goalY = 0;
+
+        while (noValidSpot) {
+
+            goalX = ((int) player.getCoorX() + ran.nextInt(-288, 288))/32;
+            goalY = ((int) player.getCoorY() + ran.nextInt(-288, 288))/32;
+
+            if (getPixelColor(goalX, goalY) != white) {
+                noValidSpot = false;
+            }
+        }
+
+        int[] goal = {goalX, goalY};
         thePath = AStar.aStar(start, goal, theMap);
     }
 
@@ -128,7 +170,6 @@ public class Monster {
     }
 
     public void followPath() {
-//        System.out.println(player.monsterDistance);
 
         if (canFindNextPoint && thePathSpot + 1 < thePath.size()) {
             canFindNextPoint = false;
@@ -333,7 +374,7 @@ public class Monster {
         this.player = player;
     }
 
-    public static Monster getInstance(){
+    public static Monster getInstance() {
         return instance;
     }
 }

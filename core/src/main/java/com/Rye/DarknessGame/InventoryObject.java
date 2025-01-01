@@ -25,7 +25,7 @@ public class InventoryObject {
     public  int getPositionX(){
         return positionX;
     }
-    public int getGetPositionY(){
+    public int getPositionY(){
         return positionY;
     }
 
@@ -36,4 +36,12 @@ public class InventoryObject {
     public void setPositionY(int positionY) {
         this.positionY = positionY;
     }
+
+    public void incrementPositionX(int offset){
+        positionX += offset;
+    }
+    public void incrementPositionY(int offset){
+        positionY += offset;
+    }
+
 }

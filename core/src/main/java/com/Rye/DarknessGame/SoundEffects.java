@@ -61,7 +61,7 @@ public class SoundEffects {
         musics.put("eerieMusic", Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/eerieMusic.mp3")));
         sounds.put("monsterStrikeSound", Gdx.audio.newSound(Gdx.files.internal("BulletSFX/monsterStrikeSound.mp3")));
         sounds.put("escapeSound", Gdx.audio.newSound(Gdx.files.internal("MonsterSFX/monsterEscape.mp3")));
-
+        musics.put("detectedNoise", Gdx.audio.newMusic(Gdx.files.internal("MonsterSFX/detectedNoise.mp3")));
     }
 
 

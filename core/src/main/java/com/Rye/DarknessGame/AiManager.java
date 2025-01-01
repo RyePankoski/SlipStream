@@ -74,11 +74,18 @@ public class AiManager {
         DebugUtility.updateVariable("Hunting? : ", String.valueOf(isHunting));
         DebugUtility.updateVariable("Distance to Monster", String.valueOf(player.monsterDistance));
 
-        if (menaceLevel >= MAX_MENACE_LEVEL && isHunting) {
+
+        if(player.monsterDistance > 1000){
+            monster.updateAttackStatus(true);
+        }
+
+        if (menaceLevel >= MAX_MENACE_LEVEL) {
+            menaceLevel = 0;
             justHunted = true;
             justHuntedTimer = System.currentTimeMillis() + 50000;
             canAttemptHunt = false;
             nextHuntAttemptTime = System.currentTimeMillis() + 30000;
+            monster.updateAttackStatus(false);
             monster.aiManager(false);
             isHunting = false;
         }
@@ -91,11 +98,10 @@ public class AiManager {
             // Randomized hunt attempt
             int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
 
-            chanceCheck = 1;
-
             if (chanceCheck <= currentHuntChance) {
                 huntFailedAttempts = 0;
                 monster.aiManager(true);
+                monster.updateAttackStatus(true);
                 isHunting = true;
             } else {
                 huntFailedAttempts++;

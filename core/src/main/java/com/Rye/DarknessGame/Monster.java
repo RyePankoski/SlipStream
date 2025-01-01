@@ -58,6 +58,13 @@ public class Monster {
     Player player;
     ShapeRenderer shapeRenderer;
 
+    double distanceToPlayer;
+
+    int sightRange = 13;
+
+    boolean canIAttack = true;
+
+
 //endregion
 
     public Monster(Pixmap pixmap) throws IOException {
@@ -65,6 +72,10 @@ public class Monster {
         initVariables();
         initDrawParams(pixmap);
         instance = this;
+    }
+
+    public void updateAttackStatus(boolean update){
+        canIAttack = update;
     }
 
     public void aiManager(boolean huntStatus) {
@@ -78,17 +89,22 @@ public class Monster {
 
     public void movementBehavior() {
 
-        if (canHuntSearch && hunting) {
-            getPathToPlayer();
-            followingPath = true;
-            canHuntSearch = false;
-            timeTillNextHuntSearch = System.currentTimeMillis() + 30000;
-        }
+        if (attacking && canIAttack) {
+            attackPlayer();
+        } else {
 
-        if (!followingPath && player.monsterDistance < 1500) {
-            move();
-        } else if (followingPath) {
-            followPath();
+            if (canHuntSearch && hunting) {
+                getPathToPlayer();
+                followingPath = true;
+                canHuntSearch = false;
+                timeTillNextHuntSearch = System.currentTimeMillis() + 30000;
+            }
+
+            if (!followingPath && player.monsterDistance < 1500) {
+                wander();
+            } else if (followingPath) {
+                followPath();
+            }
         }
     }
 
@@ -103,12 +119,13 @@ public class Monster {
             distanceToPlayer();
 
             DebugUtility.updateVariable("CanISeeYou?", String.valueOf(iSeeThePlayer));
+            DebugUtility.updateVariable("Can I attack?", String.valueOf(canIAttack));
 
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.setProjectionMatrix(player.getCamera().combined);
             shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.RED);
-            shapeRenderer.line((float)coorX, (float)coorY, player.getCoorX(), player.getCoorY());
+            shapeRenderer.line((float) coorX, (float) coorY, player.getCoorX(), player.getCoorY());
             shapeRenderer.end();
         }
     }
@@ -116,16 +133,34 @@ public class Monster {
 
     public void attackState() {
 
+        double detectSpeed = 0;
+
         DebugUtility.updateVariable("Detect-Meter", String.valueOf(detectMeter));
         DebugUtility.updateVariable("Attacking?", String.valueOf(attacking));
 
-        if (iSeeThePlayer && detectMeter < 1) {
-            detectMeter += 0.01;
-        } else if (detectMeter > 0){
-            detectMeter -= .005;
+        if (distanceToPlayer < 64) {
+            detectSpeed = .3;
+        } else if (distanceToPlayer < 120) {
+            detectSpeed = .1;
+        } else if (distanceToPlayer < 200) {
+            detectSpeed = .05;
+        } else if (distanceToPlayer < 300) {
+            detectSpeed = 0.01;
+        } else {
+            detectSpeed = 0.001;
         }
 
-        if (detectMeter > 1) {
+        DebugUtility.updateVariable("Detect Speed", String.valueOf(detectSpeed));
+
+
+        if (iSeeThePlayer && detectMeter < 3) {
+            detectMeter += detectSpeed;
+        } else if (detectMeter > 0) {
+            detectMeter -= .01;
+        }
+
+        if (detectMeter >= 3) {
+            SoundEffects.playMusic("detectedNoise");
             attacking = true;
         }
 
@@ -136,14 +171,21 @@ public class Monster {
     }
 
     public void attackPlayer() {
+        double fineness = 2;
+        double dx = player.getCoorX() - coorX;
+        double dy = player.getCoorY() - coorY;
+        double angle = Math.atan2(dx, dy);
 
+        dx = fineness * Math.sin(angle);
+        dy = fineness * Math.cos(angle);
 
+        coorX += dx;
+        coorY += dy;
     }
 
     public void canISeeThePlayer() {
 
-        int sightRange = 100;
-        double fineness = 5;
+        double fineness = 30;
         double sightPointX = coorX;
         double sightPointY = coorY;
         double dx = player.getCoorX() - coorX;
@@ -161,13 +203,13 @@ public class Monster {
                 break;
             }
 
-            if (MathFunctions.distanceFromMe(sightPointX, sightPointY, player.getCoorX(), player.getCoorY()) < 10) {
+            if (MathFunctions.distanceFromMe(sightPointX, sightPointY, player.getCoorX(), player.getCoorY()) < 32) {
                 iSeeThePlayer = true;
                 break;
             }
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.circle((float)sightPointX, (float)sightPointY, 5);
+            shapeRenderer.circle((float) sightPointX, (float) sightPointY, 5);
             shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.GREEN);
             shapeRenderer.end();
 
@@ -257,6 +299,7 @@ public class Monster {
 
         double max = 2000;
         double distance = player.monsterDistance;
+        distanceToPlayer = distance;
         double percent = (max - distance) / max;
 
         if (distance < max) {
@@ -314,7 +357,7 @@ public class Monster {
         return coorY;
     }
 
-    public void move() {
+    public void wander() {
 
         int textureSize = monsterTexture.getWidth() / 2;
 
@@ -405,8 +448,10 @@ public class Monster {
 
     public void initVariables() {
         dx = 1;
+//        coorX = 800;
+//        coorY = 9000;
         coorX = 7800;
-        coorY = 400;
+        coorY = 300;
 
         health = 100;
         ran = new Random();

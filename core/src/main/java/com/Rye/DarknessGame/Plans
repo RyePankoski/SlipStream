@@ -1,0 +1,5 @@
+Create a list of behaviors that the monster can do, and have the ai manager decide what the monster will do.
+
+The monster can tell the ai manager what it sees, what it wants to do, etc. The ai AIManager can assess these facts and make better decisions for the monster.
+
+This also makes it more readable and expandable.

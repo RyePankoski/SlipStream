@@ -70,6 +70,7 @@ public class Main extends ApplicationAdapter {
 
         aiManager = new AiManager(playcor, ronald,this);
 
+
         //test classes to be later removed or implemented;
         partManager = new PartManager(playcor);
         key1 = new Key(8530, 180, 3, 30, playcor);
@@ -90,6 +91,7 @@ public class Main extends ApplicationAdapter {
         //setters
         hud.setPlayer(playcor);
         ronald.setPlayer(playcor);
+        ronald.setAiManager(aiManager);
         hud.setCamera(playcor.getCamera(), playcor.cameraZoom, playcor.getBattery());
         Gdx.input.setCursorCatched(true);
 
@@ -137,7 +139,7 @@ public class Main extends ApplicationAdapter {
                 playcor.checkBullets();
 
                 if (monsterAlive) {
-                    ronald.updateMonster();
+                    ronald.update();
                 }
                 if (System.currentTimeMillis() >= lightsOffWarningTimer && System.currentTimeMillis() < lightsOffWarningTimer + 10) {
                     SoundEffects.playMusic("shutdownAlert");

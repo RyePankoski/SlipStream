@@ -37,7 +37,62 @@ public class AiManager {
         this.main = main;
     }
 
-    // Refactored to improve readability and calculation logic
+    public void update() {
+
+        if (System.currentTimeMillis() >= nextHuntAttemptTime) canAttemptHunt = true;
+        if (System.currentTimeMillis() >= justHuntedTimer) justHunted = false;
+
+        DebugUtility.updateVariable("Chance of Hunt: ", String.valueOf(calculateHuntChance()));
+        DebugUtility.updateVariable("Menace Level: ", String.valueOf(menaceLevel));
+        DebugUtility.updateVariable("Hunting? : ", String.valueOf(isHunting));
+        DebugUtility.updateVariable("Distance to Monster", String.valueOf(player.monsterDistance));
+
+
+        if(player.monsterDistance > 1000){
+            monster.updateAttackStatus(true);
+        }
+
+        if (menaceLevel >= MAX_MENACE_LEVEL) {
+            justHuntedTimer = System.currentTimeMillis() + 50000;
+            nextHuntAttemptTime = System.currentTimeMillis() + 30000;
+
+            monster.updateAttackStatus(false);
+            monster.updateHuntStatus(false);
+
+            menaceLevel = 0;
+
+            justHunted = true;
+            canAttemptHunt = false;
+            isHunting = false;
+        }
+
+        if (!isHunting && canAttemptHunt) {
+            canAttemptHunt = false;
+            nextHuntAttemptTime = System.currentTimeMillis() + HUNT_CHANCE_INTERVAL;
+
+            int currentHuntChance = calculateHuntChance();
+            int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
+
+            if (chanceCheck <= currentHuntChance) {
+                huntFailedAttempts = 0;
+                monster.updateHuntStatus(true);
+                monster.updateAttackStatus(true);
+                isHunting = true;
+            } else {
+                huntFailedAttempts++;
+            }
+        }
+        monsterFear();
+        updateMenaceLevel();
+    }
+
+    public void monsterFear(){
+
+        if(monster.angry && monster.health < 20){
+            menaceLevel = 110;
+        }
+
+    }
     private int calculateHuntChance() {
         int huntChance = 0;
 
@@ -63,51 +118,6 @@ public class AiManager {
         } else {
             return Math.max(huntChance, 0);
         }
-    }
-
-    public void update() {
-        if (System.currentTimeMillis() >= nextHuntAttemptTime) canAttemptHunt = true;
-        if (System.currentTimeMillis() >= justHuntedTimer) justHunted = false;
-
-        DebugUtility.updateVariable("Chance of Hunt: ", String.valueOf(calculateHuntChance()));
-        DebugUtility.updateVariable("Menace Level: ", String.valueOf(menaceLevel));
-        DebugUtility.updateVariable("Hunting? : ", String.valueOf(isHunting));
-        DebugUtility.updateVariable("Distance to Monster", String.valueOf(player.monsterDistance));
-
-
-        if(player.monsterDistance > 1000){
-            monster.updateAttackStatus(true);
-        }
-
-        if (menaceLevel >= MAX_MENACE_LEVEL) {
-            menaceLevel = 0;
-            justHunted = true;
-            justHuntedTimer = System.currentTimeMillis() + 50000;
-            canAttemptHunt = false;
-            nextHuntAttemptTime = System.currentTimeMillis() + 30000;
-            monster.updateAttackStatus(false);
-            monster.aiManager(false);
-            isHunting = false;
-        }
-
-        if (!isHunting && canAttemptHunt) {
-            int currentHuntChance = calculateHuntChance();
-            canAttemptHunt = false;
-            nextHuntAttemptTime = System.currentTimeMillis() + HUNT_CHANCE_INTERVAL;
-
-            // Randomized hunt attempt
-            int chanceCheck = random.nextInt(0, MAX_HUNT_CHANCE_RANGE + 1);
-
-            if (chanceCheck <= currentHuntChance) {
-                huntFailedAttempts = 0;
-                monster.aiManager(true);
-                monster.updateAttackStatus(true);
-                isHunting = true;
-            } else {
-                huntFailedAttempts++;
-            }
-        }
-        updateMenaceLevel();
     }
 
     private void updateMenaceLevel() {

@@ -30,7 +30,7 @@ public class Monster {
     boolean angry = false;
     boolean hunting, iSeeThePlayer;
     boolean followingPath = false;
-    boolean canFindNextPoint = true, canHuntSearch = true, attacking;
+    boolean canFindNextPoint = true, canHuntSearch = true, wantToAttack;
 
     // Timers and status
     double health, detectMeter;
@@ -63,6 +63,7 @@ public class Monster {
     int sightRange = 13;
 
     boolean canIAttack = true;
+    AiManager aiManager;
 
 
 //endregion
@@ -74,11 +75,32 @@ public class Monster {
         instance = this;
     }
 
+    public void update() {
+        if (alive) {
+            if (System.currentTimeMillis() >= angerTime) angry = false;
+            if (System.currentTimeMillis() >= timeTillNextHuntSearch) canHuntSearch = true;
+            monitorHealth();
+            chooseBehavior();
+            canISeeThePlayer();
+            chooseToAttack();
+            distanceToPlayer();
+
+            DebugUtility.updateVariable("CanISeeYou?", String.valueOf(iSeeThePlayer));
+            DebugUtility.updateVariable("Can I attack?", String.valueOf(canIAttack));
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setProjectionMatrix(player.getCamera().combined);
+            shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.RED);
+            shapeRenderer.line((float) coorX, (float) coorY, player.getCoorX(), player.getCoorY());
+            shapeRenderer.end();
+        }
+    }
+
     public void updateAttackStatus(boolean update){
         canIAttack = update;
     }
 
-    public void aiManager(boolean huntStatus) {
+    public void updateHuntStatus(boolean huntStatus) {
         hunting = huntStatus;
         if (!hunting) {
             SoundEffects.playSound("escapeSound");
@@ -87,10 +109,11 @@ public class Monster {
         }
     }
 
-    public void movementBehavior() {
+    public void chooseBehavior() {
 
-        if (attacking && canIAttack) {
+        if (wantToAttack && canIAttack) {
             attackPlayer();
+
         } else {
 
             if (canHuntSearch && hunting) {
@@ -108,35 +131,12 @@ public class Monster {
         }
     }
 
-    public void updateMonster() {
-        if (alive) {
-            if (System.currentTimeMillis() >= angerTime) angry = false;
-            if (System.currentTimeMillis() >= timeTillNextHuntSearch) canHuntSearch = true;
-            monitorHealth();
-            movementBehavior();
-            canISeeThePlayer();
-            attackState();
-            distanceToPlayer();
-
-            DebugUtility.updateVariable("CanISeeYou?", String.valueOf(iSeeThePlayer));
-            DebugUtility.updateVariable("Can I attack?", String.valueOf(canIAttack));
-
-
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setProjectionMatrix(player.getCamera().combined);
-            shapeRenderer.setColor(com.badlogic.gdx.graphics.Color.RED);
-            shapeRenderer.line((float) coorX, (float) coorY, player.getCoorX(), player.getCoorY());
-            shapeRenderer.end();
-        }
-    }
-
-
-    public void attackState() {
+    public void chooseToAttack() {
 
         double detectSpeed = 0;
 
         DebugUtility.updateVariable("Detect-Meter", String.valueOf(detectMeter));
-        DebugUtility.updateVariable("Attacking?", String.valueOf(attacking));
+        DebugUtility.updateVariable("Attacking?", String.valueOf(wantToAttack));
 
         if (distanceToPlayer < 64) {
             detectSpeed = .3;
@@ -152,7 +152,6 @@ public class Monster {
 
         DebugUtility.updateVariable("Detect Speed", String.valueOf(detectSpeed));
 
-
         if (iSeeThePlayer && detectMeter < 3) {
             detectMeter += detectSpeed;
         } else if (detectMeter > 0) {
@@ -161,23 +160,23 @@ public class Monster {
 
         if (detectMeter >= 3) {
             SoundEffects.playMusic("detectedNoise");
-            attacking = true;
+            wantToAttack = true;
         }
 
         if (detectMeter <= 0) {
-            attacking = false;
+            wantToAttack = false;
             detectMeter = 0;
         }
     }
 
     public void attackPlayer() {
-        double fineness = 2;
+        double attackSpeed = 2;
         double dx = player.getCoorX() - coorX;
         double dy = player.getCoorY() - coorY;
         double angle = Math.atan2(dx, dy);
 
-        dx = fineness * Math.sin(angle);
-        dy = fineness * Math.cos(angle);
+        dx = attackSpeed * Math.sin(angle);
+        dy = attackSpeed * Math.cos(angle);
 
         coorX += dx;
         coorY += dy;
@@ -217,7 +216,6 @@ public class Monster {
             sightPointY += dy;
         }
     }
-
 
     public void getPathToPlayer() {
         System.out.println("finding path to player");
@@ -281,6 +279,78 @@ public class Monster {
 
         if (thePathSpot == thePath.size()) {
             followingPath = false;
+        }
+    }
+
+    public void wander() {
+
+        int textureSize = monsterTexture.getWidth() / 2;
+
+        moveSpeed = 1;
+        moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
+
+        //region out of bounds detection
+        if (coorX + dx > pixmap.getWidth()) {
+            dx *= -1;
+            dy += ran.nextDouble(-2, 2);
+        } else if (coorX + dx < 0) {
+            dx *= -1;
+            dy += ran.nextDouble(-2, 2);
+        }
+        if (coorY + dy > pixmap.getHeight()) {
+            dy *= -1;
+            dx += ran.nextDouble(-2, 2);
+
+        } else if (coorY + dy < 0) {
+            dy *= -1;
+            dx += ran.nextDouble(-2, 2);
+        }
+        //endregion
+
+        //region wall collision
+        if (dx > 0) {
+            dx = moveSpeed;
+            if (getPixelColor((int) coorX + textureSize, (int) coorY).equals(white)) {
+                dx *= -1;
+                dy += ran.nextDouble(-2, 2);
+            }
+        } else if (dx < 0) {
+            dx = -moveSpeed;
+            if (getPixelColor((int) coorX - textureSize, (int) coorY).equals(white)) {
+                dx *= -1;
+                dy += ran.nextDouble(-2, 2);
+            }
+        }
+
+        if (dy > 0) {
+            dy = moveSpeed;
+            if (getPixelColor((int) coorX, (int) coorY + textureSize).equals(white)) {
+                dy *= -1;
+                dx += ran.nextDouble(-2, 2);
+            }
+        } else if (dy < 0) {
+            dy = -moveSpeed;
+            if (getPixelColor((int) coorX, (int) coorY - textureSize).equals(white)) {
+                dy *= -1;
+                dx += ran.nextDouble(-2, 2);
+            }
+        }
+        //endregion
+
+        coorX += dx;
+        coorY += dy;
+
+        if (dx < -moveSpeed) {
+            dx = -moveSpeed;
+        }
+        if (dx > moveSpeed) {
+            dx = moveSpeed;
+        }
+        if (dy < -moveSpeed) {
+            dy = -moveSpeed;
+        }
+        if (dy > moveSpeed) {
+            dy = moveSpeed;
         }
     }
 
@@ -357,78 +427,6 @@ public class Monster {
         return coorY;
     }
 
-    public void wander() {
-
-        int textureSize = monsterTexture.getWidth() / 2;
-
-        moveSpeed = 1;
-        moveSpeed = angry ? moveSpeed * 2 : moveSpeed;
-
-        //region out of bounds detection
-        if (coorX + dx > pixmap.getWidth()) {
-            dx *= -1;
-            dy += ran.nextDouble(-2, 2);
-        } else if (coorX + dx < 0) {
-            dx *= -1;
-            dy += ran.nextDouble(-2, 2);
-        }
-        if (coorY + dy > pixmap.getHeight()) {
-            dy *= -1;
-            dx += ran.nextDouble(-2, 2);
-
-        } else if (coorY + dy < 0) {
-            dy *= -1;
-            dx += ran.nextDouble(-2, 2);
-        }
-        //endregion
-
-        //region wall collision
-        if (dx > 0) {
-            dx = moveSpeed;
-            if (getPixelColor((int) coorX + textureSize, (int) coorY).equals(white)) {
-                dx *= -1;
-                dy += ran.nextDouble(-2, 2);
-            }
-        } else if (dx < 0) {
-            dx = -moveSpeed;
-            if (getPixelColor((int) coorX - textureSize, (int) coorY).equals(white)) {
-                dx *= -1;
-                dy += ran.nextDouble(-2, 2);
-            }
-        }
-
-        if (dy > 0) {
-            dy = moveSpeed;
-            if (getPixelColor((int) coorX, (int) coorY + textureSize).equals(white)) {
-                dy *= -1;
-                dx += ran.nextDouble(-2, 2);
-            }
-        } else if (dy < 0) {
-            dy = -moveSpeed;
-            if (getPixelColor((int) coorX, (int) coorY - textureSize).equals(white)) {
-                dy *= -1;
-                dx += ran.nextDouble(-2, 2);
-            }
-        }
-        //endregion
-
-        coorX += dx;
-        coorY += dy;
-
-        if (dx < -moveSpeed) {
-            dx = -moveSpeed;
-        }
-        if (dx > moveSpeed) {
-            dx = moveSpeed;
-        }
-        if (dy < -moveSpeed) {
-            dy = -moveSpeed;
-        }
-        if (dy > moveSpeed) {
-            dy = moveSpeed;
-        }
-    }
-
     public void drawMyself(SpriteBatch spriteBatch) {
         spriteBatch.draw(monsterTexture, (float) coorX - monsterTexture.getWidth() / 2f, (float) coorY - monsterTexture.getHeight() / 2f);
     }
@@ -451,7 +449,7 @@ public class Monster {
 //        coorX = 800;
 //        coorY = 9000;
         coorX = 7800;
-        coorY = 300;
+        coorY = 400;
 
         health = 100;
         ran = new Random();
@@ -459,6 +457,10 @@ public class Monster {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void setAiManager(AiManager aiManager){
+        this.aiManager = aiManager;
     }
 
     public static Monster getInstance() {

@@ -54,7 +54,7 @@ public class Main extends ApplicationAdapter {
         monsterCollisionMask = new CollisionMask();
         lightMask = new LightMask();
         hud = new Hud();
-        lightsOffTimer = System.currentTimeMillis() + 300000;
+        lightsOffTimer = System.currentTimeMillis() + 20000;
         lightsOffWarningTimer = lightsOffTimer - 10000;
 
         //dependent objects
